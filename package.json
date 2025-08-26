@@ -5,7 +5,7 @@
   "main": "index.html",
   "scripts": {
     "dev": "serve .",
-    "build": "echo 'No build step required for static site'",
+    "build": "mkdir -p public && cp -r *.html *.js *.css public/",
     "test": "echo 'Run tests by opening test.html in browser'",
     "deploy": "vercel --prod"
   },
