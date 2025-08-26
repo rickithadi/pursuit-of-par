@@ -445,6 +445,98 @@
             }
         }
         
+        /* Visual Settings Styles */
+        .visual-settings {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+            margin-top: 0.5rem;
+        }
+        
+        .setting-toggle {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            cursor: pointer;
+            padding: 0.5rem;
+            border-radius: 6px;
+            transition: background-color 0.2s;
+        }
+        
+        .setting-toggle:hover {
+            background-color: rgba(76, 175, 80, 0.1);
+        }
+        
+        .setting-toggle input[type="checkbox"] {
+            display: none;
+        }
+        
+        .toggle-slider {
+            position: relative;
+            width: 40px;
+            height: 20px;
+            background: #ccc;
+            border-radius: 10px;
+            transition: background-color 0.3s;
+        }
+        
+        .toggle-slider:before {
+            content: '';
+            position: absolute;
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            top: 2px;
+            left: 2px;
+            background: white;
+            transition: transform 0.3s;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+        
+        .setting-toggle input:checked + .toggle-slider {
+            background: var(--primary-green);
+        }
+        
+        .setting-toggle input:checked + .toggle-slider:before {
+            transform: translateX(20px);
+        }
+        
+        .toggle-label {
+            font-size: 0.9rem;
+            color: var(--gray-dark);
+            user-select: none;
+        }
+        
+        /* Accessibility Enhancements */
+        .course-3d-viewport:focus {
+            outline: 3px solid var(--primary-green);
+            outline-offset: 2px;
+        }
+        
+        .enhanced-dice:focus {
+            outline: 2px solid var(--gold);
+            outline-offset: 2px;
+        }
+        
+        /* High Contrast Mode */
+        body.high-contrast {
+            --primary-green: #000000;
+            --light-green: #FFFFFF;
+            --dark-green: #000000;
+            --gold: #FFFF00;
+        }
+        
+        body.high-contrast .course-3d-viewport {
+            border: 3px solid #000000;
+        }
+        
+        /* Colorblind Mode */
+        body.colorblind-mode {
+            --primary-green: #0077BE;
+            --light-green: #87CEEB;
+            --dark-green: #003F5C;
+        }
+        
         @media (max-width: 768px) {
             .enhanced-game-container {
                 padding: 0.5rem;
@@ -466,6 +558,14 @@
             .mode-options {
                 grid-template-columns: 1fr;
             }
+            
+            .visual-settings {
+                gap: 0.5rem;
+            }
+            
+            .toggle-label {
+                font-size: 0.8rem;
+            }
         }
     </style>
 </head>
@@ -473,7 +573,7 @@
     <div class="enhanced-game-container">
         <div class="enhanced-header">
             <h1 class="enhanced-title">🎲 In Pursuit of Par</h1>
-            <p class="enhanced-subtitle">Enhanced 3D Golf Simulation - TPC Sawgrass Stadium Course</p>
+            <p class="enhanced-subtitle">Colonist.io-Inspired Golf Course Visualization - TPC Sawgrass Stadium Course</p>
             <div class="game-navigation" style="margin-top: 1rem; display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;">
                 <a href="index.html" class="btn btn-secondary">📊 Scorecard</a>
                 <a href="game.html" class="btn btn-secondary">🎮 Classic Game</a>
@@ -482,7 +582,10 @@
             </div>
             <div class="performance-indicator">
                 <div class="performance-dot"></div>
-                <span>Enhanced 3D Engine Active</span>
+                <span>Colonist.io-Inspired Visuals Active</span>
+            </div>
+            <div class="accessibility-info" style="margin-top: 1rem; font-size: 0.8rem; color: rgba(255,255,255,0.8);">
+                Accessibility: Ctrl+H (Hex Grid) | Ctrl+C (Colorblind) | Ctrl+K (High Contrast)
             </div>
         </div>
         
@@ -572,6 +675,29 @@
                     
                     <div class="control-group">
                         <div class="control-group-title">
+                            🎨 Visual Settings
+                        </div>
+                        <div class="visual-settings">
+                            <label class="setting-toggle">
+                                <input type="checkbox" id="enableHexGrid" checked>
+                                <span class="toggle-slider"></span>
+                                <span class="toggle-label">Hex Grid Overlay</span>
+                            </label>
+                            <label class="setting-toggle">
+                                <input type="checkbox" id="colorBlindMode">
+                                <span class="toggle-slider"></span>
+                                <span class="toggle-label">Colorblind Friendly</span>
+                            </label>
+                            <label class="setting-toggle">
+                                <input type="checkbox" id="highContrastMode">
+                                <span class="toggle-slider"></span>
+                                <span class="toggle-label">High Contrast</span>
+                            </label>
+                        </div>
+                    </div>
+                    
+                    <div class="control-group">
+                        <div class="control-group-title">
                             🌬️ Course Conditions
                         </div>
                         <div class="wind-indicator">
@@ -641,16 +767,32 @@
                     <button class="btn btn-secondary" style="flex: 1;" id="undoShot3D">↶ Undo</button>
                     <button class="btn btn-primary" style="flex: 1;" id="nextHole3D">Next Hole ➤</button>
                 </div>
+                
+                <div style="margin-top: 1rem; padding: 1rem; background: var(--cream); border-radius: 8px;">
+                    <h4 style="margin: 0 0 0.5rem 0; color: var(--primary-green);">🔄 Units & Settings</h4>
+                    <button id="unitsToggle" class="btn btn-secondary" style="width: 100%; margin-bottom: 0.5rem;">
+                        Toggle Units (Yards ⇄ Meters)
+                    </button>
+                    <div style="display: flex; gap: 0.5rem;">
+                        <button id="exportSettings" class="btn btn-secondary" style="flex: 1; font-size: 0.8rem;">Export</button>
+                        <button id="importSettings" class="btn btn-secondary" style="flex: 1; font-size: 0.8rem;">Import</button>
+                    </div>
+                    <input type="file" id="settingsFileInput" accept=".json" style="display: none;">
+                </div>
             </div>
         </div>
     </div>
     
+    <!-- Load Phaser.js CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/phaser@3.80.1/dist/phaser.min.js"></script>
+    
     <!-- Load dependencies -->
     <script src="authentic-mechanics.js"></script>
     <script src="board-game-bridge.js"></script>
+    <script src="phaser-engine.js"></script>
     <script type="module">
-        // Import the enhanced 3D engine
-        import { Enhanced3DGolfEngine } from './game-engine-3d.js';
+        // Initialize Phaser engine instead of 3D engine
+        // import { Enhanced3DGolfEngine } from './game-engine-3d.js';
         
         // Initialize when DOM is ready
         document.addEventListener('DOMContentLoaded', () => {
@@ -659,12 +801,54 @@
                 document.getElementById('loadingOverlay').style.display = 'none';
             }, 2000);
             
-            // Initialize the enhanced engine
-            window.enhanced3DEngine = new Enhanced3DGolfEngine();
+            // Initialize the Phaser engine with authentic mechanics
+            window.phaserEngine = new PhaserBoardGameEngine();
             
             // Setup enhanced UI interactions
             setupEnhanced3DUI();
+            setupAccessibilityControls();
         });
+        
+        function setupAccessibilityControls() {
+            // Hex grid toggle
+            document.getElementById('enableHexGrid')?.addEventListener('change', (e) => {
+                if (window.phaserEngine?.currentScene?.toggleHexGrid) {
+                    window.phaserEngine.currentScene.toggleHexGrid();
+                }
+            });
+            
+            // Colorblind mode toggle
+            document.getElementById('colorBlindMode')?.addEventListener('change', (e) => {
+                document.body.classList.toggle('colorblind-mode', e.target.checked);
+                if (window.phaserEngine?.currentScene?.toggleColorBlindMode) {
+                    window.phaserEngine.currentScene.toggleColorBlindMode();
+                }
+            });
+            
+            // High contrast toggle
+            document.getElementById('highContrastMode')?.addEventListener('change', (e) => {
+                document.body.classList.toggle('high-contrast', e.target.checked);
+                if (window.phaserEngine?.currentScene?.toggleHighContrast) {
+                    window.phaserEngine.currentScene.toggleHighContrast();
+                }
+            });
+            
+            // Keyboard accessibility
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'h' && e.ctrlKey) {
+                    e.preventDefault();
+                    document.getElementById('enableHexGrid')?.click();
+                }
+                if (e.key === 'c' && e.ctrlKey) {
+                    e.preventDefault();
+                    document.getElementById('colorBlindMode')?.click();
+                }
+                if (e.key === 'k' && e.ctrlKey) {
+                    e.preventDefault();
+                    document.getElementById('highContrastMode')?.click();
+                }
+            });
+        }
         
         function setupEnhanced3DUI() {
             // Power slider updates
@@ -687,21 +871,21 @@
                 });
             });
             
-            // Camera controls
+            // Camera controls - adapted for Phaser 2D views
             document.getElementById('cameraOverhead')?.addEventListener('click', () => {
-                window.enhanced3DEngine?.setCameraView('overhead');
+                window.phaserEngine?.currentScene?.cameras?.main?.setZoom(0.5);
             });
             
             document.getElementById('cameraBehindBall')?.addEventListener('click', () => {
-                window.enhanced3DEngine?.setCameraView('behind');
+                window.phaserEngine?.currentScene?.cameras?.main?.setZoom(1.0);
             });
             
             document.getElementById('cameraGreen')?.addEventListener('click', () => {
-                window.enhanced3DEngine?.setCameraView('green');
+                window.phaserEngine?.currentScene?.cameras?.main?.centerOn(400, 90);
             });
             
             document.getElementById('cameraFree')?.addEventListener('click', () => {
-                window.enhanced3DEngine?.setCameraView('free');
+                window.phaserEngine?.currentScene?.cameras?.main?.setZoom(0.8);
             });
             
             // Mode selection
@@ -711,24 +895,58 @@
                     option.classList.add('selected');
                     
                     const mode = option.dataset.mode;
-                    window.enhanced3DEngine?.setGameMode(mode);
+                    console.log(`Game mode changed to: ${mode}`);
                 });
             });
             
             // Simulate dynamic wind
             simulateWeatherEffects();
+            
+            // Setup units and settings controls
+            setupUnitsAndSettings();
+        }
+        
+        function setupUnitsAndSettings() {
+            // Units toggle button
+            document.getElementById('unitsToggle')?.addEventListener('click', () => {
+                window.phaserEngine?.toggleUnits();
+            });
+            
+            // Export settings button
+            document.getElementById('exportSettings')?.addEventListener('click', () => {
+                window.phaserEngine?.exportSettings();
+            });
+            
+            // Import settings button
+            document.getElementById('importSettings')?.addEventListener('click', () => {
+                document.getElementById('settingsFileInput').click();
+            });
+            
+            // File input for settings import
+            document.getElementById('settingsFileInput')?.addEventListener('change', (e) => {
+                const file = e.target.files[0];
+                if (file) {
+                    window.phaserEngine?.importSettings(file);
+                }
+                // Reset file input
+                e.target.value = '';
+            });
         }
         
         function showTrajectoryPreview(club) {
             const preview = document.getElementById('trajectoryPreview');
             const text = document.getElementById('trajectoryText');
             
-            // Get shot data for preview
-            const shotData = window.enhanced3DEngine?.getClubPreview?.(club);
-            if (shotData) {
-                text.textContent = `${club.toUpperCase()}: ${shotData.minDistance}-${shotData.maxDistance} yards, ${shotData.accuracy}% accuracy`;
-                preview.classList.add('show');
-            }
+            // Get shot data for preview from Phaser engine
+            const clubDistances = {
+                'driver': '220-270', '3wood': '200-240', '5wood': '180-210',
+                '3iron': '160-180', '5iron': '140-160', '7iron': '120-140',
+                '9iron': '100-120', 'wedge': '50-80', 'putter': '10-30'
+            };
+            
+            const distance = clubDistances[club] || '100-150';
+            text.textContent = `${club.toUpperCase()}: ${distance} yards, authentic board game mechanics`;
+            preview.classList.add('show');
         }
         
         function hideTrajectoryPreview() {

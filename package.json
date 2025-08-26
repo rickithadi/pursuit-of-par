@@ -28,6 +28,7 @@
     "node": ">=14"
   },
   "devDependencies": {
+    "playwright": "^1.55.0",
     "serve": "^14.0.0"
   }
 }
