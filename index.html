@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TPC Sawgrass - THE PLAYERS Stadium Course Scorecard</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <!-- Header Section -->
+    <header class="header">
+        <div class="header-content">
+            <div class="course-branding">
+                <h1 class="course-name">TPC Sawgrass</h1>
+                <p class="course-subtitle">THE PLAYERS Stadium Course</p>
+                <p class="course-designer">Designed by Pete & Alice Dye</p>
+            </div>
+            
+            <div class="course-stats">
+                <div class="stat">
+                    <span class="stat-label">Par</span>
+                    <span class="stat-value">72</span>
+                </div>
+                <div class="stat">
+                    <span class="stat-label">Total Yardage</span>
+                    <span class="stat-value">6,394</span>
+                </div>
+                <div class="stat">
+                    <span class="stat-label">Designer</span>
+                    <span class="stat-value">Dye</span>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Player Management Section -->
+    <section class="player-management">
+        <div class="player-controls">
+            <button class="btn btn-primary" id="addPlayerBtn">+ Add Player</button>
+            <span class="player-count" id="playerCount">2 Players</span>
+        </div>
+    </section>
+
+    <!-- Score Display Section -->
+    <section class="score-display">
+        <div class="player-scores" id="playerScores">
+            <!-- Players will be dynamically generated here -->
+        </div>
+        
+        <div class="progress-container">
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressFill"></div>
+            </div>
+            <span class="progress-text" id="progressText">0 holes completed</span>
+        </div>
+    </section>
+
+    <!-- Control Buttons -->
+    <section class="controls">
+        <button class="btn btn-primary" id="exportBtn">Export Scorecard</button>
+        <button class="btn btn-secondary" id="clearBtn">Clear Scores</button>
+        <button class="btn btn-info" id="statsBtn">View Statistics</button>
+        <a href="rules.html" class="btn btn-rules">📖 Game Rules</a>
+        <a href="game.html" class="btn btn-game">🎲 Play Game</a>
+    </section>
+
+    <!-- Holes Grid -->
+    <main class="holes-container">
+        <div class="holes-grid" id="holesGrid">
+            <!-- Holes will be dynamically generated here -->
+        </div>
+    </main>
+
+    <!-- Statistics Modal -->
+    <div class="modal" id="statsModal">
+        <div class="modal-content">
+            <span class="modal-close" id="modalClose">&times;</span>
+            <h2 class="modal-title">Round Statistics</h2>
+            <div class="modal-body" id="statsContent">
+                <!-- Statistics will be dynamically generated here -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-main">
+            <p class="footer-text">TPC Sawgrass Digital Scorecard</p>
+            <p class="footer-subtitle">Tournament Edition for Board Game Players</p>
+        </div>
+        <div class="footer-game-info">
+            <h4 class="game-title">🎲 "In Pursuit of Par" Board Game (1987)</h4>
+            <p class="game-credit">by Pursuit of Par Enterprises • Panama City Beach, FL</p>
+            <p class="game-description">Experience the legendary TPC Sawgrass Stadium Course with tournament-accurate hole data, difficulty rankings, and scoring averages from THE PLAYERS Championship.</p>
+        </div>
+        <div class="footer-features">
+            <p><strong>Board Game Features:</strong> Strategic course management • Tournament statistics • Professional scoring • Championship-level challenge</p>
+        </div>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>

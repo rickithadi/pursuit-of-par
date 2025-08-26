@@ -1,0 +1,33 @@
+{
+  "name": "tpc-sawgrass-scorecard",
+  "version": "1.0.0",
+  "description": "TPC Sawgrass Digital Scorecard for 'In Pursuit of Par' Board Game",
+  "main": "index.html",
+  "scripts": {
+    "dev": "serve .",
+    "build": "echo 'No build step required for static site'",
+    "test": "echo 'Run tests by opening test.html in browser'",
+    "deploy": "vercel --prod"
+  },
+  "keywords": [
+    "golf",
+    "scorecard",
+    "tpc-sawgrass",
+    "board-game",
+    "pursuit-of-par",
+    "golf-scoring"
+  ],
+  "author": "Claude Code",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/yourusername/tpc-sawgrass-scorecard.git"
+  },
+  "homepage": "https://golf.rickithadi.dev",
+  "engines": {
+    "node": ">=14"
+  },
+  "devDependencies": {
+    "serve": "^14.0.0"
+  }
+}

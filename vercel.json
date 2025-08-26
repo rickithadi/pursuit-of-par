@@ -1,0 +1,100 @@
+{
+  "version": 2,
+  "name": "tpc-sawgrass-scorecard",
+  "builds": [
+    {
+      "src": "index.html",
+      "use": "@vercel/static"
+    },
+    {
+      "src": "styles.css",
+      "use": "@vercel/static"
+    },
+    {
+      "src": "script.js",
+      "use": "@vercel/static"
+    },
+    {
+      "src": "test.html",
+      "use": "@vercel/static"
+    },
+    {
+      "src": "test-suite.js",
+      "use": "@vercel/static"
+    },
+    {
+      "src": "rules.html",
+      "use": "@vercel/static"
+    },
+    {
+      "src": "game.html",
+      "use": "@vercel/static"
+    },
+    {
+      "src": "game-engine.js",
+      "use": "@vercel/static"
+    }
+  ],
+  "routes": [
+    {
+      "src": "/",
+      "dest": "/index.html"
+    },
+    {
+      "src": "/test",
+      "dest": "/test.html"
+    },
+    {
+      "src": "/tests",
+      "dest": "/test.html"
+    },
+    {
+      "src": "/rules",
+      "dest": "/rules.html"
+    },
+    {
+      "src": "/guide",
+      "dest": "/rules.html"
+    },
+    {
+      "src": "/game",
+      "dest": "/game.html"
+    },
+    {
+      "src": "/play",
+      "dest": "/game.html"
+    }
+  ],
+  "headers": [
+    {
+      "source": "/(.*)",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=31536000, immutable"
+        },
+        {
+          "key": "X-Content-Type-Options",
+          "value": "nosniff"
+        },
+        {
+          "key": "X-Frame-Options",
+          "value": "DENY"
+        },
+        {
+          "key": "X-XSS-Protection",
+          "value": "1; mode=block"
+        }
+      ]
+    },
+    {
+      "source": "/index.html",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=0, must-revalidate"
+        }
+      ]
+    }
+  ]
+}

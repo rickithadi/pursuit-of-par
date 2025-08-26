@@ -1,0 +1,978 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>In Pursuit of Par - Complete Rules & Strategy Guide</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        .rules-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem 1rem;
+        }
+        
+        .rules-header {
+            background: linear-gradient(135deg, var(--primary-green) 0%, var(--dark-green) 100%);
+            color: var(--white);
+            padding: 3rem 2rem;
+            border-radius: 12px;
+            text-align: center;
+            margin-bottom: 3rem;
+            box-shadow: var(--shadow-lg);
+        }
+        
+        .rules-title {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+        
+        .rules-subtitle {
+            font-size: 1.25rem;
+            color: var(--gold);
+            margin-bottom: 0.5rem;
+        }
+        
+        .rules-year {
+            font-size: 1rem;
+            color: rgba(255,255,255,0.8);
+            font-style: italic;
+        }
+        
+        .nav-menu {
+            background: var(--white);
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            box-shadow: var(--shadow-md);
+            position: sticky;
+            top: 1rem;
+            z-index: 100;
+        }
+        
+        .nav-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--primary-green);
+            margin-bottom: 1rem;
+        }
+        
+        .nav-links {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 0.5rem;
+        }
+        
+        .nav-link {
+            color: var(--primary-green);
+            text-decoration: none;
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            transition: var(--transition);
+            font-weight: 500;
+        }
+        
+        .nav-link:hover {
+            background: var(--cream);
+            color: var(--dark-green);
+        }
+        
+        .rules-section {
+            background: var(--white);
+            border-radius: 12px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: var(--shadow-md);
+        }
+        
+        .section-header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 2px solid var(--gold);
+        }
+        
+        .section-icon {
+            font-size: 2rem;
+            color: var(--gold);
+        }
+        
+        .section-title {
+            font-size: 1.75rem;
+            font-weight: 700;
+            color: var(--primary-green);
+        }
+        
+        .subsection {
+            margin-bottom: 2rem;
+        }
+        
+        .subsection-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--primary-green);
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .rule-list {
+            list-style: none;
+            padding: 0;
+        }
+        
+        .rule-item {
+            background: var(--cream);
+            padding: 1rem;
+            margin-bottom: 1rem;
+            border-radius: 6px;
+            border-left: 4px solid var(--gold);
+        }
+        
+        .rule-number {
+            font-weight: 700;
+            color: var(--primary-green);
+            margin-right: 0.5rem;
+        }
+        
+        .strategy-tip {
+            background: linear-gradient(135deg, #e8f5f0, #d0f0e0);
+            border: 2px solid var(--gold);
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin: 1.5rem 0;
+        }
+        
+        .tip-header {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-weight: 600;
+            color: var(--primary-green);
+            margin-bottom: 0.75rem;
+        }
+        
+        .component-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-top: 1.5rem;
+        }
+        
+        .component-card {
+            background: var(--cream);
+            border-radius: 8px;
+            padding: 1.5rem;
+            text-align: center;
+        }
+        
+        .component-icon {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+        }
+        
+        .component-name {
+            font-weight: 600;
+            color: var(--primary-green);
+            margin-bottom: 0.5rem;
+        }
+        
+        .difficulty-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1rem 0;
+        }
+        
+        .difficulty-table th,
+        .difficulty-table td {
+            border: 1px solid var(--gray-light);
+            padding: 0.75rem;
+            text-align: center;
+        }
+        
+        .difficulty-table th {
+            background: var(--primary-green);
+            color: var(--white);
+            font-weight: 600;
+        }
+        
+        .difficulty-1 { background: #ffebee; }
+        .difficulty-2 { background: #fff3e0; }
+        .difficulty-3 { background: #e8f5e8; }
+        
+        .quick-ref {
+            position: fixed;
+            right: 1rem;
+            bottom: 1rem;
+            background: var(--primary-green);
+            color: var(--white);
+            padding: 0.75rem 1.5rem;
+            border-radius: 25px;
+            text-decoration: none;
+            font-weight: 600;
+            box-shadow: var(--shadow-lg);
+            transition: var(--transition);
+            z-index: 1000;
+        }
+        
+        .quick-ref:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-lg);
+            background: var(--light-green);
+            color: var(--white);
+        }
+        
+        @media (max-width: 968px) {
+            .rules-container {
+                padding: 1rem 0.5rem;
+            }
+            
+            .rules-header {
+                padding: 2rem 1rem;
+            }
+            
+            .rules-title {
+                font-size: 2rem;
+            }
+            
+            .nav-menu {
+                position: relative;
+                margin-bottom: 1rem;
+            }
+            
+            .nav-links {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 0.25rem;
+            }
+            
+            .nav-link {
+                padding: 0.5rem;
+                font-size: 0.875rem;
+                text-align: center;
+            }
+            
+            .component-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 1rem;
+            }
+            
+            .difficulty-table {
+                font-size: 0.875rem;
+            }
+            
+            .difficulty-table th,
+            .difficulty-table td {
+                padding: 0.5rem 0.25rem;
+            }
+        }
+        
+        @media (max-width: 640px) {
+            .rules-title {
+                font-size: 1.5rem;
+            }
+            
+            .rules-subtitle {
+                font-size: 1rem;
+            }
+            
+            .nav-links {
+                grid-template-columns: 1fr;
+            }
+            
+            .rules-section {
+                padding: 1rem;
+                margin-bottom: 1rem;
+            }
+            
+            .section-title {
+                font-size: 1.5rem;
+            }
+            
+            .subsection-title {
+                font-size: 1.125rem;
+            }
+            
+            .component-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .component-card {
+                padding: 1rem;
+            }
+            
+            .difficulty-table {
+                font-size: 0.75rem;
+                overflow-x: auto;
+                display: block;
+                white-space: nowrap;
+            }
+            
+            .difficulty-table tbody {
+                display: block;
+                overflow-x: auto;
+            }
+            
+            .difficulty-table tr {
+                display: table;
+                width: 100%;
+                table-layout: fixed;
+            }
+            
+            .quick-ref {
+                position: static;
+                display: block;
+                text-align: center;
+                margin: 2rem auto;
+                max-width: 200px;
+            }
+            
+            .rule-item {
+                padding: 0.75rem;
+            }
+            
+            .strategy-tip {
+                padding: 1rem;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .rules-container {
+                padding: 0.5rem 0.25rem;
+            }
+            
+            .rules-header {
+                padding: 1.5rem 0.5rem;
+            }
+            
+            .rules-title {
+                font-size: 1.25rem;
+            }
+            
+            .section-icon {
+                font-size: 1.5rem;
+            }
+            
+            .section-title {
+                font-size: 1.25rem;
+            }
+            
+            .nav-link {
+                padding: 0.75rem;
+                font-size: 0.875rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="rules-container">
+        <div class="rules-header">
+            <h1 class="rules-title">🎲 In Pursuit of Par</h1>
+            <p class="rules-subtitle">Complete Rules & Strategy Guide</p>
+            <p class="rules-year">TPC Sawgrass Stadium Course Edition (1987)</p>
+        </div>
+        
+        <nav class="nav-menu">
+            <div class="nav-title">📋 Quick Navigation</div>
+            <div class="nav-links">
+                <a href="#overview" class="nav-link">Game Overview</a>
+                <a href="#components" class="nav-link">Components</a>
+                <a href="#setup" class="nav-link">Setup</a>
+                <a href="#gameplay" class="nav-link">How to Play</a>
+                <a href="#scoring" class="nav-link">Scoring</a>
+                <a href="#strategy" class="nav-link">Strategy</a>
+                <a href="#variants" class="nav-link">Game Variants</a>
+            </div>
+        </nav>
+        
+        <section id="overview" class="rules-section">
+            <div class="section-header">
+                <div class="section-icon">⛳</div>
+                <h2 class="section-title">Game Overview</h2>
+            </div>
+            
+            <div class="subsection">
+                <h3 class="subsection-title">🏌️ The Challenge</h3>
+                <p><strong>"In Pursuit of Par"</strong> is a realistic golf board game that simulates playing the legendary TPC Sawgrass Stadium Course. Unlike actual golf, all players have equal ability "swinging the clubs" - success depends entirely on <strong>club selection</strong>, <strong>strategic aim</strong>, and <strong>dice luck</strong>.</p>
+                
+                <div class="strategy-tip">
+                    <div class="tip-header">
+                        🎯 <strong>Game Philosophy</strong>
+                    </div>
+                    <p>The game is designed to simulate golf among players of equal skill. Your strategic decisions matter more than physical ability, making every round a battle of wits and calculated risk-taking.</p>
+                </div>
+            </div>
+            
+            <div class="subsection">
+                <h3 class="subsection-title">📊 Game Specifications</h3>
+                <ul class="rule-list">
+                    <li class="rule-item">
+                        <span class="rule-number">👥</span><strong>Players:</strong> 1-4 players
+                    </li>
+                    <li class="rule-item">
+                        <span class="rule-number">⏱️</span><strong>Play Time:</strong> 45-60 minutes
+                    </li>
+                    <li class="rule-item">
+                        <span class="rule-number">🎂</span><strong>Age:</strong> 12+ years
+                    </li>
+                    <li class="rule-item">
+                        <span class="rule-number">🎯</span><strong>Objective:</strong> Shoot the lowest score, ideally Par 72 or below
+                    </li>
+                </ul>
+            </div>
+        </section>
+        
+        <section id="components" class="rules-section">
+            <div class="section-header">
+                <div class="section-icon">📦</div>
+                <h2 class="section-title">Game Components</h2>
+            </div>
+            
+            <div class="component-grid">
+                <div class="component-card">
+                    <div class="component-icon">🗺️</div>
+                    <div class="component-name">Game Boards</div>
+                    <p>18 hole golf course laid out on three double-sided game boards</p>
+                </div>
+                <div class="component-card">
+                    <div class="component-icon">🟢</div>
+                    <div class="component-name">Green Six-Sided Dice</div>
+                    <p>Primary dice for determining shot distance using Shot Schedule Cards</p>
+                </div>
+                <div class="component-card">
+                    <div class="component-icon">🟢</div>
+                    <div class="component-name">Green Twelve-Sided Dice</div>
+                    <p>Direction dice for shot trajectory and accuracy</p>
+                </div>
+                <div class="component-card">
+                    <div class="component-icon">🔴</div>
+                    <div class="component-name">Red Six-Sided Dice</div>
+                    <p>"Problem Dice" for shots from hazards, rough, sand traps, and trees</p>
+                </div>
+                <div class="component-card">
+                    <div class="component-icon">📊</div>
+                    <div class="component-name">Shot Schedule Cards</div>
+                    <p>Complex tables for Iron Shots, Pitching/Sand Wedge, and Greenside Trap/Putts</p>
+                </div>
+                <div class="component-card">
+                    <div class="component-icon">📐</div>
+                    <div class="component-name">Distance/Direction Gauges</div>
+                    <p>Orange triangular gauges: 10°, 20°, and 50 yard measuring tools</p>
+                </div>
+                <div class="component-card">
+                    <div class="component-icon">✏️</div>
+                    <div class="component-name">Special Ball Marking Pencils</div>
+                    <p>2 "All Stabilo" pencils for precise ball position marking</p>
+                </div>
+                <div class="component-card">
+                    <div class="component-icon">📋</div>
+                    <div class="component-name">Official Score Cards</div>
+                    <p>10 double-sided official score cards for tournament-style scoring</p>
+                </div>
+                <div class="component-card">
+                    <div class="component-icon">📖</div>
+                    <div class="component-name">Rules Sheet</div>
+                    <p>Complete description and rules for realistic golf simulation</p>
+                </div>
+            </div>
+        </section>
+        
+        <section id="setup" class="rules-section">
+            <div class="section-header">
+                <div class="section-icon">🔧</div>
+                <h2 class="section-title">Game Setup</h2>
+            </div>
+            
+            <div class="subsection">
+                <h3 class="subsection-title">🎯 Choose Your Tees</h3>
+                <p>Each hole on TPC Sawgrass offers four different tee options:</p>
+                <ul class="rule-list">
+                    <li class="rule-item">
+                        <span class="rule-number">🏆</span><strong>Championship Tees (Black):</strong> THE PLAYERS Championship distances - maximum challenge!
+                    </li>
+                    <li class="rule-item">
+                        <span class="rule-number">💙</span><strong>Blue Tees:</strong> Advanced amateur level - still very challenging
+                    </li>
+                    <li class="rule-item">
+                        <span class="rule-number">⚪</span><strong>White Tees:</strong> Regular men's tees - good for most players
+                    </li>
+                    <li class="rule-item">
+                        <span class="rule-number">💚</span><strong>Green Tees:</strong> Forward tees - shorter distances, more forgiving
+                    </li>
+                </ul>
+                
+                <div class="strategy-tip">
+                    <div class="tip-header">
+                        💡 <strong>Tee Selection Strategy</strong>
+                    </div>
+                    <p>Choose tees based on your group's skill level. Championship tees provide the ultimate challenge but can be frustrating for beginners. White tees offer a good balance of challenge and playability.</p>
+                </div>
+            </div>
+            
+            <div class="subsection">
+                <h3 class="subsection-title">📋 Setup Steps</h3>
+                <ol class="rule-list">
+                    <li class="rule-item">
+                        <span class="rule-number">1.</span>Set up the course boards in order (Holes 1-18)
+                    </li>
+                    <li class="rule-item">
+                        <span class="rule-number">2.</span>Each player chooses a marker color and places it on Hole 1 tee
+                    </li>
+                    <li class="rule-item">
+                        <span class="rule-number">3.</span>Give each player a scorecard (or use our digital scorecard!)
+                    </li>
+                    <li class="rule-item">
+                        <span class="rule-number">4.</span>Place dice and club reference cards within reach
+                    </li>
+                    <li class="rule-item">
+                        <span class="rule-number">5.</span>Determine playing order (lowest handicap player goes first)
+                    </li>
+                </ol>
+            </div>
+        </section>
+        
+        <section id="gameplay" class="rules-section">
+            <div class="section-header">
+                <div class="section-icon">🎮</div>
+                <h2 class="section-title">How to Play</h2>
+            </div>
+            
+            <div class="subsection">
+                <h3 class="subsection-title">🎲 Authentic Dice Mechanics</h3>
+                <p><strong>In Pursuit of Par</strong> uses a sophisticated 3-dice system for realistic golf shot simulation:</p>
+                
+                <ol class="rule-list">
+                    <li class="rule-item">
+                        <span class="rule-number">🟢</span><strong>Green Six-Sided Dice:</strong> Primary distance dice - consult Shot Schedule Cards for yardage based on club selection (Woods 1-8, Irons 3-9, Pitching Wedge, Sand Wedge)
+                    </li>
+                    <li class="rule-item">
+                        <span class="rule-number">🟢</span><strong>Green Twelve-Sided Direction Dice:</strong> Determines shot direction using 10° and 20° degree gauges. Roll determines if shot travels straight, 10° left/right, or 20° left/right
+                    </li>
+                    <li class="rule-item">
+                        <span class="rule-number">🔴</span><strong>Red Problem Dice:</strong> Only used for difficult lies - shots from Rough, Fairway Sand Traps, Behind Trees, or Under Trees. Reduces distance and accuracy
+                    </li>
+                    <li class="rule-item">
+                        <span class="rule-number">📐</span><strong>Distance/Direction Gauges:</strong> Use orange triangular gauges to measure exact shot placement on course boards
+                    </li>
+                    <li class="rule-item">
+                        <span class="rule-number">✏️</span><strong>Mark Ball Position:</strong> Use special "All Stabilo" pencils to mark precise ball location for next shot
+                    </li>
+                </ol>
+                
+                <div class="strategy-tip">
+                    <div class="tip-header">
+                        🎯 <strong>Shot Sequence</strong>
+                    </div>
+                    <p><strong>1.</strong> Choose club and consult Shot Schedule → <strong>2.</strong> Roll Green distance dice → <strong>3.</strong> Roll Green direction dice → <strong>4.</strong> Apply Red problem dice if in hazard → <strong>5.</strong> Measure with gauges → <strong>6.</strong> Mark new position</p>
+                </div>
+            </div>
+            
+            <div class="subsection">
+                <h3 class="subsection-title">📊 Shot Schedule System</h3>
+                <p>The game uses detailed Shot Schedule Cards for different shot types:</p>
+                
+                <ul class="rule-list">
+                    <li class="rule-item">
+                        <span class="rule-number">⛳</span><strong>Iron Shots Schedule:</strong> Woods 1-8, Irons 3-9 with distance ranges from 100-280+ yards based on dice roll
+                    </li>
+                    <li class="rule-item">
+                        <span class="rule-number">🏌️</span><strong>Pitching/Sand Wedge Schedule:</strong> Short game shots 45-100 yards for approach shots
+                    </li>
+                    <li class="rule-item">
+                        <span class="rule-number">🟢</span><strong>Greenside Trap Shots & Putts:</strong> Special schedule for shots around the green including putts, chips, and bunker shots
+                    </li>
+                    <li class="rule-item">
+                        <span class="rule-number">🔴</span><strong>Problem Shot Schedule:</strong> Reduced distances when using Red dice for shots from hazards
+                    </li>
+                </ul>
+            </div>
+            
+            <div class="subsection">
+                <h3 class="subsection-title">🏌️‍♂️ Club Selection Guide</h3>
+                
+                <table class="difficulty-table">
+                    <thead>
+                        <tr>
+                            <th>Club Type</th>
+                            <th>Best Distance</th>
+                            <th>Accuracy</th>
+                            <th>When to Use</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>Driver</strong></td>
+                            <td>220-280 yards</td>
+                            <td>⭐⭐</td>
+                            <td>Tee shots on long holes</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Fairway Wood</strong></td>
+                            <td>180-220 yards</td>
+                            <td>⭐⭐⭐</td>
+                            <td>Long shots from fairway</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Long Irons</strong></td>
+                            <td>140-180 yards</td>
+                            <td>⭐⭐⭐⭐</td>
+                            <td>Approach shots to green</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Short Irons</strong></td>
+                            <td>100-140 yards</td>
+                            <td>⭐⭐⭐⭐⭐</td>
+                            <td>Precision approaches</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Wedges</strong></td>
+                            <td>50-100 yards</td>
+                            <td>⭐⭐⭐⭐⭐</td>
+                            <td>Short game around green</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Putter</strong></td>
+                            <td>On the green</td>
+                            <td>⭐⭐⭐⭐⭐</td>
+                            <td>Rolling ball into hole</td>
+                        </tr>
+                    </tbody>
+                </table>
+                
+                <div class="strategy-tip">
+                    <div class="tip-header">
+                        🎯 <strong>Club Selection Strategy</strong>
+                    </div>
+                    <p>Longer clubs = more distance but less accuracy. Shorter clubs = more precision but less distance. Choose based on your lie, distance to target, and risk tolerance.</p>
+                </div>
+            </div>
+            
+            <div class="subsection">
+                <h3 class="subsection-title">⚠️ Authentic Hazard System</h3>
+                <p>The Red Problem Dice system creates realistic golf challenges:</p>
+                
+                <ul class="rule-list">
+                    <li class="rule-item">
+                        <span class="rule-number">🌾</span><strong>The Rough:</strong> Any area outside the Fairway being played. Use Red Problem Dice which significantly reduces shot distance compared to normal Shot Schedule
+                    </li>
+                    <li class="rule-item">
+                        <span class="rule-number">🏖️</span><strong>Fairway Sand Traps:</strong> Any sand traps more than 50 yards from the Green in either Fairway or Rough. Use Red Problem Dice for reduced distance
+                    </li>
+                    <li class="rule-item">
+                        <span class="rule-number">🌳</span><strong>Behind a Tree:</strong> Any shot when a tree is between the ball and intended direction of shot. Severely limits club selection and distance
+                    </li>
+                    <li class="rule-item">
+                        <span class="rule-number">🌲</span><strong>Under a Tree:</strong> Any shot from within tree foliage outline. Most restrictive situation - very limited distance options
+                    </li>
+                    <li class="rule-item">
+                        <span class="rule-number">💧</span><strong>Water Hazards:</strong> Ball must be placed within Rough/Fairway for penalty stroke. Cannot play from water
+                    </li>
+                    <li class="rule-item">
+                        <span class="rule-number">🟢</span><strong>Greenside Traps & Putts:</strong> Special putting schedule applies when on the Green or in greenside bunkers
+                    </li>
+                </ul>
+                
+                <div class="strategy-tip">
+                    <div class="tip-header">
+                        🔴 <strong>Problem Dice Strategy</strong>
+                    </div>
+                    <p>Red Problem Dice dramatically reduce shot distances. The key is avoiding hazards rather than trying to recover from them. Play conservatively to stay in the Fairway whenever possible!</p>
+                </div>
+            </div>
+            
+            <div class="subsection">
+                <h3 class="subsection-title">⛳ Circles on Green & Putting</h3>
+                <p>The Green features special circles for realistic putting mechanics:</p>
+                
+                <ul class="rule-list">
+                    <li class="rule-item">
+                        <span class="rule-number">⚫</span><strong>Large Black Circle:</strong> Anywhere on the Green outside the black circle - determine exact putting distance to rest inside the large black circle on the Green
+                    </li>
+                    <li class="rule-item">
+                        <span class="rule-number">⚪</span><strong>Small White Circle:</strong> For shots coming to rest inside the large black circle on the Green, use the Greenside Trap Shots & Putts Schedule to determine if putt goes in hole
+                    </li>
+                    <li class="rule-item">
+                        <span class="rule-number">🎯</span><strong>Putting System:</strong> The next shot is a "gimme" (only one putt required) if shot "holed" in small circle. Normal rules of golf apply for penalty shots
+                    </li>
+                    <li class="rule-item">
+                        <span class="rule-number">🟢</span><strong>Green Direction Dice:</strong> Must indicate the number of putts required once ball is on the Green
+                    </li>
+                </ul>
+                
+                <div class="strategy-tip">
+                    <div class="tip-header">
+                        ⛳ <strong>Putting Strategy</strong>
+                    </div>
+                    <p>Getting inside the large black circle with your approach shot is crucial - it sets up easier putts using the Greenside schedule. Shots that land in the small white circle can result in one-putt "gimmes"!</p>
+                </div>
+            </div>
+            
+            <div class="subsection">
+                <h3 class="subsection-title">✏️ Special Ball Marking System</h3>
+                <p>The game includes precision ball marking for tournament-level accuracy:</p>
+                
+                <ul class="rule-list">
+                    <li class="rule-item">
+                        <span class="rule-number">🖊️</span><strong>"All Stabilo" Pencils:</strong> Two special pencils included for marking golf ball positions. These pencils have proven to be the only acceptable ball marking device for this game
+                    </li>
+                    <li class="rule-item">
+                        <span class="rule-number">⚠️</span><strong>Marking Guidelines:</strong> Mark lightly - do not press the pencil point into the game boards. Use one colored pencil and two should use one colored pencil each
+                    </li>
+                    <li class="rule-item">
+                        <span class="rule-number">🧽</span><strong>Cleaning Tips:</strong> A slightly damp cloth (terry cloth preferred) should be used to remove pencil marks from the boards immediately when play on a particular hole is complete
+                    </li>
+                    <li class="rule-item">
+                        <span class="rule-number">📏</span><strong>Precision Marking:</strong> Do not use the "All Stabilo" pencils to mark score cards - use normal pen or pencil. Reserve the special pencils only for ball position marking
+                    </li>
+                </ul>
+                
+                <div class="strategy-tip">
+                    <div class="tip-header">
+                        🎯 <strong>Pencil Care Instructions</strong>
+                    </div>
+                    <p><strong>Important:</strong> If used only as intended, the two "All Stabilo" pencils should allow many rounds of "In Pursuit of Par" before replacement would be required. Defective parts will be replaced free of charge by contacting Pursuit of Par Enterprises in Panama City Beach, FL.</p>
+                </div>
+            </div>
+        </section>
+        
+        <section id="scoring" class="rules-section">
+            <div class="section-header">
+                <div class="section-icon">📊</div>
+                <h2 class="section-title">Scoring System</h2>
+            </div>
+            
+            <div class="subsection">
+                <h3 class="subsection-title">🏆 Standard Golf Scoring</h3>
+                
+                <table class="difficulty-table">
+                    <thead>
+                        <tr>
+                            <th>Score Name</th>
+                            <th>Strokes vs Par</th>
+                            <th>Example</th>
+                            <th>Difficulty</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr class="difficulty-1">
+                            <td><strong>Ace/Hole-in-One</strong></td>
+                            <td>1 stroke total</td>
+                            <td>1 on par 3</td>
+                            <td>Extremely Rare</td>
+                        </tr>
+                        <tr class="difficulty-1">
+                            <td><strong>Albatross</strong></td>
+                            <td>-3 strokes</td>
+                            <td>2 on par 5</td>
+                            <td>Very Rare</td>
+                        </tr>
+                        <tr class="difficulty-2">
+                            <td><strong>Eagle</strong></td>
+                            <td>-2 strokes</td>
+                            <td>3 on par 5</td>
+                            <td>Rare</td>
+                        </tr>
+                        <tr class="difficulty-2">
+                            <td><strong>Birdie</strong></td>
+                            <td>-1 stroke</td>
+                            <td>3 on par 4</td>
+                            <td>Good Score</td>
+                        </tr>
+                        <tr class="difficulty-3">
+                            <td><strong>Par</strong></td>
+                            <td>Even</td>
+                            <td>4 on par 4</td>
+                            <td>Expected Score</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Bogey</strong></td>
+                            <td>+1 stroke</td>
+                            <td>5 on par 4</td>
+                            <td>Acceptable</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Double Bogey</strong></td>
+                            <td>+2 strokes</td>
+                            <td>6 on par 4</td>
+                            <td>Difficult Hole</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            
+            <div class="subsection">
+                <h3 class="subsection-title">🎯 Winning the Game</h3>
+                <ul class="rule-list">
+                    <li class="rule-item">
+                        <span class="rule-number">🏆</span><strong>Lowest Total Score Wins:</strong> Player with the fewest total strokes after 18 holes
+                    </li>
+                    <li class="rule-item">
+                        <span class="rule-number">🎖️</span><strong>Par 72 Goal:</strong> Shooting par (72) or under is considered excellent
+                    </li>
+                    <li class="rule-item">
+                        <span class="rule-number">⚖️</span><strong>Tiebreaker:</strong> If tied, compare back-nine scores, then final holes
+                    </li>
+                </ul>
+                
+                <div class="strategy-tip">
+                    <div class="tip-header">
+                        📈 <strong>Score Expectations</strong>
+                    </div>
+                    <p><strong>Championship Level:</strong> 70-75 | <strong>Advanced:</strong> 75-80 | <strong>Intermediate:</strong> 80-90 | <strong>Beginner:</strong> 90-100</p>
+                </div>
+            </div>
+        </section>
+        
+        <section id="strategy" class="rules-section">
+            <div class="section-header">
+                <div class="section-icon">🧠</div>
+                <h2 class="section-title">Strategy Guide</h2>
+            </div>
+            
+            <div class="subsection">
+                <h3 class="subsection-title">🎯 Course Management</h3>
+                <p>TPC Sawgrass is famous for punishing aggressive play. Smart course management is key:</p>
+                
+                <ul class="rule-list">
+                    <li class="rule-item">
+                        <span class="rule-number">🔍</span><strong>Study Hole Difficulty:</strong> Use the difficulty rankings (1-18) to identify the toughest holes and play them conservatively
+                    </li>
+                    <li class="rule-item">
+                        <span class="rule-number">📊</span><strong>Know the Averages:</strong> Compare your target scores to the tournament scoring averages for each hole
+                    </li>
+                    <li class="rule-item">
+                        <span class="rule-number">⚡</span><strong>Risk vs Reward:</strong> Par 5s offer eagle opportunities but also water hazard dangers
+                    </li>
+                    <li class="rule-item">
+                        <span class="rule-number">🎯</span><strong>Aim for Center:</strong> TPC Sawgrass punishes missed shots - accuracy over distance
+                    </li>
+                </ul>
+            </div>
+            
+            <div class="subsection">
+                <h3 class="subsection-title">🏆 Hole-by-Hole Strategy</h3>
+                
+                <div class="strategy-tip">
+                    <div class="tip-header">
+                        🌊 <strong>Hole 5 - Hardest on Course</strong>
+                    </div>
+                    <p><strong>Par 4, 471 yards, Difficulty #1:</strong> The toughest hole at TPC Sawgrass. Play for bogey and be happy with par. Use conservative club selection off the tee.</p>
+                </div>
+                
+                <div class="strategy-tip">
+                    <div class="tip-header">
+                        ⚡ <strong>Hole 8 - Long Par 3</strong>
+                    </div>
+                    <p><strong>Par 3, 237 yards, Difficulty #2:</strong> Long carry over water. Club up and aim for center of green. Par is an excellent score here.</p>
+                </div>
+                
+                <div class="strategy-tip">
+                    <div class="tip-header">
+                        🏝️ <strong>Hole 17 - Island Green</strong>
+                    </div>
+                    <p><strong>Par 3, 137 yards, Difficulty #12:</strong> Golf's most famous hole! The green is completely surrounded by water. Aim for the center and take your par. Aggressive pin-hunting often leads to water balls.</p>
+                </div>
+                
+                <div class="strategy-tip">
+                    <div class="tip-header">
+                        😌 <strong>Hole 12 - Scoring Opportunity</strong>
+                    </div>
+                    <p><strong>Par 4, 358 yards, Difficulty #18:</strong> The easiest hole on the course. This is your birdie opportunity! Aggressive play is rewarded here.</p>
+                </div>
+            </div>
+            
+            <div class="subsection">
+                <h3 class="subsection-title">🎲 Dice Strategy Tips</h3>
+                <ul class="rule-list">
+                    <li class="rule-item">
+                        <span class="rule-number">🎯</span><strong>Play the Percentages:</strong> Choose clubs with higher accuracy ratings for crucial shots
+                    </li>
+                    <li class="rule-item">
+                        <span class="rule-number">🔄</span><strong>Avoid Big Numbers:</strong> Better to make bogey than risk double bogey or worse
+                    </li>
+                    <li class="rule-item">
+                        <span class="rule-number">💪</span><strong>Take Your Medicine:</strong> If in trouble, play safe rather than attempting hero shots
+                    </li>
+                    <li class="rule-item">
+                        <span class="rule-number">📍</span><strong>Pin Position Matters:</strong> Aim for center of green when pin is tucked behind hazards
+                    </li>
+                </ul>
+            </div>
+        </section>
+        
+        <section id="variants" class="rules-section">
+            <div class="section-header">
+                <div class="section-icon">🎲</div>
+                <h2 class="section-title">Game Variants</h2>
+            </div>
+            
+            <div class="subsection">
+                <h3 class="subsection-title">🏌️ Match Play</h3>
+                <p>Instead of stroke play, compete hole-by-hole:</p>
+                <ul class="rule-list">
+                    <li class="rule-item">
+                        <span class="rule-number">⚔️</span>Win individual holes to gain points
+                    </li>
+                    <li class="rule-item">
+                        <span class="rule-number">🏆</span>Player who wins most holes wins the match
+                    </li>
+                    <li class="rule-item">
+                        <span class="rule-number">🤝</span>Tied holes are "halved" (no point to either player)
+                    </li>
+                </ul>
+            </div>
+            
+            <div class="subsection">
+                <h3 class="subsection-title">⚡ Speed Golf</h3>
+                <p>Fast-paced variant for quicker games:</p>
+                <ul class="rule-list">
+                    <li class="rule-item">
+                        <span class="rule-number">⏱️</span>Set a time limit per hole (e.g., 3 minutes)
+                    </li>
+                    <li class="rule-item">
+                        <span class="rule-number">🚀</span>Quick decisions on club selection and aim
+                    </li>
+                    <li class="rule-item">
+                        <span class="rule-number">📦</span>Play only 9 holes for shorter sessions
+                    </li>
+                </ul>
+            </div>
+            
+            <div class="subsection">
+                <h3 class="subsection-title">🎯 Skills Challenge</h3>
+                <p>Practice specific aspects of the game:</p>
+                <ul class="rule-list">
+                    <li class="rule-item">
+                        <span class="rule-number">🎯</span><strong>Putting Contest:</strong> Play only the putting portion of each hole
+                    </li>
+                    <li class="rule-item">
+                        <span class="rule-number">💥</span><strong>Driving Range:</strong> See who can hit the longest/most accurate drives
+                    </li>
+                    <li class="rule-item">
+                        <span class="rule-number">🏝️</span><strong>Island Green Challenge:</strong> Play only Hole 17 repeatedly
+                    </li>
+                </ul>
+            </div>
+        </section>
+        
+        <div class="strategy-tip" style="margin-top: 3rem;">
+            <div class="tip-header">
+                🎲 <strong>Ready to Play?</strong>
+            </div>
+            <p>Now that you know the rules, head over to our digital scorecard to track your round at TPC Sawgrass! The scorecard automatically calculates your scores, tracks statistics, and lets you export professional tournament-style scorecards.</p>
+            <div style="text-align: center; margin-top: 1rem;">
+                <a href="index.html" style="background: linear-gradient(135deg, var(--primary-green), var(--light-green)); color: white; padding: 1rem 2rem; border-radius: 6px; text-decoration: none; font-weight: 600; display: inline-block;">🏌️ Start Your Round</a>
+            </div>
+        </div>
+    </div>
+    
+    <a href="index.html" class="quick-ref">🏌️ Digital Scorecard</a>
+</body>
+</html>

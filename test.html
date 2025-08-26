@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TPC Sawgrass Scorecard - Test Suite</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: #f5f5f5;
+            color: #333;
+        }
+        
+        .test-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        
+        .test-header {
+            background: linear-gradient(135deg, #1a5f3f, #0d3926);
+            color: white;
+            padding: 2rem;
+            text-align: center;
+        }
+        
+        .test-title {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        .test-subtitle {
+            font-size: 1rem;
+            opacity: 0.9;
+        }
+        
+        .test-content {
+            padding: 2rem;
+        }
+        
+        .test-suite {
+            margin-bottom: 2rem;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            overflow: hidden;
+        }
+        
+        .suite-header {
+            background: #f8f9fa;
+            padding: 1rem 1.5rem;
+            border-bottom: 1px solid #ddd;
+            font-weight: 600;
+            color: #495057;
+        }
+        
+        .test-case {
+            padding: 1rem 1.5rem;
+            border-bottom: 1px solid #eee;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .test-case:last-child {
+            border-bottom: none;
+        }
+        
+        .test-name {
+            font-weight: 500;
+        }
+        
+        .test-status {
+            padding: 0.25rem 0.75rem;
+            border-radius: 4px;
+            font-size: 0.875rem;
+            font-weight: 600;
+            min-width: 80px;
+            text-align: center;
+        }
+        
+        .test-pass {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        
+        .test-fail {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        
+        .test-running {
+            background: #fff3cd;
+            color: #856404;
+            border: 1px solid #ffeaa7;
+        }
+        
+        .test-summary {
+            background: #e9ecef;
+            padding: 1.5rem;
+            border-radius: 6px;
+            margin-bottom: 2rem;
+            text-align: center;
+        }
+        
+        .summary-stats {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            margin-bottom: 1rem;
+        }
+        
+        .stat {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        
+        .stat-value {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #1a5f3f;
+        }
+        
+        .stat-label {
+            font-size: 0.875rem;
+            color: #666;
+            text-transform: uppercase;
+        }
+        
+        .run-tests-btn {
+            background: linear-gradient(135deg, #1a5f3f, #2d8659);
+            color: white;
+            border: none;
+            padding: 1rem 2rem;
+            border-radius: 6px;
+            font-size: 1.125rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-bottom: 2rem;
+            display: block;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        
+        .run-tests-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(26, 95, 63, 0.3);
+        }
+        
+        .run-tests-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+        
+        .test-log {
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 6px;
+            padding: 1rem;
+            max-height: 300px;
+            overflow-y: auto;
+            font-family: 'Courier New', monospace;
+            font-size: 0.875rem;
+            line-height: 1.5;
+            margin-top: 1rem;
+        }
+        
+        .log-entry {
+            margin-bottom: 0.5rem;
+        }
+        
+        .log-info {
+            color: #17a2b8;
+        }
+        
+        .log-success {
+            color: #28a745;
+        }
+        
+        .log-error {
+            color: #dc3545;
+        }
+        
+        .log-warning {
+            color: #ffc107;
+        }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <div class="test-header">
+            <h1 class="test-title">TPC Sawgrass Scorecard Test Suite</h1>
+            <p class="test-subtitle">Comprehensive Testing for "In Pursuit of Par" Board Game Scorecard</p>
+        </div>
+        
+        <div class="test-content">
+            <button id="runTestsBtn" class="run-tests-btn">Run All Tests</button>
+            
+            <div class="test-summary" id="testSummary">
+                <div class="summary-stats">
+                    <div class="stat">
+                        <div class="stat-value" id="totalTests">0</div>
+                        <div class="stat-label">Total Tests</div>
+                    </div>
+                    <div class="stat">
+                        <div class="stat-value" id="passedTests">0</div>
+                        <div class="stat-label">Passed</div>
+                    </div>
+                    <div class="stat">
+                        <div class="stat-value" id="failedTests">0</div>
+                        <div class="stat-label">Failed</div>
+                    </div>
+                    <div class="stat">
+                        <div class="stat-value" id="testTime">0ms</div>
+                        <div class="stat-label">Duration</div>
+                    </div>
+                </div>
+                <div id="overallStatus">Ready to run tests</div>
+            </div>
+            
+            <!-- Course Data Tests -->
+            <div class="test-suite">
+                <div class="suite-header">Course Data & Configuration Tests</div>
+                <div class="test-case">
+                    <div class="test-name">Course data structure is valid</div>
+                    <div class="test-status" id="test-course-structure">Pending</div>
+                </div>
+                <div class="test-case">
+                    <div class="test-name">All 18 holes have required properties</div>
+                    <div class="test-status" id="test-holes-complete">Pending</div>
+                </div>
+                <div class="test-case">
+                    <div class="test-name">Total par equals 72</div>
+                    <div class="test-status" id="test-total-par">Pending</div>
+                </div>
+                <div class="test-case">
+                    <div class="test-name">Hole 17 is marked as signature (Island Green)</div>
+                    <div class="test-status" id="test-island-green">Pending</div>
+                </div>
+                <div class="test-case">
+                    <div class="test-name">Difficulty rankings are valid (1-18)</div>
+                    <div class="test-status" id="test-difficulty-rankings">Pending</div>
+                </div>
+            </div>
+            
+            <!-- Player Management Tests -->
+            <div class="test-suite">
+                <div class="suite-header">Player Management Tests</div>
+                <div class="test-case">
+                    <div class="test-name">Default initialization with 2 players</div>
+                    <div class="test-status" id="test-default-players">Pending</div>
+                </div>
+                <div class="test-case">
+                    <div class="test-name">Add player functionality (up to 4 players)</div>
+                    <div class="test-status" id="test-add-player">Pending</div>
+                </div>
+                <div class="test-case">
+                    <div class="test-name">Prevent adding more than 4 players</div>
+                    <div class="test-status" id="test-max-players">Pending</div>
+                </div>
+                <div class="test-case">
+                    <div class="test-name">Remove player functionality</div>
+                    <div class="test-status" id="test-remove-player">Pending</div>
+                </div>
+                <div class="test-case">
+                    <div class="test-name">Prevent removing last player</div>
+                    <div class="test-status" id="test-min-players">Pending</div>
+                </div>
+                <div class="test-case">
+                    <div class="test-name">Player name updates work correctly</div>
+                    <div class="test-status" id="test-player-names">Pending</div>
+                </div>
+            </div>
+            
+            <!-- Scoring System Tests -->
+            <div class="test-suite">
+                <div class="suite-header">Scoring System Tests</div>
+                <div class="test-case">
+                    <div class="test-name">Score input validation (1-15)</div>
+                    <div class="test-status" id="test-score-validation">Pending</div>
+                </div>
+                <div class="test-case">
+                    <div class="test-name">Score totals calculate correctly</div>
+                    <div class="test-status" id="test-score-totals">Pending</div>
+                </div>
+                <div class="test-case">
+                    <div class="test-name">To-par calculations are accurate</div>
+                    <div class="test-status" id="test-to-par">Pending</div>
+                </div>
+                <div class="test-case">
+                    <div class="test-name">Front/back nine calculations</div>
+                    <div class="test-status" id="test-front-back-nine">Pending</div>
+                </div>
+                <div class="test-case">
+                    <div class="test-name">Progress tracking works correctly</div>
+                    <div class="test-status" id="test-progress">Pending</div>
+                </div>
+                <div class="test-case">
+                    <div class="test-name">Score color coding (eagle, birdie, par, bogey)</div>
+                    <div class="test-status" id="test-score-colors">Pending</div>
+                </div>
+            </div>
+            
+            <!-- Statistics Tests -->
+            <div class="test-suite">
+                <div class="suite-header">Statistics & Analytics Tests</div>
+                <div class="test-case">
+                    <div class="test-name">Eagle count calculation</div>
+                    <div class="test-status" id="test-eagles">Pending</div>
+                </div>
+                <div class="test-case">
+                    <div class="test-name">Birdie count calculation</div>
+                    <div class="test-status" id="test-birdies">Pending</div>
+                </div>
+                <div class="test-case">
+                    <div class="test-name">Par count calculation</div>
+                    <div class="test-status" id="test-pars">Pending</div>
+                </div>
+                <div class="test-case">
+                    <div class="test-name">Bogey and double bogey counts</div>
+                    <div class="test-status" id="test-bogeys">Pending</div>
+                </div>
+                <div class="test-case">
+                    <div class="test-name">Best hole identification</div>
+                    <div class="test-status" id="test-best-hole">Pending</div>
+                </div>
+            </div>
+            
+            <!-- Data Persistence Tests -->
+            <div class="test-suite">
+                <div class="suite-header">Data Persistence Tests</div>
+                <div class="test-case">
+                    <div class="test-name">Save data to localStorage</div>
+                    <div class="test-status" id="test-save-data">Pending</div>
+                </div>
+                <div class="test-case">
+                    <div class="test-name">Load data from localStorage</div>
+                    <div class="test-status" id="test-load-data">Pending</div>
+                </div>
+                <div class="test-case">
+                    <div class="test-name">Handle corrupted localStorage data</div>
+                    <div class="test-status" id="test-corrupted-data">Pending</div>
+                </div>
+                <div class="test-case">
+                    <div class="test-name">Clear scores functionality</div>
+                    <div class="test-status" id="test-clear-scores">Pending</div>
+                </div>
+            </div>
+            
+            <!-- Export Tests -->
+            <div class="test-suite">
+                <div class="suite-header">Export & Print Tests</div>
+                <div class="test-case">
+                    <div class="test-name">Generate printable HTML scorecard</div>
+                    <div class="test-status" id="test-export-html">Pending</div>
+                </div>
+                <div class="test-case">
+                    <div class="test-name">Include all player data in export</div>
+                    <div class="test-status" id="test-export-players">Pending</div>
+                </div>
+                <div class="test-case">
+                    <div class="test-name">Board game branding in export</div>
+                    <div class="test-status" id="test-export-branding">Pending</div>
+                </div>
+                <div class="test-case">
+                    <div class="test-name">Hole 17 Island Green marking in export</div>
+                    <div class="test-status" id="test-export-island-green">Pending</div>
+                </div>
+            </div>
+            
+            <!-- UI/UX Tests -->
+            <div class="test-suite">
+                <div class="suite-header">User Interface Tests</div>
+                <div class="test-case">
+                    <div class="test-name">Responsive layout with 1-4 players</div>
+                    <div class="test-status" id="test-responsive-layout">Pending</div>
+                </div>
+                <div class="test-case">
+                    <div class="test-name">Hole card layout adapts to player count</div>
+                    <div class="test-status" id="test-hole-layout">Pending</div>
+                </div>
+                <div class="test-case">
+                    <div class="test-name">Modal functionality (stats, export)</div>
+                    <div class="test-status" id="test-modals">Pending</div>
+                </div>
+                <div class="test-case">
+                    <div class="test-name">Input field validation and feedback</div>
+                    <div class="test-status" id="test-input-validation">Pending</div>
+                </div>
+            </div>
+            
+            <div class="test-log" id="testLog">
+                <div class="log-entry log-info">Test log will appear here...</div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Include the main application script for testing -->
+    <script src="script.js"></script>
+    <script src="test-suite.js"></script>
+</body>
+</html>
