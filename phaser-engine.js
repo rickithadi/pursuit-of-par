@@ -28,6 +28,8 @@ const courseData = {
 
 class PhaserBoardGameEngine {
     constructor() {
+        console.log('🎲 PhaserBoardGameEngine constructor starting...');
+        
         this.game = null;
         this.currentScene = null;
         
@@ -41,6 +43,7 @@ class PhaserBoardGameEngine {
         // Units system
         this.units = localStorage.getItem('preferred-units') || 'yards';
         this.conversionRatio = 0.9144; // exact yards to meters
+        console.log('✓ Basic properties initialized');
         
         // Visual enhancement settings
         this.visualSettings = {
@@ -49,31 +52,110 @@ class PhaserBoardGameEngine {
             colorBlindMode: localStorage.getItem('colorblind-mode') === 'true',
             highContrast: localStorage.getItem('high-contrast') === 'true'
         };
+        console.log('✓ Visual settings initialized');
         
         // Apply accessibility enhancements
-        this.applyAccessibilitySettings();
+        try {
+            this.applyAccessibilitySettings();
+            console.log('✓ Accessibility settings applied');
+        } catch (error) {
+            console.warn('⚠️ Accessibility settings error:', error.message);
+        }
         
-        // Game systems
-        this.diceSystem = new AuthenticDiceSystem();
-        this.shotCalculator = new BoardGameShotCalculator();
-        this.analysisSystem = new ShotAnalysisSystem();
+        // Initialize systems as null - they will be created after all classes are loaded
+        this.diceSystem = null;
+        this.shotCalculator = null;
+        this.analysisSystem = null;
+        console.log('✓ Systems initialized as null');
         
-        this.init();
+        try {
+            this.init();
+            console.log('✓ PhaserBoardGameEngine init() completed');
+        } catch (error) {
+            console.error('✗ PhaserBoardGameEngine init() failed:', error.message);
+            throw error;
+        }
+        
+        console.log('🎲 PhaserBoardGameEngine constructor completed successfully');
     }
 
     init() {
         this.setupPhaserConfig();
-        this.createGame();
         this.setupDefaultPlayers();
+        
+        // Defer game creation until after DOM load to avoid forward references
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', () => this.createGame());
+        } else {
+            this.createGame();
+        }
+        
         console.log('🎲 Phaser.js Engine initialized with authentic 1987 mechanics');
+    }
+    
+    initializeGameSystems() {
+        console.log('🎲 Initializing game systems...');
+        
+        // Check class availability
+        console.log('Class availability check:');
+        console.log('- AuthenticDiceSystem:', typeof AuthenticDiceSystem !== 'undefined');
+        console.log('- BoardGameShotCalculator:', typeof BoardGameShotCalculator !== 'undefined');
+        console.log('- ShotAnalysisSystem:', typeof ShotAnalysisSystem !== 'undefined');
+        
+        // Initialize game systems after all classes are loaded
+        if (!this.diceSystem && typeof AuthenticDiceSystem !== 'undefined') {
+            try {
+                this.diceSystem = new AuthenticDiceSystem();
+                console.log('✓ AuthenticDiceSystem initialized');
+            } catch (error) {
+                console.error('✗ AuthenticDiceSystem initialization failed:', error.message);
+            }
+        }
+        
+        if (!this.shotCalculator && typeof BoardGameShotCalculator !== 'undefined') {
+            try {
+                this.shotCalculator = new BoardGameShotCalculator();
+                console.log('✓ BoardGameShotCalculator initialized');
+            } catch (error) {
+                console.error('✗ BoardGameShotCalculator initialization failed:', error.message);
+            }
+        }
+        
+        if (!this.analysisSystem && typeof ShotAnalysisSystem !== 'undefined') {
+            try {
+                this.analysisSystem = new ShotAnalysisSystem();
+                console.log('✓ ShotAnalysisSystem initialized');
+            } catch (error) {
+                console.error('✗ ShotAnalysisSystem initialization failed:', error.message);
+            }
+        }
+        
+        console.log('🎲 Game systems initialization completed');
+        console.log('Final system status:');
+        console.log('- diceSystem:', this.diceSystem ? 'OK' : 'NULL');
+        console.log('- shotCalculator:', this.shotCalculator ? 'OK' : 'NULL');
+        console.log('- analysisSystem:', this.analysisSystem ? 'OK' : 'NULL');
     }
 
     setupPhaserConfig() {
+        // Get viewport dimensions or use default
+        const container = document.getElementById('course3DViewport');
+        let containerWidth = 1120;
+        let containerHeight = 500;
+        
+        if (container) {
+            containerWidth = container.offsetWidth || 1120;
+            containerHeight = container.offsetHeight || 500;
+            console.log(`✓ Viewport found - using dimensions: ${containerWidth}x${containerHeight}`);
+        } else {
+            console.warn('⚠️ Viewport not found, using default dimensions');
+        }
+        
         this.config = {
             type: Phaser.AUTO,
-            width: 800,
-            height: 600,
-            parent: 'courseVisualization',
+            width: containerWidth,
+            height: containerHeight,
+            parent: 'course3DViewport',
             backgroundColor: '#F5F5DC', // Cream background for colonist.io aesthetic
             scene: [GolfCourseScene],
             physics: {
@@ -85,20 +167,85 @@ class PhaserBoardGameEngine {
             },
             scale: {
                 mode: Phaser.Scale.FIT,
-                autoCenter: Phaser.Scale.CENTER_BOTH
+                autoCenter: Phaser.Scale.CENTER_BOTH,
+                min: {
+                    width: 320,
+                    height: 240
+                },
+                max: {
+                    width: 1600,
+                    height: 1200
+                }
+            },
+            canvas: {
+                style: 'display: block; margin: 0 auto;'
             }
         };
+        
+        console.log('✓ Phaser config setup with explicit dimensions');
     }
 
     createGame() {
+        console.log('🎮 Creating Phaser game...');
+        
         // Clear existing content
-        const container = document.getElementById('courseVisualization');
-        if (container) {
-            container.innerHTML = '';
+        const container = document.getElementById('course3DViewport');
+        if (!container) {
+            console.error('✗ Cannot find course3DViewport container!');
+            return;
         }
-
-        this.game = new Phaser.Game(this.config);
-        this.game.phaserEngine = this; // Reference back to this engine
+        
+        console.log(`✓ Container found: ${container.offsetWidth}x${container.offsetHeight}`);
+        
+        // Clear any existing content
+        container.innerHTML = '';
+        
+        // Remove loading overlay if present
+        const loadingOverlay = document.getElementById('loadingOverlay');
+        if (loadingOverlay) {
+            loadingOverlay.style.display = 'none';
+            console.log('✓ Loading overlay hidden');
+        }
+        
+        try {
+            // Create the game with error handling
+            this.game = new Phaser.Game(this.config);
+            this.game.phaserEngine = this; // Reference back to this engine
+            
+            console.log('✓ Phaser game instance created');
+            
+            // Verify canvas was created
+            setTimeout(() => {
+                const canvas = container.querySelector('canvas');
+                if (canvas) {
+                    console.log(`✓ Canvas created and inserted: ${canvas.width}x${canvas.height}`);
+                    
+                    // Apply additional styling for colonist.io aesthetic
+                    canvas.style.border = '2px solid #4CAF50';
+                    canvas.style.borderRadius = '8px';
+                    canvas.style.boxShadow = '0 4px 12px rgba(0,0,0,0.15)';
+                    
+                    console.log('✓ Canvas styling applied');
+                } else {
+                    console.error('✗ Canvas was not created or inserted into container!');
+                }
+            }, 100);
+            
+        } catch (error) {
+            console.error('✗ Error creating Phaser game:', error.message);
+            console.error('Stack:', error.stack);
+            
+            // Show error message in container
+            container.innerHTML = `
+                <div style="padding: 2rem; text-align: center; color: #d32f2f; background: #ffebee; border-radius: 8px; margin: 1rem;">
+                    <h3>🚫 Canvas Creation Error</h3>
+                    <p>Failed to create Phaser game canvas: ${error.message}</p>
+                    <button onclick="location.reload()" style="padding: 0.5rem 1rem; margin-top: 1rem; background: #f44336; color: white; border: none; border-radius: 4px; cursor: pointer;">
+                        Reload Page
+                    </button>
+                </div>
+            `;
+        }
     }
 
     setupDefaultPlayers() {
@@ -856,8 +1003,12 @@ class GolfCourseScene extends Phaser.Scene {
     }
 
     init() {
+        console.log('🎮 GolfCourseScene: Initializing...');
+        
         this.engine = this.game.phaserEngine;
         this.engine.currentScene = this;
+        
+        console.log('✓ Engine reference established');
         
         // Initialize visual settings with colonist.io preferences
         this.visualSettings = {
@@ -866,38 +1017,93 @@ class GolfCourseScene extends Phaser.Scene {
             colorBlindMode: localStorage.getItem('colorblind-mode') === 'true',
             highContrast: localStorage.getItem('high-contrast') === 'true'
         };
+        
+        console.log('✓ Visual settings loaded:', this.visualSettings);
     }
 
     preload() {
+        console.log('📦 GolfCourseScene: Preloading assets...');
         // Load any necessary assets for colonist.io styling
         // For now, we'll use programmatic graphics
-        console.log('🎨 Loading colonist.io-inspired course assets');
+        console.log('✓ Using programmatic graphics for colonist.io-inspired visuals');
     }
 
     create() {
-        this.setupCourseVisuals();
-        this.createDiceSprites();
-        this.createBall();
-        this.setupInputHandlers();
-        this.createVisualSettingsPanel();
+        console.log('🎨 GolfCourseScene: Creating scene...');
+        console.log(`Scene dimensions: ${this.scale.width}x${this.scale.height}`);
+        
+        try {
+            console.log('🏞️ Setting up course visuals...');
+            this.setupCourseVisuals();
+            
+            console.log('🎲 Creating dice sprites...');
+            this.createDiceSprites();
+            
+            console.log('⛳ Creating ball...');
+            this.createBall();
+            
+            console.log('🖱️ Setting up input handlers...');
+            this.setupInputHandlers();
+            
+            console.log('⚙️ Creating visual settings panel...');
+            this.createVisualSettingsPanel();
+            
+            console.log('✅ GolfCourseScene created successfully!');
+        } catch (error) {
+            console.error('❌ Error creating GolfCourseScene:', error.message);
+            console.error('Stack:', error.stack);
+        }
     }
 
     setupCourseVisuals() {
         const { width, height } = this.scale;
-        const hole = courseData?.holes?.[this.engine.currentHole - 1] || courseData?.holes?.[0];
+        console.log('🏌️ Setting up course visuals, canvas size:', width, 'x', height);
+        
+        // Check course data availability
+        if (!courseData || !courseData.holes) {
+            console.error('❌ Course data not available!', courseData);
+            // Create fallback hole data
+            window.courseData = {
+                holes: [
+                    { number: 1, par: 4, yardage: 394, layout: 'straight', difficulty: 13 }
+                ]
+            };
+        }
+        
+        const hole = courseData.holes[this.engine?.currentHole - 1] || courseData.holes[0];
+        console.log('🏌️ Current hole data:', hole);
         
         // Clear canvas with colonist.io cream background
-        this.add.rectangle(width/2, height/2, width, height, 0xF5F5DC);
+        const bg = this.add.rectangle(width/2, height/2, width, height, 0xF5F5DC);
+        console.log('🎨 Background created:', bg);
+        
+        // Add test shapes to verify rendering works
+        const testCircle = this.add.circle(100, 100, 30, 0xFF0000);
+        console.log('🔴 Test circle created:', testCircle);
+        
+        const testRect = this.add.rectangle(200, 100, 60, 40, 0x00FF00);
+        console.log('🟢 Test rectangle created:', testRect);
         
         // Get color palette based on accessibility settings
         const colors = this.getColorPalette();
         
         // Create colonist.io inspired course areas with high contrast
+        console.log('🟢 Creating fairway area...');
         this.createFairwayArea(colors, hole);
+        
+        console.log('🟤 Creating rough areas...');
         this.createRoughAreas(colors);
+        
+        console.log('🟢 Creating green area...');
         this.createGreenArea(colors);
+        
+        console.log('💧 Creating hazard areas...');
         this.createHazardAreas(colors, hole);
+        
+        console.log('📍 Creating tee box...');
         this.createTeeBox(colors);
+        
+        console.log('📏 Creating distance markers...');
         this.createDistanceMarkers(colors);
         
         // Optional hex grid overlay for colonist.io authenticity
@@ -3121,43 +3327,7 @@ class ShotAnalysisSystem {
 }
 
 // Placeholder shot calculator (to be enhanced by Agent 3)
-class BoardGameShotCalculator {
-    calculate(club, diceResult, lie) {
-        // Basic calculation - will be enhanced by other agents
-        const baseDistance = this.getClubDistance(club);
-        const modifier = this.getLieModifier(lie);
-        
-        return {
-            distance: baseDistance * modifier * (diceResult.distance / 3.5),
-            direction: this.getDirectionFromDice(diceResult.direction),
-            position: { x: 50, y: 50 }, // Placeholder
-            lie: 'fairway'
-        };
-    }
-
-    getClubDistance(club) {
-        const distances = {
-            'driver': 250, '3wood': 220, '5wood': 190,
-            '3iron': 170, '5iron': 150, '7iron': 130,
-            '9iron': 110, 'wedge': 70, 'putter': 30
-        };
-        return distances[club] || 100;
-    }
-
-    getLieModifier(lie) {
-        const modifiers = {
-            'tee': 1.0, 'fairway': 1.0, 'rough': 0.8,
-            'sand': 0.6, 'trees': 0.7, 'water': 0.0, 'green': 1.0
-        };
-        return modifiers[lie] || 1.0;
-    }
-
-    getDirectionFromDice(roll) {
-        if (roll <= 4) return 'left';
-        if (roll <= 8) return 'straight';
-        return 'right';
-    }
-}
+// BoardGameShotCalculator is imported from authentic-mechanics.js
 
 // Course data needs to be available globally
 if (typeof courseData === 'undefined') {
@@ -3192,14 +3362,17 @@ if (typeof module !== 'undefined' && module.exports) {
     module.exports = {
         PhaserBoardGameEngine,
         GolfCourseScene,
-        AuthenticDiceSystem,
-        ShotAnalysisSystem,
-        BoardGameShotCalculator
+        ShotAnalysisSystem
     };
 } else {
     window.PhaserBoardGameEngine = PhaserBoardGameEngine;
     window.GolfCourseScene = GolfCourseScene;
-    window.AuthenticDiceSystem = AuthenticDiceSystem;
     window.ShotAnalysisSystem = ShotAnalysisSystem;
-    window.BoardGameShotCalculator = BoardGameShotCalculator;
+    
+    // Add method to initialize the scene after classes are loaded
+    PhaserBoardGameEngine.prototype.initializeScene = function() {
+        if (this.game && !this.currentScene) {
+            this.game.scene.add('GolfCourseScene', GolfCourseScene, true);
+        }
+    };
 }
