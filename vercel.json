@@ -1,98 +1,42 @@
 {
-  "version": 2,
-  "name": "tpc-sawgrass-scorecard",
-  "builds": [
+  "rewrites": [
     {
-      "src": "index.html",
-      "use": "@vercel/static"
+      "source": "/test",
+      "destination": "/test.html"
     },
     {
-      "src": "styles.css",
-      "use": "@vercel/static"
+      "source": "/tests",
+      "destination": "/test.html"
     },
     {
-      "src": "script.js",
-      "use": "@vercel/static"
+      "source": "/rules",
+      "destination": "/rules.html"
     },
     {
-      "src": "test.html",
-      "use": "@vercel/static"
+      "source": "/guide",
+      "destination": "/rules.html"
     },
     {
-      "src": "test-suite.js",
-      "use": "@vercel/static"
+      "source": "/game",
+      "destination": "/game.html"
     },
     {
-      "src": "rules.html",
-      "use": "@vercel/static"
+      "source": "/play",
+      "destination": "/game.html"
     },
     {
-      "src": "game.html",
-      "use": "@vercel/static"
+      "source": "/3d",
+      "destination": "/game-3d.html"
     },
     {
-      "src": "game-engine.js",
-      "use": "@vercel/static"
-    },
-    {
-      "src": "game-engine-3d.js",
-      "use": "@vercel/static"
-    },
-    {
-      "src": "authentic-mechanics.js",
-      "use": "@vercel/static"
-    },
-    {
-      "src": "game-3d.html",
-      "use": "@vercel/static"
-    }
-  ],
-  "routes": [
-    {
-      "src": "/",
-      "dest": "/index.html"
-    },
-    {
-      "src": "/test",
-      "dest": "/test.html"
-    },
-    {
-      "src": "/tests",
-      "dest": "/test.html"
-    },
-    {
-      "src": "/rules",
-      "dest": "/rules.html"
-    },
-    {
-      "src": "/guide",
-      "dest": "/rules.html"
-    },
-    {
-      "src": "/game",
-      "dest": "/game.html"
-    },
-    {
-      "src": "/play",
-      "dest": "/game.html"
-    },
-    {
-      "src": "/3d",
-      "dest": "/game-3d.html"
-    },
-    {
-      "src": "/enhanced",
-      "dest": "/game-3d.html"
+      "source": "/enhanced",
+      "destination": "/game-3d.html"
     }
   ],
   "headers": [
     {
       "source": "/(.*)",
       "headers": [
-        {
-          "key": "Cache-Control",
-          "value": "public, max-age=31536000, immutable"
-        },
         {
           "key": "X-Content-Type-Options",
           "value": "nosniff"
@@ -108,11 +52,11 @@
       ]
     },
     {
-      "source": "/index.html",
+      "source": "/(.*\\.(js|css|html))$",
       "headers": [
         {
           "key": "Cache-Control",
-          "value": "public, max-age=0, must-revalidate"
+          "value": "public, max-age=86400, stale-while-revalidate=604800"
         }
       ]
     }
