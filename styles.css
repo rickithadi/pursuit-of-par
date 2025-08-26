@@ -1,4 +1,5 @@
 :root {
+    /* TPC Sawgrass Color Scheme - Consistent across all pages */
     --primary-green: #1a5f3f;
     --dark-green: #0d3926;
     --light-green: #2d8659;
@@ -6,6 +7,7 @@
     --light-gold: #e6c896;
     --cream: #f5f2e8;
     --white: #ffffff;
+    --paper-white: #fefdfb;
     --gray-light: #e5e5e5;
     --gray-medium: #999999;
     --gray-dark: #333333;
@@ -14,10 +16,37 @@
     --par-color: #333333;
     --bogey-color: #ff8c00;
     --double-bogey-color: #dc143c;
-    --shadow-sm: 0 2px 4px rgba(0,0,0,0.1);
-    --shadow-md: 0 4px 6px rgba(0,0,0,0.1);
-    --shadow-lg: 0 10px 15px rgba(0,0,0,0.1);
-    --transition: all 0.3s ease;
+    
+    /* Enhanced shadows for board game depth */
+    --shadow-sm: 0 2px 4px rgba(0,0,0,0.12);
+    --shadow-md: 0 4px 8px rgba(0,0,0,0.15);
+    --shadow-lg: 0 8px 16px rgba(0,0,0,0.18);
+    --shadow-board: 0 6px 12px rgba(26,95,63,0.25), inset 0 1px 0 rgba(255,255,255,0.3);
+    --shadow-card: 0 4px 12px rgba(0,0,0,0.15), inset 0 1px 2px rgba(255,255,255,0.4);
+    --shadow-pressed: inset 0 2px 4px rgba(0,0,0,0.2);
+    
+    /* Enhanced transitions */
+    --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    --transition-fast: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+    
+    /* Board game texture gradients */
+    --paper-texture: radial-gradient(circle at 25% 25%, rgba(245,242,232,0.8) 0%, transparent 50%),
+                     radial-gradient(circle at 75% 75%, rgba(201,169,110,0.1) 0%, transparent 50%),
+                     linear-gradient(45deg, rgba(245,242,232,0.95) 0%, rgba(254,253,251,1) 100%);
+    --card-texture: linear-gradient(135deg, rgba(255,255,255,0.9) 0%, rgba(245,242,232,0.7) 100%),
+                    radial-gradient(circle at 20% 80%, rgba(201,169,110,0.05) 0%, transparent 50%);
+    
+    /* Typography improvements */
+    --font-weight-light: 300;
+    --font-weight-regular: 400;
+    --font-weight-medium: 500;
+    --font-weight-semibold: 600;
+    --font-weight-bold: 700;
+    --font-weight-extrabold: 800;
+    
+    /* Enhanced focus styles for accessibility */
+    --focus-ring: 0 0 0 3px rgba(201,169,110,0.4);
+    --focus-ring-dark: 0 0 0 3px rgba(26,95,63,0.4);
 }
 
 * {
@@ -28,18 +57,49 @@
 
 body {
     font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-    background: linear-gradient(135deg, var(--cream) 0%, #ffffff 100%);
+    background: var(--paper-texture);
     color: var(--gray-dark);
     line-height: 1.6;
     min-height: 100vh;
+    font-weight: var(--font-weight-regular);
+    /* Subtle texture overlay for authentic board game feel */
+    position: relative;
 }
 
-/* Header Styles */
+body::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    pointer-events: none;
+    z-index: -1;
+    background-image: 
+        /* Paper grain texture */
+        radial-gradient(circle at 1px 1px, rgba(26,95,63,0.02) 1px, transparent 0);
+    background-size: 20px 20px;
+    opacity: 0.6;
+}
+
+/* Header Styles - Enhanced 1987 Board Game Aesthetic */
 .header {
     background: linear-gradient(135deg, var(--primary-green) 0%, var(--dark-green) 100%);
     color: var(--white);
     padding: 2rem 0;
-    box-shadow: var(--shadow-lg);
+    box-shadow: var(--shadow-board);
+    position: relative;
+    border-bottom: 3px solid var(--gold);
+}
+
+.header::after {
+    content: '';
+    position: absolute;
+    bottom: -3px;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, transparent 0%, var(--light-gold) 50%, transparent 100%);
 }
 
 .header-content {
@@ -60,21 +120,28 @@ body {
 
 .course-name {
     font-size: 2.5rem;
-    font-weight: 700;
+    font-weight: var(--font-weight-extrabold);
     color: var(--white);
-    text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+    text-shadow: 3px 3px 6px rgba(0,0,0,0.4), 1px 1px 2px rgba(0,0,0,0.6);
+    letter-spacing: -0.02em;
+    line-height: 1.1;
 }
 
 .course-subtitle {
     font-size: 1.25rem;
     color: var(--gold);
-    font-weight: 500;
+    font-weight: var(--font-weight-semibold);
+    text-shadow: 1px 1px 3px rgba(0,0,0,0.3);
+    letter-spacing: 0.02em;
+    text-transform: uppercase;
 }
 
 .course-designer {
     font-size: 0.875rem;
-    color: rgba(255,255,255,0.8);
+    color: rgba(255,255,255,0.85);
     font-style: italic;
+    font-weight: var(--font-weight-regular);
+    margin-top: 0.25rem;
 }
 
 .tee-selection {
@@ -116,6 +183,8 @@ body {
     padding: 1rem 1.5rem;
     border-radius: 8px;
     backdrop-filter: blur(10px);
+    border: 1px solid rgba(201,169,110,0.3);
+    box-shadow: inset 0 1px 0 rgba(255,255,255,0.2);
 }
 
 .stat {
@@ -148,10 +217,11 @@ body {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    background: var(--white);
+    background: var(--card-texture);
     padding: 1rem 1.5rem;
-    border-radius: 8px;
-    box-shadow: var(--shadow-sm);
+    border-radius: 12px;
+    box-shadow: var(--shadow-card);
+    border: 1px solid rgba(201,169,110,0.2);
 }
 
 .player-count {
@@ -175,12 +245,16 @@ body {
 }
 
 .player-card {
-    background: var(--white);
+    background: var(--card-texture);
     border-radius: 12px;
     padding: 1.5rem;
-    box-shadow: var(--shadow-md);
+    box-shadow: var(--shadow-card);
     transition: var(--transition);
     position: relative;
+    border: 1px solid rgba(201,169,110,0.2);
+    /* Vintage scorecard styling */
+    background-size: cover;
+    background-position: center;
 }
 
 .player-remove {
@@ -227,7 +301,8 @@ body {
 .player-name:focus {
     outline: none;
     border-color: var(--gold);
-    box-shadow: 0 0 0 3px rgba(201,169,110,0.2);
+    box-shadow: var(--focus-ring);
+    background: var(--paper-white);
 }
 
 .score-info {
@@ -288,28 +363,49 @@ body {
     color: var(--primary-green);
 }
 
-/* Progress Bar */
+/* Progress Bar - Enhanced Board Game Style */
 .progress-container {
-    background: var(--white);
+    background: var(--card-texture);
     padding: 1rem;
-    border-radius: 8px;
-    box-shadow: var(--shadow-sm);
+    border-radius: 12px;
+    box-shadow: var(--shadow-card);
+    border: 1px solid rgba(201,169,110,0.2);
 }
 
 .progress-bar {
-    height: 8px;
+    height: 12px;
     background: var(--gray-light);
-    border-radius: 4px;
+    border-radius: 6px;
     overflow: hidden;
     margin-bottom: 0.5rem;
+    border: 1px solid rgba(0,0,0,0.1);
+    box-shadow: inset 0 2px 4px rgba(0,0,0,0.1);
 }
 
 .progress-fill {
     height: 100%;
-    background: linear-gradient(90deg, var(--primary-green), var(--light-green));
-    border-radius: 4px;
-    transition: width 0.5s ease;
+    background: linear-gradient(90deg, var(--primary-green), var(--light-green), var(--gold));
+    border-radius: 6px;
+    transition: width 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94);
     width: 0%;
+    position: relative;
+    box-shadow: inset 0 1px 0 rgba(255,255,255,0.3);
+}
+
+.progress-fill::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.2) 50%, transparent 100%);
+    animation: progressShine 2s ease-in-out infinite;
+}
+
+@keyframes progressShine {
+    0% { transform: translateX(-100%); }
+    100% { transform: translateX(100%); }
 }
 
 .progress-text {
@@ -332,51 +428,89 @@ body {
 .btn {
     padding: 0.75rem 1.5rem;
     border: none;
-    border-radius: 6px;
+    border-radius: 8px;
     font-size: 1rem;
-    font-weight: 600;
+    font-weight: var(--font-weight-semibold);
     cursor: pointer;
     transition: var(--transition);
-    box-shadow: var(--shadow-sm);
+    box-shadow: var(--shadow-card);
+    position: relative;
+    overflow: hidden;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    letter-spacing: 0.01em;
+    /* Enhanced button depth */
+    border: 1px solid rgba(0,0,0,0.1);
 }
 
 .btn:hover {
-    transform: translateY(-2px);
-    box-shadow: var(--shadow-md);
+    transform: translateY(-3px);
+    box-shadow: var(--shadow-lg);
+}
+
+.btn:active {
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-pressed);
+}
+
+.btn:focus {
+    outline: none;
+    box-shadow: var(--shadow-card), var(--focus-ring);
 }
 
 .btn-primary {
     background: linear-gradient(135deg, var(--primary-green), var(--light-green));
     color: var(--white);
+    border-color: var(--primary-green);
+}
+
+.btn-primary:hover {
+    background: linear-gradient(135deg, var(--dark-green), var(--primary-green));
 }
 
 .btn-secondary {
-    background: var(--white);
+    background: var(--card-texture);
     color: var(--primary-green);
     border: 2px solid var(--primary-green);
+}
+
+.btn-secondary:hover {
+    background: linear-gradient(135deg, var(--cream), var(--paper-white));
+    border-color: var(--dark-green);
+    color: var(--dark-green);
 }
 
 .btn-info {
     background: linear-gradient(135deg, var(--gold), var(--light-gold));
     color: var(--dark-green);
+    border-color: var(--gold);
+}
+
+.btn-info:hover {
+    background: linear-gradient(135deg, var(--light-gold), var(--gold));
 }
 
 .btn-rules {
     background: linear-gradient(135deg, #8b4513, #d2691e);
     color: var(--white);
-    text-decoration: none;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
+    border-color: #8b4513;
+}
+
+.btn-rules:hover {
+    background: linear-gradient(135deg, #654321, #8b4513);
 }
 
 .btn-game {
     background: linear-gradient(135deg, #7b68ee, #9370db);
     color: var(--white);
-    text-decoration: none;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
+    border-color: #7b68ee;
+}
+
+.btn-game:hover {
+    background: linear-gradient(135deg, #6a5acd, #7b68ee);
 }
 
 /* Holes Grid */
@@ -393,18 +527,42 @@ body {
 }
 
 .hole-card {
-    background: var(--white);
+    background: var(--card-texture);
     border-radius: 12px;
     padding: 1.5rem;
-    box-shadow: var(--shadow-md);
+    box-shadow: var(--shadow-card);
     transition: var(--transition);
     position: relative;
     overflow: hidden;
+    border: 1px solid rgba(201,169,110,0.2);
+    /* Enhanced vintage scorecard styling */
+    background-size: cover;
+    background-position: center;
+}
+
+.hole-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: 
+        /* Subtle paper texture overlay */
+        radial-gradient(circle at 80% 20%, rgba(201,169,110,0.03) 0%, transparent 50%),
+        radial-gradient(circle at 20% 80%, rgba(26,95,63,0.02) 0%, transparent 50%);
+    pointer-events: none;
+    z-index: 0;
+}
+
+.hole-card > * {
+    position: relative;
+    z-index: 1;
 }
 
 .hole-card:hover {
-    transform: translateY(-4px);
-    box-shadow: var(--shadow-lg);
+    transform: translateY(-6px);
+    box-shadow: var(--shadow-lg), 0 0 0 1px rgba(201,169,110,0.3);
 }
 
 .hole-card.island-green {
@@ -553,7 +711,9 @@ body {
 .score-input:focus {
     outline: none;
     border-color: var(--gold);
-    box-shadow: 0 0 0 3px rgba(201,169,110,0.2);
+    box-shadow: var(--focus-ring);
+    background: var(--paper-white);
+    transform: scale(1.05);
 }
 
 .score-input.eagle {
@@ -599,46 +759,10 @@ body {
     font-style: italic;
 }
 
-/* Modal Styles */
-.modal {
-    display: none;
-    position: fixed;
-    z-index: 1000;
-    left: 0;
-    top: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0,0,0,0.5);
-    backdrop-filter: blur(5px);
-}
-
 .modal.show {
     display: flex;
     align-items: center;
     justify-content: center;
-}
-
-.modal-content {
-    background: var(--white);
-    border-radius: 12px;
-    padding: 2rem;
-    max-width: 600px;
-    width: 90%;
-    max-height: 80vh;
-    overflow-y: auto;
-    position: relative;
-    animation: slideIn 0.3s ease;
-}
-
-@keyframes slideIn {
-    from {
-        transform: translateY(-50px);
-        opacity: 0;
-    }
-    to {
-        transform: translateY(0);
-        opacity: 1;
-    }
 }
 
 .modal-close {
@@ -783,6 +907,130 @@ body {
     color: var(--gold);
 }
 
+/* Enhanced Dice Animations - Board Game Authentic */
+.dice-authentic {
+    width: 60px;
+    height: 60px;
+    background: var(--paper-white);
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.8rem;
+    font-weight: var(--font-weight-extrabold);
+    box-shadow: var(--shadow-card);
+    transition: var(--transition);
+    position: relative;
+    border: 2px solid rgba(0,0,0,0.1);
+    /* Authentic board game dice styling */
+    background-image: 
+        radial-gradient(circle at 20% 20%, rgba(0,0,0,0.02) 20%, transparent 21%),
+        radial-gradient(circle at 80% 80%, rgba(0,0,0,0.02) 20%, transparent 21%);
+}
+
+.dice-authentic.green {
+    background: linear-gradient(135deg, #4CAF50, #2E7D32);
+    color: var(--white);
+    border-color: #2E7D32;
+}
+
+.dice-authentic.red {
+    background: linear-gradient(135deg, #F44336, #C62828);
+    color: var(--white);
+    border-color: #C62828;
+}
+
+.dice-authentic.rolling {
+    animation: authenticDiceRoll 1.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+@keyframes authenticDiceRoll {
+    0% { 
+        transform: rotate(0deg) scale(1); 
+        box-shadow: var(--shadow-card);
+    }
+    15% { 
+        transform: rotate(180deg) scale(1.2); 
+        box-shadow: var(--shadow-lg);
+    }
+    30% { 
+        transform: rotate(360deg) scale(0.9); 
+        box-shadow: var(--shadow-sm);
+    }
+    45% { 
+        transform: rotate(540deg) scale(1.15); 
+        box-shadow: var(--shadow-md);
+    }
+    60% { 
+        transform: rotate(720deg) scale(1); 
+        box-shadow: var(--shadow-lg);
+    }
+    75% { 
+        transform: rotate(810deg) scale(1.08); 
+        box-shadow: var(--shadow-card);
+    }
+    90% { 
+        transform: rotate(880deg) scale(0.98); 
+        box-shadow: var(--shadow-md);
+    }
+    100% { 
+        transform: rotate(900deg) scale(1); 
+        box-shadow: var(--shadow-card);
+    }
+}
+
+/* Enhanced Modal Styling */
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.6);
+    backdrop-filter: blur(8px);
+}
+
+.modal-content {
+    background: var(--card-texture);
+    border-radius: 16px;
+    padding: 2rem;
+    max-width: 600px;
+    width: 90%;
+    max-height: 80vh;
+    overflow-y: auto;
+    position: relative;
+    animation: modalSlideIn 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    border: 1px solid rgba(201,169,110,0.3);
+    box-shadow: var(--shadow-lg);
+}
+
+@keyframes modalSlideIn {
+    from {
+        transform: translateY(-60px) scale(0.95);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0) scale(1);
+        opacity: 1;
+    }
+}
+
+/* Touch Target Improvements for Mobile */
+.btn, .score-input, .player-name, .club-option, .mode-option {
+    min-height: 44px; /* iOS/Android recommended minimum */
+    min-width: 44px;
+}
+
+/* Enhanced Focus States for Accessibility */
+.btn:focus-visible,
+.score-input:focus-visible,
+.player-name:focus-visible {
+    outline: 3px solid var(--gold);
+    outline-offset: 2px;
+}
+
 /* Responsive Design */
 @media (max-width: 968px) {
     .header-content {
@@ -799,9 +1047,10 @@ body {
     }
 }
 
-@media (max-width: 640px) {
+@media (max-width: 768px) {
     .course-name {
-        font-size: 1.75rem;
+        font-size: 2rem;
+        line-height: 1.2;
     }
     
     .course-subtitle {
@@ -810,6 +1059,7 @@ body {
     
     .player-scores {
         grid-template-columns: 1fr;
+        gap: 1rem;
     }
     
     .total-score {
@@ -822,15 +1072,203 @@ body {
     
     .controls {
         flex-direction: column;
+        gap: 0.75rem;
     }
     
     .btn {
         width: 100%;
+        padding: 1rem 1.5rem;
+        font-size: 1.1rem;
     }
     
     .holes-grid {
         grid-template-columns: 1fr;
+        gap: 1rem;
     }
+    
+    .hole-card {
+        padding: 1.25rem;
+    }
+    
+    /* Enhanced mobile touch targets */
+    .score-input {
+        padding: 1rem;
+        font-size: 1.75rem;
+        min-height: 56px;
+    }
+    
+    .player-name {
+        padding: 0.75rem;
+        font-size: 1.2rem;
+        min-height: 52px;
+    }
+}
+
+@media (max-width: 640px) {
+    .course-name {
+        font-size: 1.75rem;
+    }
+    
+    .header {
+        padding: 1.5rem 0;
+    }
+    
+    .header-content {
+        padding: 0 0.75rem;
+    }
+    
+    .course-stats {
+        gap: 1rem;
+        padding: 0.75rem 1rem;
+    }
+    
+    .stat {
+        min-width: 60px;
+    }
+}
+
+/* Board Game Utility Classes */
+.board-game-card {
+    background: var(--card-texture);
+    border-radius: 12px;
+    padding: 1rem;
+    box-shadow: var(--shadow-card);
+    border: 1px solid rgba(201,169,110,0.2);
+    position: relative;
+    overflow: hidden;
+}
+
+.board-game-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: 
+        radial-gradient(circle at 75% 25%, rgba(201,169,110,0.03) 0%, transparent 50%),
+        radial-gradient(circle at 25% 75%, rgba(26,95,63,0.02) 0%, transparent 50%);
+    pointer-events: none;
+    z-index: 0;
+}
+
+.board-game-card > * {
+    position: relative;
+    z-index: 1;
+}
+
+.vintage-border {
+    border: 2px solid var(--gold);
+    border-radius: 8px;
+    position: relative;
+}
+
+.vintage-border::before {
+    content: '';
+    position: absolute;
+    top: -2px;
+    left: -2px;
+    right: -2px;
+    bottom: -2px;
+    background: linear-gradient(45deg, var(--light-gold), var(--gold), var(--light-gold));
+    border-radius: 10px;
+    z-index: -1;
+}
+
+.scorecard-header {
+    background: linear-gradient(135deg, var(--primary-green), var(--dark-green));
+    color: var(--white);
+    padding: 1rem;
+    border-radius: 8px 8px 0 0;
+    text-align: center;
+    font-weight: var(--font-weight-bold);
+    text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
+    border-bottom: 2px solid var(--gold);
+}
+
+.game-element {
+    transition: var(--transition);
+    cursor: pointer;
+}
+
+.game-element:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+}
+
+.game-element:active {
+    transform: translateY(0px);
+    box-shadow: var(--shadow-sm);
+}
+
+/* Club Selection Enhanced Styling */
+.club-option {
+    padding: 0.75rem;
+    background: var(--card-texture);
+    border: 2px solid transparent;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: var(--transition);
+    text-align: center;
+    font-weight: var(--font-weight-medium);
+    position: relative;
+    overflow: hidden;
+    min-height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.club-option::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(201,169,110,0.2), transparent);
+    transition: left 0.5s;
+}
+
+.club-option:hover::before {
+    left: 100%;
+}
+
+.club-option:hover {
+    background: var(--cream);
+    border-color: var(--primary-green);
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+}
+
+.club-option.selected {
+    background: linear-gradient(135deg, var(--primary-green), var(--light-green));
+    color: var(--white);
+    border-color: var(--gold);
+    box-shadow: var(--shadow-card);
+}
+
+.club-option:focus {
+    outline: none;
+    box-shadow: var(--focus-ring);
+}
+
+/* Game Status Panel - Consistent Styling */
+.game-status {
+    background: var(--card-texture);
+    padding: 1rem;
+    border-radius: 8px;
+    border: 1px solid rgba(201,169,110,0.2);
+    box-shadow: var(--shadow-sm);
+}
+
+.control-title {
+    font-weight: var(--font-weight-semibold);
+    color: var(--primary-green);
+    margin-bottom: 1rem;
+    font-size: 1.1rem;
+    text-transform: uppercase;
+    letter-spacing: 0.02em;
 }
 
 /* Print Styles */
