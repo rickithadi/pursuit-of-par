@@ -33,6 +33,18 @@
     {
       "src": "game-engine.js",
       "use": "@vercel/static"
+    },
+    {
+      "src": "game-engine-3d.js",
+      "use": "@vercel/static"
+    },
+    {
+      "src": "authentic-mechanics.js",
+      "use": "@vercel/static"
+    },
+    {
+      "src": "game-3d.html",
+      "use": "@vercel/static"
     }
   ],
   "routes": [
@@ -63,6 +75,14 @@
     {
       "src": "/play",
       "dest": "/game.html"
+    },
+    {
+      "src": "/3d",
+      "dest": "/game-3d.html"
+    },
+    {
+      "src": "/enhanced",
+      "dest": "/game-3d.html"
     }
   ],
   "headers": [

@@ -1,0 +1,766 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>In Pursuit of Par - Enhanced 3D Golf Simulation</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        .enhanced-game-container {
+            max-width: 1800px;
+            margin: 0 auto;
+            padding: 1rem;
+            background: var(--cream);
+            min-height: 100vh;
+        }
+        
+        .enhanced-header {
+            background: linear-gradient(135deg, var(--primary-green), var(--dark-green));
+            color: var(--white);
+            padding: 2rem;
+            border-radius: 12px;
+            text-align: center;
+            margin-bottom: 2rem;
+            box-shadow: var(--shadow-lg);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .enhanced-header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="20" cy="20" r="2" fill="rgba(255,255,255,0.1)"/><circle cx="80" cy="30" r="1.5" fill="rgba(255,255,255,0.08)"/><circle cx="60" cy="70" r="1" fill="rgba(255,255,255,0.06)"/></svg>');
+            pointer-events: none;
+        }
+        
+        .enhanced-title {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+        
+        .enhanced-subtitle {
+            font-size: 1.2rem;
+            color: var(--gold);
+            margin-bottom: 1rem;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
+        }
+        
+        .performance-indicator {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: rgba(255,255,255,0.1);
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            margin-top: 1rem;
+        }
+        
+        .performance-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #4CAF50;
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+        
+        .enhanced-layout {
+            display: grid;
+            grid-template-columns: 1fr 450px;
+            gap: 2rem;
+        }
+        
+        .course-3d-area {
+            background: var(--white);
+            border-radius: 12px;
+            padding: 1.5rem;
+            box-shadow: var(--shadow-lg);
+            position: relative;
+        }
+        
+        .course-3d-viewport {
+            width: 100%;
+            height: 700px;
+            border-radius: 8px;
+            overflow: hidden;
+            background: linear-gradient(135deg, #87ceeb 0%, #98fb98 100%);
+            position: relative;
+            box-shadow: inset 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        .viewport-overlay {
+            position: absolute;
+            top: 1rem;
+            left: 1rem;
+            right: 1rem;
+            z-index: 10;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+        }
+        
+        .hole-info-3d {
+            background: rgba(255,255,255,0.95);
+            padding: 1rem;
+            border-radius: 8px;
+            box-shadow: var(--shadow-md);
+            min-width: 200px;
+        }
+        
+        .camera-controls {
+            background: rgba(255,255,255,0.95);
+            padding: 0.5rem;
+            border-radius: 8px;
+            display: flex;
+            gap: 0.5rem;
+        }
+        
+        .camera-btn {
+            background: var(--primary-green);
+            color: white;
+            border: none;
+            padding: 0.5rem;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: var(--transition);
+            font-size: 0.8rem;
+        }
+        
+        .camera-btn:hover {
+            background: var(--dark-green);
+            transform: translateY(-1px);
+        }
+        
+        .enhanced-panel {
+            background: var(--white);
+            border-radius: 12px;
+            padding: 2rem;
+            box-shadow: var(--shadow-lg);
+            height: fit-content;
+        }
+        
+        .game-mode-selector {
+            background: var(--cream);
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 2rem;
+        }
+        
+        .mode-title {
+            font-weight: 600;
+            color: var(--primary-green);
+            margin-bottom: 1rem;
+        }
+        
+        .mode-options {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0.5rem;
+        }
+        
+        .mode-option {
+            padding: 0.75rem;
+            background: var(--white);
+            border: 2px solid transparent;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: var(--transition);
+            text-align: center;
+            font-size: 0.9rem;
+        }
+        
+        .mode-option:hover {
+            border-color: var(--primary-green);
+        }
+        
+        .mode-option.selected {
+            background: var(--primary-green);
+            color: var(--white);
+            border-color: var(--gold);
+        }
+        
+        .enhanced-controls {
+            margin-bottom: 2rem;
+        }
+        
+        .control-group {
+            background: var(--cream);
+            padding: 1.5rem;
+            border-radius: 8px;
+            margin-bottom: 1.5rem;
+        }
+        
+        .control-group-title {
+            font-weight: 600;
+            color: var(--primary-green);
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .shot-power-control {
+            margin: 1rem 0;
+        }
+        
+        .power-meter {
+            width: 100%;
+            height: 8px;
+            background: var(--gray-light);
+            border-radius: 4px;
+            overflow: hidden;
+            position: relative;
+            margin: 1rem 0;
+        }
+        
+        .power-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #4CAF50, #FFC107, #FF5722);
+            width: 75%;
+            transition: width 0.3s ease;
+        }
+        
+        .power-labels {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.8rem;
+            color: var(--gray-medium);
+            margin-top: 0.5rem;
+        }
+        
+        .wind-indicator {
+            background: rgba(135, 206, 235, 0.2);
+            padding: 1rem;
+            border-radius: 6px;
+            margin: 1rem 0;
+            text-align: center;
+        }
+        
+        .wind-arrow {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+            display: block;
+            transform: rotate(45deg);
+            transition: transform 0.5s ease;
+        }
+        
+        .wind-strength {
+            font-weight: 600;
+            color: var(--primary-green);
+        }
+        
+        .enhanced-dice-display {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            margin: 1.5rem 0;
+        }
+        
+        .enhanced-dice {
+            width: 60px;
+            height: 60px;
+            background: var(--white);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.8rem;
+            font-weight: 700;
+            box-shadow: var(--shadow-md);
+            transition: var(--transition);
+            position: relative;
+        }
+        
+        .enhanced-dice.green {
+            background: linear-gradient(135deg, #4CAF50, #2E7D32);
+            color: var(--white);
+        }
+        
+        .enhanced-dice.red {
+            background: linear-gradient(135deg, #F44336, #C62828);
+            color: var(--white);
+        }
+        
+        .enhanced-dice.rolling {
+            animation: enhanced-roll 0.8s ease-in-out;
+        }
+        
+        @keyframes enhanced-roll {
+            0%, 100% { transform: rotate(0deg) scale(1); }
+            25% { transform: rotate(90deg) scale(1.1); }
+            50% { transform: rotate(180deg) scale(1.2); }
+            75% { transform: rotate(270deg) scale(1.1); }
+        }
+        
+        .dice-label {
+            position: absolute;
+            bottom: -20px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 0.7rem;
+            color: var(--gray-medium);
+            white-space: nowrap;
+        }
+        
+        .enhanced-shot-button {
+            width: 100%;
+            padding: 1.2rem;
+            background: linear-gradient(135deg, var(--primary-green), var(--light-green));
+            color: var(--white);
+            border: none;
+            border-radius: 12px;
+            font-size: 1.2rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            margin-bottom: 1rem;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .enhanced-shot-button::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            transition: left 0.5s;
+        }
+        
+        .enhanced-shot-button:hover::before {
+            left: 100%;
+        }
+        
+        .enhanced-shot-button:hover {
+            transform: translateY(-3px);
+            box-shadow: var(--shadow-lg);
+        }
+        
+        .enhanced-shot-button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .trajectory-preview {
+            background: rgba(255,255,255,0.95);
+            padding: 1rem;
+            border-radius: 8px;
+            margin: 1rem 0;
+            display: none;
+        }
+        
+        .trajectory-preview.show {
+            display: block;
+            animation: fadeIn 0.3s ease;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .stats-mini {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1rem;
+            margin: 1rem 0;
+        }
+        
+        .stat-mini {
+            text-align: center;
+            padding: 1rem;
+            background: var(--cream);
+            border-radius: 6px;
+        }
+        
+        .stat-mini-value {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--primary-green);
+        }
+        
+        .stat-mini-label {
+            font-size: 0.8rem;
+            color: var(--gray-medium);
+            text-transform: uppercase;
+        }
+        
+        .loading-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(255,255,255,0.9);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 8px;
+            z-index: 20;
+        }
+        
+        .loading-spinner {
+            width: 50px;
+            height: 50px;
+            border: 3px solid var(--gray-light);
+            border-top: 3px solid var(--primary-green);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        @media (max-width: 1400px) {
+            .enhanced-layout {
+                grid-template-columns: 1fr;
+                gap: 1rem;
+            }
+            
+            .enhanced-panel {
+                order: -1;
+            }
+            
+            .course-3d-viewport {
+                height: 500px;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .enhanced-game-container {
+                padding: 0.5rem;
+            }
+            
+            .enhanced-header {
+                padding: 1rem;
+            }
+            
+            .enhanced-title {
+                font-size: 1.8rem;
+            }
+            
+            .viewport-overlay {
+                flex-direction: column;
+                gap: 1rem;
+            }
+            
+            .mode-options {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="enhanced-game-container">
+        <div class="enhanced-header">
+            <h1 class="enhanced-title">🎲 In Pursuit of Par</h1>
+            <p class="enhanced-subtitle">Enhanced 3D Golf Simulation - TPC Sawgrass Stadium Course</p>
+            <div class="game-navigation" style="margin-top: 1rem; display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;">
+                <a href="index.html" class="btn btn-secondary">📊 Scorecard</a>
+                <a href="game.html" class="btn btn-secondary">🎮 Classic Game</a>
+                <a href="rules.html" class="btn btn-info">📖 Rules</a>
+                <a href="test.html" class="btn btn-secondary">🧪 Tests</a>
+            </div>
+            <div class="performance-indicator">
+                <div class="performance-dot"></div>
+                <span>Enhanced 3D Engine Active</span>
+            </div>
+        </div>
+        
+        <div class="enhanced-layout">
+            <div class="course-3d-area">
+                <div class="course-3d-viewport" id="course3DViewport">
+                    <div class="loading-overlay" id="loadingOverlay">
+                        <div style="text-align: center;">
+                            <div class="loading-spinner"></div>
+                            <p style="margin-top: 1rem; color: var(--primary-green); font-weight: 600;">Loading 3D Course...</p>
+                        </div>
+                    </div>
+                    
+                    <div class="viewport-overlay">
+                        <div class="hole-info-3d">
+                            <div class="hole-number" style="font-size: 2rem; font-weight: 700; color: var(--primary-green); margin-bottom: 0.5rem;" id="currentHole3D">1</div>
+                            <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.5rem; font-size: 0.9rem;">
+                                <div>
+                                    <div style="color: var(--gray-medium); font-size: 0.7rem;">PAR</div>
+                                    <div style="font-weight: 600;" id="holePar3D">4</div>
+                                </div>
+                                <div>
+                                    <div style="color: var(--gray-medium); font-size: 0.7rem;">YARDS</div>
+                                    <div style="font-weight: 600;" id="holeYardage3D">394</div>
+                                </div>
+                                <div>
+                                    <div style="color: var(--gray-medium); font-size: 0.7rem;">DIFF</div>
+                                    <div style="font-weight: 600;" id="holeDifficulty3D">#13</div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="camera-controls">
+                            <button class="camera-btn" id="cameraOverhead">📐 Overhead</button>
+                            <button class="camera-btn" id="cameraBehindBall">🎯 Behind Ball</button>
+                            <button class="camera-btn" id="cameraGreen">🏁 Green</button>
+                            <button class="camera-btn" id="cameraFree">🔄 Free</button>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="trajectory-preview" id="trajectoryPreview">
+                    <h4 style="margin: 0 0 0.5rem 0; color: var(--primary-green);">Shot Preview</h4>
+                    <p style="margin: 0; font-size: 0.9rem; color: var(--gray-dark);" id="trajectoryText">Hover over clubs to see shot preview</p>
+                </div>
+            </div>
+            
+            <div class="enhanced-panel">
+                <div class="game-mode-selector">
+                    <div class="mode-title">🎮 Game Mode</div>
+                    <div class="mode-options">
+                        <div class="mode-option selected" data-mode="authentic">📜 Authentic 1987</div>
+                        <div class="mode-option" data-mode="enhanced">✨ Enhanced 3D</div>
+                    </div>
+                </div>
+                
+                <div class="enhanced-controls">
+                    <div class="control-group">
+                        <div class="control-group-title">
+                            🏌️ Club Selection
+                        </div>
+                        <div class="club-selector" id="clubSelector3D">
+                            <div class="club-option" data-club="driver">Driver</div>
+                            <div class="club-option" data-club="3wood">3 Wood</div>
+                            <div class="club-option" data-club="5wood">5 Wood</div>
+                            <div class="club-option" data-club="3iron">3 Iron</div>
+                            <div class="club-option" data-club="5iron">5 Iron</div>
+                            <div class="club-option" data-club="7iron">7 Iron</div>
+                            <div class="club-option" data-club="9iron">9 Iron</div>
+                            <div class="club-option" data-club="wedge">Wedge</div>
+                            <div class="club-option" data-club="putter">Putter</div>
+                        </div>
+                        
+                        <div class="shot-power-control">
+                            <label style="display: block; margin-bottom: 0.5rem; font-weight: 500;">Shot Power</label>
+                            <div class="power-meter">
+                                <div class="power-fill" id="powerFill"></div>
+                            </div>
+                            <div class="power-labels">
+                                <span>Soft</span>
+                                <span>Normal</span>
+                                <span>Full</span>
+                            </div>
+                            <input type="range" id="powerSlider" min="25" max="100" value="75" style="width: 100%; margin-top: 0.5rem;">
+                        </div>
+                    </div>
+                    
+                    <div class="control-group">
+                        <div class="control-group-title">
+                            🌬️ Course Conditions
+                        </div>
+                        <div class="wind-indicator">
+                            <span class="wind-arrow" id="windArrow">↗</span>
+                            <div class="wind-strength" id="windStrength">5 mph</div>
+                            <div style="font-size: 0.8rem; color: var(--gray-medium); margin-top: 0.25rem;">NE Wind</div>
+                        </div>
+                        
+                        <div class="stats-mini">
+                            <div class="stat-mini">
+                                <div class="stat-mini-value" id="temperature">72°</div>
+                                <div class="stat-mini-label">Temperature</div>
+                            </div>
+                            <div class="stat-mini">
+                                <div class="stat-mini-value" id="humidity">45%</div>
+                                <div class="stat-mini-label">Humidity</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="control-group">
+                        <div class="control-group-title">
+                            🎲 Authentic Dice Roll
+                        </div>
+                        <div class="enhanced-dice-display">
+                            <div class="enhanced-dice green" id="greenDice3D">
+                                ?
+                                <div class="dice-label">Distance</div>
+                            </div>
+                            <div class="enhanced-dice green" id="directionDice3D">
+                                ?
+                                <div class="dice-label">Direction</div>
+                            </div>
+                            <div class="enhanced-dice red" id="problemDice3D" style="display: none;">
+                                ?
+                                <div class="dice-label">Problem</div>
+                            </div>
+                        </div>
+                        
+                        <button class="enhanced-shot-button" id="takeShot3D">
+                            🏌️ Take Shot
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="game-status">
+                    <div class="control-title">📊 Current Status</div>
+                    <div class="status-item">
+                        <span class="status-label">Player:</span>
+                        <span class="status-value" id="currentPlayer3D">Player 1</span>
+                    </div>
+                    <div class="status-item">
+                        <span class="status-label">Strokes:</span>
+                        <span class="status-value" id="currentStrokes3D">0</span>
+                    </div>
+                    <div class="status-item">
+                        <span class="status-label">Distance to Pin:</span>
+                        <span class="status-value" id="distanceToPin3D">394 yards</span>
+                    </div>
+                    <div class="status-item">
+                        <span class="status-label">Lie:</span>
+                        <span class="status-value" id="currentLie3D">Tee</span>
+                    </div>
+                </div>
+                
+                <div style="display: flex; gap: 0.5rem; margin-top: 1rem;">
+                    <button class="btn btn-secondary" style="flex: 1;" id="undoShot3D">↶ Undo</button>
+                    <button class="btn btn-primary" style="flex: 1;" id="nextHole3D">Next Hole ➤</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Load dependencies -->
+    <script src="authentic-mechanics.js"></script>
+    <script src="board-game-bridge.js"></script>
+    <script type="module">
+        // Import the enhanced 3D engine
+        import { Enhanced3DGolfEngine } from './game-engine-3d.js';
+        
+        // Initialize when DOM is ready
+        document.addEventListener('DOMContentLoaded', () => {
+            // Show loading for better UX
+            setTimeout(() => {
+                document.getElementById('loadingOverlay').style.display = 'none';
+            }, 2000);
+            
+            // Initialize the enhanced engine
+            window.enhanced3DEngine = new Enhanced3DGolfEngine();
+            
+            // Setup enhanced UI interactions
+            setupEnhanced3DUI();
+        });
+        
+        function setupEnhanced3DUI() {
+            // Power slider updates
+            const powerSlider = document.getElementById('powerSlider');
+            const powerFill = document.getElementById('powerFill');
+            
+            powerSlider?.addEventListener('input', (e) => {
+                const power = e.target.value;
+                powerFill.style.width = `${power}%`;
+            });
+            
+            // Club hover preview
+            document.querySelectorAll('.club-option').forEach(club => {
+                club.addEventListener('mouseenter', () => {
+                    showTrajectoryPreview(club.dataset.club);
+                });
+                
+                club.addEventListener('mouseleave', () => {
+                    hideTrajectoryPreview();
+                });
+            });
+            
+            // Camera controls
+            document.getElementById('cameraOverhead')?.addEventListener('click', () => {
+                window.enhanced3DEngine?.setCameraView('overhead');
+            });
+            
+            document.getElementById('cameraBehindBall')?.addEventListener('click', () => {
+                window.enhanced3DEngine?.setCameraView('behind');
+            });
+            
+            document.getElementById('cameraGreen')?.addEventListener('click', () => {
+                window.enhanced3DEngine?.setCameraView('green');
+            });
+            
+            document.getElementById('cameraFree')?.addEventListener('click', () => {
+                window.enhanced3DEngine?.setCameraView('free');
+            });
+            
+            // Mode selection
+            document.querySelectorAll('.mode-option').forEach(option => {
+                option.addEventListener('click', () => {
+                    document.querySelectorAll('.mode-option').forEach(o => o.classList.remove('selected'));
+                    option.classList.add('selected');
+                    
+                    const mode = option.dataset.mode;
+                    window.enhanced3DEngine?.setGameMode(mode);
+                });
+            });
+            
+            // Simulate dynamic wind
+            simulateWeatherEffects();
+        }
+        
+        function showTrajectoryPreview(club) {
+            const preview = document.getElementById('trajectoryPreview');
+            const text = document.getElementById('trajectoryText');
+            
+            // Get shot data for preview
+            const shotData = window.enhanced3DEngine?.getClubPreview?.(club);
+            if (shotData) {
+                text.textContent = `${club.toUpperCase()}: ${shotData.minDistance}-${shotData.maxDistance} yards, ${shotData.accuracy}% accuracy`;
+                preview.classList.add('show');
+            }
+        }
+        
+        function hideTrajectoryPreview() {
+            document.getElementById('trajectoryPreview').classList.remove('show');
+        }
+        
+        function simulateWeatherEffects() {
+            const windArrow = document.getElementById('windArrow');
+            const windStrength = document.getElementById('windStrength');
+            const temperature = document.getElementById('temperature');
+            const humidity = document.getElementById('humidity');
+            
+            // Update weather every 30 seconds
+            setInterval(() => {
+                // Wind direction (8 directions)
+                const directions = ['↑', '↗', '→', '↘', '↓', '↙', '←', '↖'];
+                const randomDir = directions[Math.floor(Math.random() * directions.length)];
+                windArrow.textContent = randomDir;
+                
+                // Wind strength (0-15 mph)
+                const strength = Math.floor(Math.random() * 16);
+                windStrength.textContent = `${strength} mph`;
+                
+                // Temperature (65-85°F)
+                const temp = Math.floor(Math.random() * 21) + 65;
+                temperature.textContent = `${temp}°`;
+                
+                // Humidity (30-70%)
+                const hum = Math.floor(Math.random() * 41) + 30;
+                humidity.textContent = `${hum}%`;
+            }, 30000);
+        }
+    </script>
+</body>
+</html>
