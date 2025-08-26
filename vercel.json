@@ -5,7 +5,7 @@
       "destination": "/test.html"
     },
     {
-      "source": "/tests",
+      "source": "/tests", 
       "destination": "/test.html"
     },
     {
@@ -31,17 +31,6 @@
     {
       "source": "/enhanced",
       "destination": "/game-3d.html"
-    }
-  ],
-  "headers": [
-    {
-      "source": "/api/(.*)",
-      "headers": [
-        {
-          "key": "Access-Control-Allow-Origin",
-          "value": "*"
-        }
-      ]
     }
   ]
 }
