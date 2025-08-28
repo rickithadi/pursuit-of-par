@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Simple Game Test</title>
+    <style>
+        body { font-family: Arial; padding: 20px; background: #f0f0f0; }
+        .status { padding: 10px; margin: 10px 0; border-radius: 5px; }
+        .loading { background: #fff3cd; color: #856404; }
+        .success { background: #d1edff; color: #0c5460; }
+        .error { background: #f8d7da; color: #721c24; }
+    </style>
+</head>
+<body>
+    <h1>🎮 Simple Game Loading Test</h1>
+    <div id="status" class="status loading">Testing basic game loading...</div>
+    
+    <script>
+        console.log('Starting simple test...');
+        
+        // Test if the basic HTML works
+        setTimeout(() => {
+            document.getElementById('status').innerHTML = '✅ Basic HTML and JavaScript working!';
+            document.getElementById('status').className = 'status success';
+            
+            // Now test if we can load Phaser
+            testPhaserLoading();
+        }, 1000);
+        
+        function testPhaserLoading() {
+            document.getElementById('status').innerHTML = '⏳ Testing Phaser.js loading...';
+            document.getElementById('status').className = 'status loading';
+            
+            const script = document.createElement('script');
+            script.src = 'https://cdn.jsdelivr.net/npm/phaser@3.80.1/dist/phaser.min.js';
+            
+            script.onload = () => {
+                if (typeof Phaser !== 'undefined') {
+                    document.getElementById('status').innerHTML = '✅ Phaser.js loaded successfully!';
+                    document.getElementById('status').className = 'status success';
+                    
+                    // Test local file loading
+                    setTimeout(testLocalFiles, 1000);
+                } else {
+                    document.getElementById('status').innerHTML = '❌ Phaser loaded but not accessible';
+                    document.getElementById('status').className = 'status error';
+                }
+            };
+            
+            script.onerror = () => {
+                document.getElementById('status').innerHTML = '❌ Failed to load Phaser.js from CDN';
+                document.getElementById('status').className = 'status error';
+            };
+            
+            document.head.appendChild(script);
+        }
+        
+        function testLocalFiles() {
+            document.getElementById('status').innerHTML = '⏳ Testing local file loading...';
+            document.getElementById('status').className = 'status loading';
+            
+            const testFile = document.createElement('script');
+            testFile.src = 'authentic-mechanics.js';
+            
+            testFile.onload = () => {
+                document.getElementById('status').innerHTML = '✅ Local files loading successfully!<br>Game should work properly now.';
+                document.getElementById('status').className = 'status success';
+            };
+            
+            testFile.onerror = () => {
+                document.getElementById('status').innerHTML = '❌ Failed to load local game files';
+                document.getElementById('status').className = 'status error';
+            };
+            
+            document.head.appendChild(testFile);
+        }
+    </script>
+</body>
+</html>

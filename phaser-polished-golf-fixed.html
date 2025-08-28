@@ -1,0 +1,630 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Polished Golf Course - FIXED Ball Movement</title>
+    <style>
+        :root {
+            --vintage-cream: #F5DEB3;
+            --brown-wood: #8B4513;
+            --fairway-green: #2E7D32;
+            --rough-dark: #33691E;
+            --sand-tan: #D7B899;
+            --water-blue: #1976D2;
+            --pin-red: #D32F2F;
+        }
+
+        body { 
+            margin: 0; 
+            padding: 0; 
+            background: linear-gradient(135deg, var(--vintage-cream) 0%, #E6D3A3 100%);
+            font-family: 'Times New Roman', serif; 
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+        }
+        
+        .header {
+            background: var(--brown-wood);
+            color: white;
+            padding: 15px;
+            text-align: center;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+        }
+        
+        .game-container {
+            display: flex;
+            flex: 1;
+            padding: 20px;
+            gap: 20px;
+            max-width: 1400px;
+            margin: 0 auto;
+            width: 100%;
+        }
+        
+        .left-panel {
+            width: 320px;
+            background: white;
+            border: 3px solid var(--brown-wood);
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+            height: fit-content;
+        }
+        
+        .right-panel {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        #gameCanvas {
+            flex: 1;
+            border: 3px solid var(--brown-wood);
+            border-radius: 8px;
+            background: #87CEEB;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+        }
+        
+        .distance-info {
+            background: var(--brown-wood);
+            color: white;
+            padding: 10px;
+            border-radius: 0 0 8px 8px;
+            display: flex;
+            justify-content: space-around;
+            font-weight: bold;
+        }
+        
+        h2 {
+            color: var(--brown-wood);
+            margin: 0 0 15px 0;
+            text-align: center;
+            font-size: 1.4em;
+            border-bottom: 2px solid var(--brown-wood);
+            padding-bottom: 8px;
+        }
+        
+        .club-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin: 15px 0;
+        }
+        
+        .club-btn {
+            padding: 12px 8px;
+            background: linear-gradient(145deg, #D2691E, #CD853F);
+            color: white;
+            border: 2px solid var(--brown-wood);
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 0.9em;
+            transition: all 0.3s ease;
+            text-align: center;
+        }
+        
+        .club-btn:hover {
+            background: linear-gradient(145deg, #CD853F, #D2691E);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+        
+        .club-btn.selected {
+            background: var(--brown-wood);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(0,0,0,0.3);
+        }
+        
+        .shot-info {
+            background: #f5f5f5;
+            border: 2px solid #ddd;
+            border-radius: 6px;
+            padding: 15px;
+            margin: 15px 0;
+        }
+        
+        .distance-display {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin: 10px 0;
+        }
+        
+        .distance-item {
+            background: var(--fairway-green);
+            color: white;
+            padding: 8px;
+            border-radius: 4px;
+            text-align: center;
+            font-weight: bold;
+            font-size: 0.9em;
+        }
+        
+        .take-shot-btn {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(145deg, #4CAF50, #45a049);
+            color: white;
+            border: 3px solid #2E7D32;
+            border-radius: 8px;
+            font-size: 1.2em;
+            font-weight: bold;
+            cursor: pointer;
+            margin: 15px 0;
+            transition: all 0.3s ease;
+        }
+        
+        .take-shot-btn:hover:not(:disabled) {
+            background: linear-gradient(145deg, #45a049, #4CAF50);
+            transform: translateY(-2px);
+        }
+        
+        .take-shot-btn:disabled {
+            background: #999;
+            cursor: not-allowed;
+            opacity: 0.6;
+        }
+        
+        .debug-info {
+            background: #f0f0f0;
+            border: 1px solid #ccc;
+            padding: 10px;
+            margin: 10px 0;
+            font-size: 12px;
+            font-family: monospace;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>🏌️ TPC Sawgrass - Hole 1 "Opening Statement" - FIXED</h1>
+        <p>Par 4 • 394 Yards • Ball Movement Fixed</p>
+    </div>
+    
+    <div class="game-container">
+        <div class="left-panel">
+            <h2>Club Selection</h2>
+            <div class="club-grid">
+                <button class="club-btn" data-club="driver">Driver<br><small>220-280y</small></button>
+                <button class="club-btn" data-club="3wood">3-Wood<br><small>190-230y</small></button>
+                <button class="club-btn" data-club="5iron">5-Iron<br><small>120-160y</small></button>
+                <button class="club-btn" data-club="7iron">7-Iron<br><small>90-130y</small></button>
+                <button class="club-btn" data-club="9iron">9-Iron<br><small>70-100y</small></button>
+                <button class="club-btn" data-club="wedge">Wedge<br><small>40-70y</small></button>
+                <button class="club-btn" data-club="putter">Putter<br><small>5-30y</small></button>
+            </div>
+            
+            <button class="take-shot-btn" id="takeShotBtn" disabled>
+                Select Club First
+            </button>
+            
+            <div class="shot-info">
+                <h2>Shot Information</h2>
+                <div class="distance-display">
+                    <div class="distance-item" id="distanceToPin">To Pin: 394y</div>
+                    <div class="distance-item" id="distanceToGreen">To Green: 374y</div>
+                    <div class="distance-item" id="currentLie">Lie: Tee</div>
+                    <div class="distance-item" id="strokeCount">Strokes: 0</div>
+                </div>
+            </div>
+            
+            <div class="debug-info" id="debugInfo">
+                Debug: Ready to test ball movement
+            </div>
+        </div>
+        
+        <div class="right-panel">
+            <div id="gameCanvas"></div>
+            <div class="distance-info">
+                <span id="ballCoords">Ball: Tee Box (400, 650)</span>
+                <span id="windInfo">Wind: Calm</span>
+                <span id="holeInfo">394 Yards Par 4</span>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/phaser@3.70.0/dist/phaser.min.js"></script>
+    
+    <script>
+        // Game state
+        let gameState = {
+            ballPosition: { x: 400, y: 650 },
+            distanceToPin: 394,
+            currentLie: 'tee',
+            strokeCount: 0,
+            selectedClub: null
+        };
+        
+        // Club data
+        const clubData = {
+            driver: { min: 220, max: 280, accuracy: 0.7 },
+            '3wood': { min: 190, max: 230, accuracy: 0.8 },
+            '5iron': { min: 120, max: 160, accuracy: 0.9 },
+            '7iron': { min: 90, max: 130, accuracy: 0.95 },
+            '9iron': { min: 70, max: 100, accuracy: 1.0 },
+            wedge: { min: 40, max: 70, accuracy: 1.0 },
+            putter: { min: 5, max: 30, accuracy: 1.0 }
+        };
+        
+        let game = null;
+        let golfScene = null;
+        
+        function debug(message) {
+            document.getElementById('debugInfo').textContent = message;
+            console.log(message);
+        }
+        
+        class FixedGolfScene extends Phaser.Scene {
+            constructor() {
+                super({ key: 'FixedGolfScene' });
+                this.ball = null;
+                this.ballShadow = null;
+                this.lieIndicator = null;
+                this.distanceLines = null;
+            }
+            
+            create() {
+                debug('Creating golf scene...');
+                
+                golfScene = this;
+                window.golfScene = this;
+                
+                // Create course elements
+                this.createBackground();
+                this.createSimplifiedCourse();
+                this.createBallFixed(); // FIXED VERSION
+                this.createDistanceSystem();
+                this.updateAllDisplays();
+                
+                debug('Scene created successfully');
+            }
+            
+            createBackground() {
+                // Sky gradient
+                this.add.rectangle(500, 350, 1000, 700, 0x87CEEB);
+            }
+            
+            createSimplifiedCourse() {
+                debug('Creating simplified course...');
+                
+                const graphics = this.add.graphics();
+                
+                // Rough background
+                graphics.fillStyle(0x33691E);
+                graphics.fillRect(0, 50, 1000, 650);
+                
+                // Fairway (main corridor)
+                graphics.fillGradientStyle(0x2E7D32, 0x2E7D32, 0x4CAF50, 0x4CAF50, 1);
+                graphics.fillEllipse(500, 350, 300, 500);
+                
+                // Water hazard
+                graphics.fillGradientStyle(0x1976D2, 0x1976D2, 0x0D47A1, 0x0D47A1, 1);
+                graphics.fillEllipse(200, 450, 120, 80);
+                
+                // Sand bunkers
+                graphics.fillStyle(0xD7B899);
+                graphics.fillEllipse(300, 300, 80, 60);
+                graphics.fillEllipse(700, 380, 100, 70);
+                
+                // Green
+                graphics.fillGradientStyle(0x2E7D32, 0x2E7D32, 0x4CAF50, 0x4CAF50, 1);
+                graphics.fillCircle(500, 100, 80);
+                
+                // Tee box
+                graphics.fillStyle(0x8D6E63);
+                graphics.fillRoundedRect(400, 640, 200, 30, 8);
+                
+                // Pin
+                graphics.fillStyle(0x424242);
+                graphics.fillRect(496, 70, 8, 40);
+                graphics.fillStyle(0xD32F2F);
+                graphics.fillTriangle(504, 75, 504, 90, 525, 82);
+                
+                debug('Course created');
+            }
+            
+            createBallFixed() {
+                debug('Creating ball (FIXED VERSION)...');
+                
+                // FIXED: Using circle objects instead of graphics for ball
+                // This allows proper x/y positioning and animation
+                
+                // Ball shadow
+                this.ballShadow = this.add.ellipse(400, 653, 12, 6, 0x000000, 0.3);
+                debug(`Ball shadow created at (${this.ballShadow.x}, ${this.ballShadow.y})`);
+                
+                // Golf ball (using circle, not graphics!)
+                this.ball = this.add.circle(400, 650, 8, 0xFFFFFF);
+                this.ball.setStroke(0x000000, 2);
+                debug(`Ball created at (${this.ball.x}, ${this.ball.y})`);
+                
+                // Ball dimples (separate graphics that will move with ball)
+                this.ballDimples = this.add.graphics();
+                this.updateBallDimples();
+                
+                // Lie indicator
+                this.lieIndicator = this.add.circle(400, 650, 15, 0x8D6E63, 0.2);
+                this.lieIndicator.setStroke(0x8D6E63, 2);
+                debug(`Lie indicator created`);
+                
+                // Verify ball object
+                debug(`Ball object type: ${this.ball.constructor.name}`);
+                debug(`Ball has x/y: ${this.ball.x !== undefined && this.ball.y !== undefined}`);
+                
+                debug('Ball creation complete');
+            }
+            
+            updateBallDimples() {
+                // Clear and redraw dimples at ball position
+                this.ballDimples.clear();
+                this.ballDimples.fillStyle(0xE0E0E0, 0.7);
+                
+                const ballX = this.ball.x;
+                const ballY = this.ball.y;
+                
+                // Draw dimples around ball
+                for (let i = 0; i < 6; i++) {
+                    const angle = (i / 6) * Math.PI * 2;
+                    const x = ballX + Math.cos(angle) * 5;
+                    const y = ballY + Math.sin(angle) * 5;
+                    this.ballDimples.fillCircle(x, y, 1);
+                }
+            }
+            
+            createDistanceSystem() {
+                // Distance lines graphics
+                this.distanceLines = this.add.graphics();
+                
+                // Yardage markers
+                const yardages = [100, 150, 200, 250, 300, 350];
+                yardages.forEach(yard => {
+                    const progress = (394 - yard) / 394;
+                    const y = 650 - (progress * 540);
+                    
+                    // Marker
+                    this.add.circle(500, y, 5, 0xFFFFFF).setStroke(0x000000, 1);
+                    this.add.text(515, y - 5, yard + 'y', {
+                        fontSize: '12px',
+                        fill: '#000000',
+                        backgroundColor: '#FFFFFF',
+                        padding: { x: 3, y: 1 }
+                    });
+                });
+                
+                debug('Distance system created');
+            }
+            
+            takeShot(club) {
+                debug(`Taking shot with ${club}...`);
+                
+                const clubInfo = clubData[club];
+                const distance = clubInfo.min + Math.random() * (clubInfo.max - clubInfo.min);
+                const accuracy = clubInfo.accuracy;
+                const deviation = (Math.random() - 0.5) * (1 - accuracy) * 80;
+                
+                debug(`Shot: ${Math.round(distance)}y, deviation: ${Math.round(deviation)}y`);
+                
+                // Calculate new position
+                const currentX = this.ball.x;
+                const currentY = this.ball.y;
+                
+                const targetY = Math.max(110, currentY - distance * 0.75);
+                const targetX = Math.max(100, Math.min(900, currentX + deviation));
+                
+                debug(`Moving ball from (${currentX}, ${currentY}) to (${targetX}, ${targetY})`);
+                
+                // Move ball with animation
+                this.moveBall(targetX, targetY);
+                
+                // Update game state
+                gameState.ballPosition = { x: targetX, y: targetY };
+                gameState.strokeCount++;
+                gameState.currentLie = this.determineLie(targetX, targetY);
+                gameState.distanceToPin = this.calculateDistanceToPin(targetX, targetY);
+                
+                return { distance: Math.round(distance), deviation: Math.round(deviation) };
+            }
+            
+            moveBall(targetX, targetY) {
+                debug(`Animating ball movement to (${targetX}, ${targetY})`);
+                
+                // FIXED: Animate the circle objects properly
+                this.tweens.add({
+                    targets: [this.ball, this.ballShadow, this.lieIndicator],
+                    x: targetX,
+                    y: targetY,
+                    duration: 2000,
+                    ease: 'Cubic.easeOut',
+                    onStart: () => {
+                        debug('Ball animation started');
+                    },
+                    onUpdate: () => {
+                        // Update dimples position during animation
+                        this.updateBallDimples();
+                    },
+                    onComplete: () => {
+                        debug(`Ball animation complete - final position: (${this.ball.x}, ${this.ball.y})`);
+                        this.updateLieIndicator();
+                        this.showDistanceLines();
+                        this.updateAllDisplays();
+                    }
+                });
+                
+                // Add ball trail effect
+                this.addBallTrail(this.ball.x, this.ball.y);
+            }
+            
+            addBallTrail(startX, startY) {
+                const trail = this.add.circle(startX, startY, 4, 0xFFD700, 0.6);
+                
+                this.tweens.add({
+                    targets: trail,
+                    alpha: 0,
+                    scaleX: 2,
+                    scaleY: 2,
+                    duration: 2000,
+                    onComplete: () => trail.destroy()
+                });
+            }
+            
+            updateLieIndicator() {
+                const lieColors = {
+                    tee: 0x8D6E63,
+                    fairway: 0x4CAF50,
+                    rough: 0x33691E,
+                    sand: 0xD7B899,
+                    green: 0x2E7D32,
+                    water: 0x1976D2
+                };
+                
+                const color = lieColors[gameState.currentLie] || 0x8D6E63;
+                this.lieIndicator.setFillStyle(color, 0.3);
+                this.lieIndicator.setStrokeStyle(2, color);
+            }
+            
+            showDistanceLines() {
+                // Clear previous lines
+                this.distanceLines.clear();
+                
+                const ballX = this.ball.x;
+                const ballY = this.ball.y;
+                const pinX = 500;
+                const pinY = 100;
+                
+                // Line to pin
+                this.distanceLines.lineStyle(3, 0xFF5722, 0.8);
+                this.distanceLines.lineBetween(ballX, ballY, pinX, pinY);
+                
+                // Distance text
+                const distance = this.calculateDistanceToPin(ballX, ballY);
+                const midX = (ballX + pinX) / 2;
+                const midY = (ballY + pinY) / 2;
+                
+                const distanceText = this.add.text(midX, midY, `${distance}y`, {
+                    fontSize: '16px',
+                    fill: '#FF5722',
+                    backgroundColor: 'rgba(255,255,255,0.9)',
+                    padding: { x: 6, y: 3 },
+                    fontWeight: 'bold'
+                }).setOrigin(0.5);
+                
+                // Fade out after 3 seconds
+                this.time.delayedCall(3000, () => {
+                    this.distanceLines.clear();
+                    distanceText.destroy();
+                });
+            }
+            
+            calculateDistanceToPin(x, y) {
+                const distance = Phaser.Math.Distance.Between(x, y, 500, 100);
+                return Math.round(distance * 0.7); // Scale factor
+            }
+            
+            calculateDistanceToGreen(x, y) {
+                const distance = Phaser.Math.Distance.Between(x, y, 500, 100);
+                return Math.max(0, Math.round((distance - 80) * 0.7));
+            }
+            
+            determineLie(x, y) {
+                if (y > 630) return 'tee';
+                
+                const distanceToPin = Phaser.Math.Distance.Between(x, y, 500, 100);
+                if (distanceToPin < 80) return 'green';
+                
+                const distanceToWater = Phaser.Math.Distance.Between(x, y, 200, 450);
+                if (distanceToWater < 60) return 'water';
+                
+                const distanceToBunker1 = Phaser.Math.Distance.Between(x, y, 300, 300);
+                const distanceToBunker2 = Phaser.Math.Distance.Between(x, y, 700, 380);
+                if (distanceToBunker1 < 50 || distanceToBunker2 < 60) return 'sand';
+                
+                const distanceFromCenter = Math.abs(x - 500);
+                if (distanceFromCenter < 150) return 'fairway';
+                
+                return 'rough';
+            }
+            
+            updateAllDisplays() {
+                const ballX = this.ball.x;
+                const ballY = this.ball.y;
+                
+                document.getElementById('distanceToPin').textContent = 
+                    `To Pin: ${this.calculateDistanceToPin(ballX, ballY)}y`;
+                document.getElementById('distanceToGreen').textContent = 
+                    `To Green: ${this.calculateDistanceToGreen(ballX, ballY)}y`;
+                document.getElementById('currentLie').textContent = 
+                    `Lie: ${gameState.currentLie.charAt(0).toUpperCase() + gameState.currentLie.slice(1)}`;
+                document.getElementById('strokeCount').textContent = `Strokes: ${gameState.strokeCount}`;
+                document.getElementById('ballCoords').textContent = 
+                    `Ball: (${Math.round(ballX)}, ${Math.round(ballY)})`;
+                    
+                debug(`Ball at (${Math.round(ballX)}, ${Math.round(ballY)}) - ${gameState.currentLie}`);
+            }
+        }
+        
+        // Initialize game
+        window.addEventListener('load', () => {
+            debug('Starting game...');
+            
+            const config = {
+                type: Phaser.AUTO,
+                width: 1000,
+                height: 700,
+                parent: 'gameCanvas',
+                backgroundColor: 0x87CEEB,
+                scene: FixedGolfScene
+            };
+            
+            game = new Phaser.Game(config);
+            setupControls();
+        });
+        
+        function setupControls() {
+            // Club selection
+            document.querySelectorAll('.club-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    document.querySelectorAll('.club-btn').forEach(b => b.classList.remove('selected'));
+                    btn.classList.add('selected');
+                    gameState.selectedClub = btn.dataset.club;
+                    updateTakeShotButton();
+                    debug(`Selected ${btn.dataset.club}`);
+                });
+            });
+            
+            // Take shot button
+            document.getElementById('takeShotBtn').addEventListener('click', takeShot);
+        }
+        
+        function updateTakeShotButton() {
+            const btn = document.getElementById('takeShotBtn');
+            if (gameState.selectedClub) {
+                btn.disabled = false;
+                btn.textContent = `Take Shot with ${gameState.selectedClub.toUpperCase()}`;
+            } else {
+                btn.disabled = true;
+                btn.textContent = 'Select Club First';
+            }
+        }
+        
+        function takeShot() {
+            if (!gameState.selectedClub || !golfScene) {
+                debug('Cannot take shot - no club selected or scene not ready');
+                return;
+            }
+            
+            debug(`Taking shot with ${gameState.selectedClub}`);
+            
+            const result = golfScene.takeShot(gameState.selectedClub);
+            
+            // Clear selection
+            document.querySelectorAll('.club-btn').forEach(b => b.classList.remove('selected'));
+            gameState.selectedClub = null;
+            updateTakeShotButton();
+            
+            debug(`Shot complete: ${result.distance}y with ${result.deviation}y deviation`);
+        }
+    </script>
+</body>
+</html>

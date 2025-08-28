@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Phaser Step Progression - Find The Break Point</title>
+    <style>
+        body { 
+            margin: 0; 
+            padding: 20px; 
+            background: #f0f0f0; 
+            font-family: Arial, sans-serif; 
+        }
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+        #gameContainer { 
+            width: 800px; 
+            height: 600px; 
+            border: 2px solid #333; 
+            margin: 20px auto; 
+            background: white;
+        }
+        .controls {
+            text-align: center;
+            margin: 20px;
+        }
+        .controls h1 {
+            color: #333;
+        }
+        .step-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin: 20px 0;
+            flex-wrap: wrap;
+        }
+        button {
+            padding: 12px 20px;
+            background: #007acc;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 14px;
+        }
+        button:hover {
+            background: #005999;
+        }
+        button.current {
+            background: #28a745;
+        }
+        #status {
+            background: #f9f9f9;
+            border: 1px solid #ccc;
+            padding: 15px;
+            margin: 20px auto;
+            width: 800px;
+            font-family: monospace;
+            font-size: 12px;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="controls">
+            <h1>🔍 Phaser Step Progression</h1>
+            <p>Find exactly where the golf game complexity breaks Phaser</p>
+            
+            <div class="step-buttons">
+                <button onclick="runStep(1)">Step 1: Basic Scene</button>
+                <button onclick="runStep(2)">Step 2: + Course Shapes</button>
+                <button onclick="runStep(3)">Step 3: + Golf Ball</button>
+                <button onclick="runStep(4)">Step 4: + Ball Animation</button>
+                <button onclick="runStep(5)">Step 5: + Game State</button>
+                <button onclick="runStep(6)">Step 6: + UI Integration</button>
+                <button onclick="runStep(7)">Step 7: + Complex Graphics</button>
+                <button onclick="clearScene()">Clear Scene</button>
+            </div>
+        </div>
+        
+        <div id="gameContainer"></div>
+        
+        <div id="status">Ready to test progression...</div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/phaser@3.70.0/dist/phaser.min.js"></script>
+    
+    <script>
+        let game = null;
+        let currentScene = null;
+        let currentStep = 0;
+        
+        function log(message) {
+            const status = document.getElementById('status');
+            const time = new Date().toLocaleTimeString();
+            status.innerHTML += `<div>${time}: ${message}</div>`;
+            status.scrollTop = status.scrollHeight;
+            console.log(message);
+        }
+        
+        // Progressive Scene Classes
+        class StepScene extends Phaser.Scene {
+            constructor(stepNum) {
+                super({ key: `StepScene${stepNum}` });
+                this.stepNum = stepNum;
+                this.ball = null;
+                this.gameState = { ballX: 400, ballY: 550 };
+            }
+            
+            create() {
+                log(`🎮 Step ${this.stepNum}: Scene create started`);
+                currentScene = this;
+                
+                // Always start with working foundation
+                this.add.rectangle(400, 300, 800, 600, 0x87CEEB);
+                log('✅ Background added');
+                
+                // Progressive complexity
+                if (this.stepNum >= 2) this.addCourseShapes();
+                if (this.stepNum >= 3) this.addGolfBall();
+                if (this.stepNum >= 4) this.addBallAnimation();
+                if (this.stepNum >= 5) this.addGameState();
+                if (this.stepNum >= 6) this.addUIIntegration();
+                if (this.stepNum >= 7) this.addComplexGraphics();
+                
+                log(`✅ Step ${this.stepNum} complete - Scene has ${this.children.list.length} objects`);
+            }
+            
+            addCourseShapes() {
+                log('Adding basic course shapes...');
+                try {
+                    // Simple shapes only
+                    this.add.rectangle(400, 400, 200, 300, 0x32CD32); // Fairway
+                    this.add.circle(400, 150, 40, 0x00FF00); // Green
+                    this.add.rectangle(400, 570, 80, 20, 0x8B4513); // Tee
+                    this.add.rectangle(396, 130, 8, 30, 0x000000); // Pin
+                    log('✅ Basic course shapes added');
+                } catch (error) {
+                    log('❌ Error adding course shapes: ' + error.message);
+                }
+            }
+            
+            addGolfBall() {
+                log('Adding golf ball...');
+                try {
+                    this.ball = this.add.circle(400, 550, 6, 0xFFFFFF);
+                    this.ball.setStroke(0x000000, 1);
+                    log('✅ Golf ball added');
+                } catch (error) {
+                    log('❌ Error adding golf ball: ' + error.message);
+                }
+            }
+            
+            addBallAnimation() {
+                log('Adding ball animation capability...');
+                try {
+                    // Simple test animation
+                    if (this.ball) {
+                        this.tweens.add({
+                            targets: this.ball,
+                            scaleX: 1.2,
+                            scaleY: 1.2,
+                            duration: 1000,
+                            yoyo: true,
+                            repeat: -1
+                        });
+                        log('✅ Ball animation added');
+                    }
+                } catch (error) {
+                    log('❌ Error adding animation: ' + error.message);
+                }
+            }
+            
+            addGameState() {
+                log('Adding game state management...');
+                try {
+                    window.gameState = this.gameState;
+                    window.currentScene = this;
+                    
+                    // Add click to move ball
+                    this.input.on('pointerdown', (pointer) => {
+                        if (this.ball) {
+                            this.tweens.add({
+                                targets: this.ball,
+                                x: pointer.x,
+                                y: pointer.y,
+                                duration: 1000,
+                                ease: 'Power2'
+                            });
+                            log('Ball moved to: ' + pointer.x + ', ' + pointer.y);
+                        }
+                    });
+                    
+                    log('✅ Game state and interaction added');
+                } catch (error) {
+                    log('❌ Error adding game state: ' + error.message);
+                }
+            }
+            
+            addUIIntegration() {
+                log('Adding UI integration...');
+                try {
+                    // Add text overlay
+                    this.statusText = this.add.text(10, 10, 'Step 6: UI Integration', {
+                        fontSize: '16px',
+                        fill: '#000000',
+                        backgroundColor: '#FFFFFF',
+                        padding: { x: 5, y: 3 }
+                    });
+                    
+                    // Ball position display
+                    if (this.ball) {
+                        this.ballText = this.add.text(10, 40, `Ball: (${this.ball.x}, ${this.ball.y})`, {
+                            fontSize: '12px',
+                            fill: '#000000',
+                            backgroundColor: '#FFFFFF',
+                            padding: { x: 3, y: 2 }
+                        });
+                    }
+                    
+                    log('✅ UI integration added');
+                } catch (error) {
+                    log('❌ Error adding UI integration: ' + error.message);
+                }
+            }
+            
+            addComplexGraphics() {
+                log('Adding complex graphics...');
+                try {
+                    // More complex graphics operations
+                    const graphics = this.add.graphics();
+                    
+                    // Water with gradient effect
+                    graphics.fillGradientStyle(0x4682B4, 0x4682B4, 0x1E90FF, 0x1E90FF, 1);
+                    graphics.fillEllipse(200, 400, 80, 60);
+                    
+                    // Sand bunkers
+                    graphics.fillStyle(0xD2B48C);
+                    graphics.fillEllipse(300, 300, 60, 40);
+                    graphics.fillEllipse(500, 350, 70, 45);
+                    
+                    // Course contours
+                    graphics.lineStyle(2, 0x228B22, 0.5);
+                    for (let i = 0; i < 5; i++) {
+                        graphics.strokeEllipse(400, 300, 150 + i * 20, 200 + i * 15);
+                    }
+                    
+                    log('✅ Complex graphics added');
+                } catch (error) {
+                    log('❌ Error adding complex graphics: ' + error.message);
+                }
+            }
+        }
+        
+        // Initialize Phaser
+        window.addEventListener('load', () => {
+            log('🚀 Page loaded, initializing...');
+            log('Phaser version: ' + Phaser.VERSION);
+            
+            const config = {
+                type: Phaser.AUTO,
+                width: 800,
+                height: 600,
+                parent: 'gameContainer',
+                backgroundColor: 0x333333
+            };
+            
+            try {
+                game = new Phaser.Game(config);
+                log('✅ Phaser game created - ready for step testing');
+            } catch (error) {
+                log('❌ Failed to create game: ' + error.message);
+            }
+        });
+        
+        function runStep(stepNum) {
+            log(`\n🔄 Running Step ${stepNum}...`);
+            
+            // Update button states
+            document.querySelectorAll('button').forEach(btn => btn.classList.remove('current'));
+            event.target.classList.add('current');
+            
+            currentStep = stepNum;
+            
+            try {
+                // Remove current scene if exists
+                if (game.scene.isActive(`StepScene${currentStep}`)) {
+                    game.scene.remove(`StepScene${currentStep}`);
+                }
+                
+                // Create and add new scene
+                const newScene = new StepScene(stepNum);
+                game.scene.add(`StepScene${stepNum}`, newScene, true);
+                
+                log(`Step ${stepNum} scene created and started`);
+                
+                // Verify canvas after delay
+                setTimeout(() => {
+                    const canvas = document.querySelector('#gameContainer canvas');
+                    if (canvas) {
+                        const ctx = canvas.getContext('2d');
+                        const imageData = ctx.getImageData(400, 300, 1, 1);
+                        const hasColor = imageData.data[0] + imageData.data[1] + imageData.data[2] > 0;
+                        log(`Canvas check: ${hasColor ? '✅ Has graphics' : '❌ Black screen'}`);
+                    }
+                }, 500);
+                
+            } catch (error) {
+                log(`❌ Step ${stepNum} failed: ${error.message}`);
+                log(`Error stack: ${error.stack}`);
+            }
+        }
+        
+        function clearScene() {
+            log('🧹 Clearing all scenes...');
+            try {
+                for (let i = 1; i <= 7; i++) {
+                    if (game.scene.isActive(`StepScene${i}`)) {
+                        game.scene.remove(`StepScene${i}`);
+                    }
+                }
+                document.querySelectorAll('button').forEach(btn => btn.classList.remove('current'));
+                log('✅ All scenes cleared');
+            } catch (error) {
+                log('❌ Error clearing scenes: ' + error.message);
+            }
+        }
+    </script>
+</body>
+</html>

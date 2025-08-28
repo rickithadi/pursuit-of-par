@@ -1,0 +1,520 @@
+/* TPC Sawgrass Stadium Course - Hole Display Styling */
+/* Professional tournament-style interface design */
+
+/* Hole Selector Panel */
+.tpc-hole-selector {
+    background: linear-gradient(135deg, #1a5f3f 0%, #0d3926 100%);
+    color: #ffffff;
+    border-radius: 12px;
+    padding: 1.5rem;
+    margin-bottom: 1rem;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.3);
+    border: 2px solid #c9a96e;
+    position: relative;
+    overflow: hidden;
+}
+
+.tpc-hole-selector::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="20" cy="20" r="2" fill="rgba(255,255,255,0.05)"/><circle cx="80" cy="30" r="1.5" fill="rgba(255,255,255,0.03)"/><circle cx="60" cy="70" r="1" fill="rgba(255,255,255,0.04)"/></svg>');
+    pointer-events: none;
+}
+
+.hole-selector-header {
+    text-align: center;
+    margin-bottom: 1.5rem;
+    position: relative;
+    z-index: 1;
+}
+
+.hole-selector-header h3 {
+    font-size: 1.4rem;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+    color: #c9a96e;
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+}
+
+.course-subtitle {
+    font-size: 0.9rem;
+    color: rgba(255,255,255,0.8);
+    font-weight: 500;
+}
+
+/* Hole Grid Layout */
+.hole-grid {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+}
+
+.hole-card {
+    background: linear-gradient(135deg, rgba(255,255,255,0.95) 0%, rgba(245,242,232,0.9) 100%);
+    color: #333;
+    border-radius: 8px;
+    padding: 0.75rem 0.5rem;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    border: 2px solid transparent;
+    position: relative;
+    overflow: hidden;
+    min-height: 80px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    background-size: cover;
+    background-position: center;
+}
+
+.hole-card.has-aerial {
+    color: #ffffff;
+    text-shadow: 1px 1px 3px rgba(0,0,0,0.8);
+}
+
+.hole-card.has-aerial::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(135deg, rgba(26,95,63,0.7) 0%, rgba(13,57,38,0.8) 100%);
+    z-index: 0;
+}
+
+.hole-card > * {
+    position: relative;
+    z-index: 1;
+}
+
+.hole-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(26,95,63,0.4);
+    border-color: #c9a96e;
+}
+
+.hole-card.active {
+    border-color: #c9a96e;
+    background: linear-gradient(135deg, #c9a96e 0%, #e6c896 100%);
+    color: #1a5f3f;
+    font-weight: bold;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 16px rgba(201,169,110,0.4);
+}
+
+.hole-card.placeholder {
+    opacity: 0.5;
+    cursor: not-allowed;
+    background: linear-gradient(135deg, rgba(153,153,153,0.3) 0%, rgba(102,102,102,0.4) 100%);
+}
+
+.hole-card.placeholder:hover {
+    transform: none;
+    box-shadow: none;
+}
+
+.hole-number {
+    font-size: 1.2rem;
+    font-weight: 700;
+    margin-bottom: 0.25rem;
+}
+
+.hole-par {
+    font-size: 0.7rem;
+    font-weight: 500;
+    opacity: 0.8;
+}
+
+.hole-yardage {
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: #2196F3;
+}
+
+.hole-card.active .hole-yardage {
+    color: #1a5f3f;
+}
+
+.hole-difficulty {
+    font-size: 0.6rem;
+    opacity: 0.7;
+    margin-top: 0.25rem;
+}
+
+.hole-name {
+    font-size: 0.6rem;
+    margin-top: 0.25rem;
+    font-style: italic;
+    opacity: 0.9;
+}
+
+.coming-soon {
+    font-size: 0.7rem;
+    font-style: italic;
+    opacity: 0.6;
+}
+
+/* Tee Selector */
+.tee-selector {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    justify-content: center;
+    margin-top: 1rem;
+    padding-top: 1rem;
+    border-top: 1px solid rgba(255,255,255,0.2);
+}
+
+.tee-selector label {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: #c9a96e;
+}
+
+.tee-select {
+    background: rgba(255,255,255,0.1);
+    color: #ffffff;
+    border: 1px solid rgba(255,255,255,0.3);
+    border-radius: 6px;
+    padding: 0.5rem 0.75rem;
+    font-size: 0.85rem;
+    font-weight: 500;
+    cursor: pointer;
+}
+
+.tee-select:focus {
+    outline: none;
+    border-color: #c9a96e;
+    box-shadow: 0 0 0 2px rgba(201,169,110,0.3);
+}
+
+/* Enhanced Hole Information Panel */
+.tpc-hole-info-panel {
+    background: linear-gradient(135deg, #ffffff 0%, #f5f2e8 100%);
+    border: 2px solid #1a5f3f;
+    border-radius: 12px;
+    padding: 1.5rem;
+    box-shadow: 0 6px 20px rgba(26,95,63,0.2);
+    position: absolute;
+    top: 1rem;
+    left: 1rem;
+    z-index: 10;
+    max-width: 320px;
+    min-width: 280px;
+}
+
+.hole-header {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 1rem;
+    padding-bottom: 1rem;
+    border-bottom: 2px solid #c9a96e;
+}
+
+.hole-number-large {
+    font-size: 3rem;
+    font-weight: 800;
+    color: #1a5f3f;
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+    line-height: 1;
+}
+
+.hole-title {
+    flex: 1;
+}
+
+.hole-name {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: #1a5f3f;
+    margin-bottom: 0.25rem;
+}
+
+.hole-par {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: #c9a96e;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+/* Hole Statistics */
+.hole-stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(80px, 1fr));
+    gap: 1rem;
+    margin-bottom: 1rem;
+    padding: 1rem;
+    background: rgba(26,95,63,0.05);
+    border-radius: 8px;
+}
+
+.stat-item {
+    text-align: center;
+}
+
+.stat-label {
+    font-size: 0.7rem;
+    font-weight: 600;
+    color: #666;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 0.25rem;
+}
+
+.stat-value {
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: #1a5f3f;
+    line-height: 1;
+}
+
+.stat-note {
+    font-size: 0.6rem;
+    color: #888;
+    margin-top: 0.25rem;
+    font-style: italic;
+}
+
+.hole-description {
+    font-size: 0.9rem;
+    line-height: 1.5;
+    color: #555;
+    margin-bottom: 1rem;
+    padding: 0.75rem;
+    background: rgba(245,242,232,0.5);
+    border-radius: 6px;
+    border-left: 4px solid #c9a96e;
+}
+
+.strategic-button {
+    width: 100%;
+    background: linear-gradient(135deg, #2196F3 0%, #1976D2 100%);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    padding: 0.75rem 1rem;
+    font-size: 0.9rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.strategic-button:hover {
+    background: linear-gradient(135deg, #1976D2 0%, #1565C0 100%);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(33,150,243,0.3);
+}
+
+/* Strategic Overlay */
+.strategic-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0,0,0,0.8);
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+}
+
+.strategic-overlay.hidden {
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+}
+
+.strategic-content {
+    background: #ffffff;
+    border-radius: 16px;
+    padding: 2rem;
+    max-width: 600px;
+    max-height: 80vh;
+    overflow-y: auto;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.4);
+    position: relative;
+}
+
+.strategic-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+    padding-bottom: 1rem;
+    border-bottom: 2px solid #1a5f3f;
+}
+
+.strategic-header h4 {
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: #1a5f3f;
+    margin: 0;
+}
+
+.close-strategic {
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    color: #666;
+    cursor: pointer;
+    padding: 0.25rem;
+    line-height: 1;
+}
+
+.close-strategic:hover {
+    color: #333;
+}
+
+.feature-section {
+    margin-bottom: 1.5rem;
+    padding: 1rem;
+    background: rgba(245,242,232,0.3);
+    border-radius: 8px;
+    border-left: 4px solid #2196F3;
+}
+
+.feature-section h5 {
+    font-size: 1rem;
+    font-weight: 700;
+    color: #1a5f3f;
+    margin-bottom: 0.5rem;
+}
+
+.feature-section p {
+    font-size: 0.9rem;
+    line-height: 1.5;
+    color: #555;
+    margin: 0;
+}
+
+/* Tee Yardage Breakdown */
+.yardage-breakdown {
+    background: rgba(26,95,63,0.05);
+    border-radius: 8px;
+    padding: 1rem;
+}
+
+.yardage-breakdown h5 {
+    font-size: 1rem;
+    font-weight: 700;
+    color: #1a5f3f;
+    margin-bottom: 1rem;
+}
+
+.tee-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(80px, 1fr));
+    gap: 0.75rem;
+}
+
+.tee-option {
+    text-align: center;
+    padding: 0.75rem 0.5rem;
+    background: #ffffff;
+    border-radius: 6px;
+    border: 2px solid transparent;
+    transition: all 0.3s ease;
+}
+
+.tee-option.selected {
+    border-color: #c9a96e;
+    background: linear-gradient(135deg, #c9a96e 0%, #e6c896 100%);
+    color: #1a5f3f;
+    font-weight: bold;
+}
+
+.tee-name {
+    font-size: 0.8rem;
+    font-weight: 600;
+    margin-bottom: 0.25rem;
+    text-transform: capitalize;
+}
+
+.tee-yardage {
+    font-size: 0.9rem;
+    font-weight: 700;
+    color: #2196F3;
+}
+
+.tee-option.selected .tee-yardage {
+    color: #1a5f3f;
+}
+
+/* Aerial Overlay */
+.aerial-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 1;
+    border-radius: inherit;
+    pointer-events: none;
+    transition: opacity 0.5s ease;
+}
+
+/* Mobile Responsive Design */
+@media (max-width: 768px) {
+    .tpc-hole-selector {
+        padding: 1rem;
+        margin-bottom: 0.5rem;
+    }
+    
+    .hole-grid {
+        grid-template-columns: repeat(4, 1fr);
+        gap: 0.4rem;
+    }
+    
+    .hole-card {
+        padding: 0.5rem 0.25rem;
+        min-height: 70px;
+        font-size: 0.85rem;
+    }
+    
+    .tpc-hole-info-panel {
+        position: relative;
+        top: auto;
+        left: auto;
+        max-width: none;
+        margin-bottom: 1rem;
+    }
+    
+    .hole-stats {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 0.75rem;
+        padding: 0.75rem;
+    }
+    
+    .strategic-content {
+        margin: 1rem;
+        padding: 1.5rem;
+        max-height: 90vh;
+    }
+}
+
+@media (max-width: 480px) {
+    .hole-grid {
+        grid-template-columns: repeat(3, 1fr);
+    }
+    
+    .hole-number-large {
+        font-size: 2.5rem;
+    }
+    
+    .tee-grid {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}

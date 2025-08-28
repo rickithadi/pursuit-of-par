@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>In Pursuit of Par - Fresh Working Version</title>
+    <script src="https://cdn.jsdelivr.net/npm/phaser@3.80.1/dist/phaser.min.js"></script>
+    <style>
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            margin: 0;
+            padding: 0;
+            background: #f5f5dc;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #4CAF50, #2E7D32);
+            color: white;
+            padding: 1rem;
+            text-align: center;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        
+        .game-container {
+            display: flex;
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+            gap: 20px;
+        }
+        
+        .golf-course {
+            flex: 1;
+            border: 2px solid #4CAF50;
+            border-radius: 8px;
+            background: #ffffff;
+            min-height: 600px;
+            position: relative;
+        }
+        
+        .controls {
+            width: 300px;
+            background: white;
+            border: 2px solid #4CAF50;
+            border-radius: 8px;
+            padding: 20px;
+        }
+        
+        .club-selection {
+            margin-bottom: 20px;
+        }
+        
+        .club-button {
+            display: block;
+            width: 100%;
+            padding: 8px;
+            margin: 4px 0;
+            border: 1px solid #4CAF50;
+            background: #f8f8f8;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        
+        .club-button:hover {
+            background: #e8f5e8;
+        }
+        
+        .club-button.selected {
+            background: #4CAF50;
+            color: white;
+        }
+        
+        .shot-button {
+            background: #2196F3;
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 8px;
+            cursor: pointer;
+            width: 100%;
+            font-size: 16px;
+            margin-top: 10px;
+        }
+        
+        .shot-button:hover {
+            background: #1976D2;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>🏌️ In Pursuit of Par - Working Version</h1>
+        <p>Authentic 1987 Board Game with Modern Technology</p>
+    </div>
+
+    <div class="game-container">
+        <div id="golf-course" class="golf-course"></div>
+        
+        <div class="controls">
+            <h3>Club Selection</h3>
+            <div class="club-selection">
+                <button class="club-button selected" data-club="driver">Driver (200-260 yards)</button>
+                <button class="club-button" data-club="3wood">3 Wood (180-220 yards)</button>
+                <button class="club-button" data-club="5wood">5 Wood (160-200 yards)</button>
+                <button class="club-button" data-club="3iron">3 Iron (140-180 yards)</button>
+                <button class="club-button" data-club="5iron">5 Iron (120-160 yards)</button>
+                <button class="club-button" data-club="7iron">7 Iron (100-140 yards)</button>
+                <button class="club-button" data-club="9iron">9 Iron (80-120 yards)</button>
+                <button class="club-button" data-club="wedge">Wedge (40-80 yards)</button>
+                <button class="club-button" data-club="putter">Putter (10-30 yards)</button>
+            </div>
+            
+            <button class="shot-button" onclick="takeShot()">🎲 Take Shot</button>
+            
+            <div id="game-info">
+                <h3>Hole 1 - Par 4 (394 yards)</h3>
+                <p>Current Lie: Tee</p>
+                <p>Distance to Pin: 394 yards</p>
+                <p>Strokes: 0</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        console.log('🏌️ Starting Fresh Golf Game Implementation');
+        
+        // Golf game state
+        let gameState = {
+            currentHole: 1,
+            strokes: 0,
+            playerPosition: { x: 50, y: 300 },
+            selectedClub: 'driver',
+            lie: 'tee',
+            distanceToPin: 394
+        };
+        
+        let game = null;
+        let scene = null;
+        
+        // Course data
+        const holes = [
+            { number: 1, par: 4, yardage: 394, layout: 'straight' },
+            { number: 2, par: 5, yardage: 532, layout: 'straight' }
+        ];
+        
+        // Initialize Phaser when DOM is ready
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('🎮 Initializing Phaser game...');
+            initializeGame();
+        });
+        
+        function initializeGame() {
+            const config = {
+                type: Phaser.AUTO,
+                width: 800,
+                height: 600,
+                parent: 'golf-course',
+                backgroundColor: '#87CEEB', // Sky blue
+                scene: {
+                    create: createGolfCourse,
+                    update: updateGame
+                }
+            };
+            
+            try {
+                game = new Phaser.Game(config);
+                console.log('✅ Phaser game created successfully');
+            } catch (error) {
+                console.error('❌ Failed to create Phaser game:', error);
+                document.getElementById('golf-course').innerHTML = 
+                    '<div style="padding:50px;text-align:center;color:red;">Failed to initialize game: ' + error.message + '</div>';
+            }
+        }
+        
+        function createGolfCourse() {
+            scene = this;
+            console.log('🏞️ Creating golf course scene...');
+            
+            // Draw fairway
+            const fairway = this.add.rectangle(400, 300, 700, 100, 0x228B22);
+            fairway.setOrigin(0.5, 0.5);
+            
+            // Draw rough areas
+            const rough1 = this.add.rectangle(400, 200, 700, 80, 0x9ACD32);
+            rough1.setOrigin(0.5, 0.5);
+            
+            const rough2 = this.add.rectangle(400, 400, 700, 80, 0x9ACD32);
+            rough2.setOrigin(0.5, 0.5);
+            
+            // Draw green
+            const green = this.add.circle(750, 300, 40, 0x00FF00);
+            
+            // Draw pin
+            const pin = this.add.circle(750, 300, 3, 0xFF0000);
+            
+            // Draw tee box
+            const tee = this.add.rectangle(50, 300, 20, 20, 0x8B4513);
+            
+            // Draw player ball
+            gameState.ballGraphics = this.add.circle(gameState.playerPosition.x, gameState.playerPosition.y, 5, 0xFFFFFF);
+            
+            // Add test text
+            this.add.text(20, 20, 'Hole 1 - Par 4 - 394 yards', {
+                fontSize: '18px',
+                color: '#000000'
+            });
+            
+            console.log('✅ Golf course created with visual elements');
+        }
+        
+        function updateGame() {
+            // Game loop - currently empty but available for animations
+        }
+        
+        function takeShot() {
+            console.log('🎲 Taking shot with', gameState.selectedClub);
+            
+            // Simulate dice roll (simple version)
+            const distance = Math.floor(Math.random() * 100) + 50; // 50-150 yard shot
+            const direction = Math.floor(Math.random() * 60) - 30; // -30 to +30 degrees
+            
+            // Update position
+            const radians = direction * (Math.PI / 180);
+            gameState.playerPosition.x += Math.cos(radians) * distance * 2; // Scale for display
+            gameState.playerPosition.y += Math.sin(radians) * distance * 0.5;
+            
+            // Update ball position on screen
+            if (gameState.ballGraphics && scene) {
+                gameState.ballGraphics.x = gameState.playerPosition.x;
+                gameState.ballGraphics.y = gameState.playerPosition.y;
+            }
+            
+            // Update game state
+            gameState.strokes++;
+            gameState.distanceToPin = Math.max(0, gameState.distanceToPin - distance + Math.abs(direction));
+            
+            // Update UI
+            updateGameInfo();
+            
+            console.log(`Shot result: ${distance} yards, ${direction}° direction`);
+        }
+        
+        function updateGameInfo() {
+            const info = document.getElementById('game-info');
+            info.innerHTML = `
+                <h3>Hole ${gameState.currentHole} - Par 4 (394 yards)</h3>
+                <p>Current Lie: ${gameState.lie}</p>
+                <p>Distance to Pin: ${Math.round(gameState.distanceToPin)} yards</p>
+                <p>Strokes: ${gameState.strokes}</p>
+            `;
+        }
+        
+        // Club selection handling
+        document.addEventListener('DOMContentLoaded', function() {
+            const clubButtons = document.querySelectorAll('.club-button');
+            clubButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    // Remove selected class from all buttons
+                    clubButtons.forEach(b => b.classList.remove('selected'));
+                    // Add selected class to clicked button
+                    this.classList.add('selected');
+                    // Update game state
+                    gameState.selectedClub = this.dataset.club;
+                    console.log('Selected club:', gameState.selectedClub);
+                });
+            });
+        });
+    </script>
+</body>
+</html>

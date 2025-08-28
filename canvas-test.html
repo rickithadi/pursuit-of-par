@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Canvas Creation Test</title>
+    <style>
+        #course3DViewport {
+            width: 1120px;
+            height: 500px;
+            border: 2px solid #4CAF50;
+            background: #F5F5DC;
+            margin: 20px auto;
+            display: block;
+        }
+        .debug-info {
+            max-width: 1120px;
+            margin: 20px auto;
+            padding: 20px;
+            background: #f0f0f0;
+            border-radius: 8px;
+            font-family: monospace;
+        }
+    </style>
+</head>
+<body>
+    <h1>Phaser Canvas Creation Test</h1>
+    
+    <div class="debug-info">
+        <h3>Debug Information:</h3>
+        <div id="debugLog"></div>
+    </div>
+    
+    <div id="course3DViewport"></div>
+    
+    <!-- Load Phaser.js CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/phaser@3.80.1/dist/phaser.min.js"></script>
+    
+    <!-- Load dependencies -->
+    <script src="authentic-mechanics.js"></script>
+    <script src="board-game-bridge.js"></script>
+    <script src="phaser-engine.js"></script>
+    
+    <script>
+        const debugLog = document.getElementById('debugLog');
+        
+        function log(message) {
+            console.log(message);
+            debugLog.innerHTML += `<div style="margin: 5px 0; padding: 5px; background: white; border-radius: 3px;">${message}</div>`;
+        }
+        
+        document.addEventListener('DOMContentLoaded', () => {
+            log('DOM loaded - starting canvas test...');
+            
+            // Check if viewport exists
+            const viewport = document.getElementById('course3DViewport');
+            if (viewport) {
+                log(`✓ Viewport found - dimensions: ${viewport.offsetWidth}x${viewport.offsetHeight}`);
+            } else {
+                log('✗ Viewport not found!');
+                return;
+            }
+            
+            // Check Phaser availability
+            if (typeof Phaser !== 'undefined') {
+                log(`✓ Phaser.js loaded - version: ${Phaser.VERSION}`);
+            } else {
+                log('✗ Phaser.js not loaded!');
+                return;
+            }
+            
+            // Check PhaserBoardGameEngine availability
+            if (typeof PhaserBoardGameEngine !== 'undefined') {
+                log('✓ PhaserBoardGameEngine class available');
+                
+                try {
+                    // Initialize the engine
+                    log('Creating PhaserBoardGameEngine instance...');
+                    window.phaserEngine = new PhaserBoardGameEngine();
+                    
+                    // Check if game was created
+                    setTimeout(() => {
+                        if (window.phaserEngine.game) {
+                            log('✓ Phaser game instance created');
+                            log(`✓ Game canvas dimensions: ${window.phaserEngine.game.canvas.width}x${window.phaserEngine.game.canvas.height}`);
+                            
+                            // Check if canvas was inserted into viewport
+                            const canvasElements = viewport.getElementsByTagName('canvas');
+                            if (canvasElements.length > 0) {
+                                log(`✓ Canvas found in viewport - count: ${canvasElements.length}`);
+                                const canvas = canvasElements[0];
+                                log(`✓ Canvas element style: width=${canvas.style.width}, height=${canvas.style.height}`);
+                                log(`✓ Canvas computed style: width=${getComputedStyle(canvas).width}, height=${getComputedStyle(canvas).height}`);
+                                
+                                // Test canvas interactivity
+                                canvas.addEventListener('click', () => {
+                                    log('✓ Canvas click event working!');
+                                });
+                                log('✓ Click event listener added to canvas');
+                            } else {
+                                log('✗ No canvas elements found in viewport!');
+                            }
+                            
+                            // Check if current scene exists
+                            if (window.phaserEngine.currentScene) {
+                                log('✓ Current scene exists:', window.phaserEngine.currentScene.scene.key);
+                            } else {
+                                log('⚠️ No current scene set');
+                            }
+                        } else {
+                            log('✗ Phaser game instance not created');
+                        }
+                        
+                        // Initialize game systems
+                        if (window.phaserEngine.initializeGameSystems) {
+                            log('Initializing game systems...');
+                            window.phaserEngine.initializeGameSystems();
+                        }
+                        
+                        // Initialize scene
+                        if (window.phaserEngine.initializeScene) {
+                            log('Initializing scene...');
+                            window.phaserEngine.initializeScene();
+                        }
+                    }, 1000);
+                    
+                } catch (error) {
+                    log(`✗ Error creating PhaserBoardGameEngine: ${error.message}`);
+                    log(`Stack: ${error.stack}`);
+                }
+            } else {
+                log('✗ PhaserBoardGameEngine class not available!');
+            }
+        });
+    </script>
+</body>
+</html>

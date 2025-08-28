@@ -1,0 +1,405 @@
+/* 1987 Board Game Typography & Layout System */
+
+/* Authentic 1987 Font Stack - Period Appropriate */
+:root {
+    --font-1987-primary: 'Times New Roman', 'Times', serif;
+    --font-1987-secondary: 'Georgia', 'Times New Roman', serif;
+    --font-1987-display: 'Impact', 'Arial Black', sans-serif; /* For headers only */
+    --font-1987-mono: 'Courier New', 'Courier', monospace; /* For scores/numbers */
+    
+    /* 1987 Font Sizes - Chunky and bold for board game feel */
+    --text-1987-xl: 2.5rem;    /* Main game title */
+    --text-1987-lg: 1.8rem;    /* Section headers */
+    --text-1987-md: 1.2rem;    /* Body text */
+    --text-1987-sm: 1rem;      /* Small text */
+    --text-1987-xs: 0.875rem;  /* Fine print */
+    
+    /* 1987 Letter Spacing - More spaced for authenticity */
+    --spacing-1987-wide: 0.1em;
+    --spacing-1987-normal: 0.05em;
+    --spacing-1987-tight: 0em;
+    
+    /* 1987 Line Heights - Tighter for compactness */
+    --line-1987-compact: 1.2;
+    --line-1987-normal: 1.4;
+    --line-1987-relaxed: 1.6;
+}
+
+/* Base Typography for 1987 Authenticity */
+body.authentic-1987 {
+    font-family: var(--font-1987-primary);
+    font-size: var(--text-1987-md);
+    line-height: var(--line-1987-normal);
+    letter-spacing: var(--spacing-1987-normal);
+    font-weight: normal;
+}
+
+/* 1987 Game Title - Big and Bold like board game boxes */
+.game-title-1987 {
+    font-family: var(--font-1987-display);
+    font-size: var(--text-1987-xl);
+    font-weight: 900;
+    text-transform: uppercase;
+    letter-spacing: var(--spacing-1987-wide);
+    line-height: var(--line-1987-compact);
+    text-shadow: 3px 3px 6px rgba(0,0,0,0.4);
+    color: var(--vintage-brown-dark);
+    margin-bottom: 0.5rem;
+}
+
+/* 1987 Section Headers - Bold and Chunky */
+.section-header-1987 {
+    font-family: var(--font-1987-primary);
+    font-size: var(--text-1987-lg);
+    font-weight: bold;
+    text-transform: uppercase;
+    letter-spacing: var(--spacing-1987-wide);
+    line-height: var(--line-1987-compact);
+    color: var(--vintage-brown);
+    border-bottom: 3px solid var(--vintage-orange);
+    padding-bottom: 0.25rem;
+    margin-bottom: 1rem;
+}
+
+/* 1987 Body Text - Clear and Readable */
+.body-text-1987 {
+    font-family: var(--font-1987-primary);
+    font-size: var(--text-1987-md);
+    font-weight: normal;
+    line-height: var(--line-1987-normal);
+    color: var(--vintage-text-dark);
+}
+
+/* 1987 Numbers and Scores - Monospace for clarity */
+.score-text-1987,
+.distance-text-1987,
+.numeric-1987 {
+    font-family: var(--font-1987-mono);
+    font-weight: bold;
+    font-size: var(--text-1987-md);
+    color: var(--vintage-orange-dark);
+    letter-spacing: var(--spacing-1987-normal);
+}
+
+/* Large display numbers (stroke count, etc.) */
+.display-number-1987 {
+    font-family: var(--font-1987-mono);
+    font-size: 3rem;
+    font-weight: bold;
+    color: var(--vintage-orange);
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+    line-height: 1;
+}
+
+/* 1987 Button Text - All caps and bold */
+.button-text-1987 {
+    font-family: var(--font-1987-primary);
+    font-weight: bold;
+    text-transform: uppercase;
+    letter-spacing: var(--spacing-1987-wide);
+    font-size: var(--text-1987-sm);
+}
+
+/* 1987 Layout System - Chunky Grids */
+
+/* Main Game Layout - Board Game Style Grid */
+.game-layout-1987 {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    grid-template-rows: auto 1fr;
+    gap: 1rem;
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 1rem;
+    min-height: calc(100vh - 2rem);
+}
+
+.game-layout-1987 .course-area {
+    grid-column: 1 / 2;
+    grid-row: 1 / 3;
+    background: var(--vintage-green);
+    border: 4px solid var(--vintage-brown);
+    border-radius: 8px;
+    padding: 1rem;
+    position: relative;
+}
+
+.game-layout-1987 .control-panel {
+    grid-column: 2 / 3;
+    grid-row: 1 / 3;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+/* 1987 Control Panel Sections - Stacked Boxes */
+.control-section-1987 {
+    background: var(--vintage-cream);
+    border: var(--vintage-border);
+    border-radius: 6px;
+    padding: 1rem;
+    box-shadow: var(--vintage-shadow);
+}
+
+.control-section-1987 .section-title {
+    font-family: var(--font-1987-primary);
+    font-weight: bold;
+    font-size: var(--text-1987-md);
+    color: var(--vintage-brown-dark);
+    text-transform: uppercase;
+    letter-spacing: var(--spacing-1987-normal);
+    margin-bottom: 0.75rem;
+    padding-bottom: 0.25rem;
+    border-bottom: 2px solid var(--vintage-orange);
+}
+
+/* 1987 Club Selection Grid - Chunky Cards */
+.club-grid-1987 {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.5rem;
+    margin-top: 0.5rem;
+}
+
+/* 1987 Shot Schedule Table Layout */
+.shot-schedule-container-1987 {
+    background: var(--vintage-off-white);
+    border: var(--vintage-border);
+    border-radius: 6px;
+    padding: 0.75rem;
+    overflow-x: auto; /* Handle narrow screens */
+}
+
+.shot-schedule-title-1987 {
+    font-family: var(--font-1987-primary);
+    font-weight: bold;
+    font-size: var(--text-1987-sm);
+    color: var(--vintage-brown-dark);
+    text-align: center;
+    margin-bottom: 0.5rem;
+    text-transform: uppercase;
+    letter-spacing: var(--spacing-1987-normal);
+}
+
+/* 1987 Dice Display Layout - Side by Side */
+.dice-container-1987 {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 1rem;
+    padding: 1rem;
+    background: var(--vintage-cream-dark);
+    border-radius: 6px;
+    border: 2px solid var(--vintage-brown-light);
+}
+
+.dice-label-1987 {
+    font-family: var(--font-1987-primary);
+    font-size: var(--text-1987-xs);
+    font-weight: bold;
+    color: var(--vintage-text-medium);
+    text-transform: uppercase;
+    text-align: center;
+    margin-top: 0.5rem;
+}
+
+/* 1987 Status Display - Scoreboard Style */
+.status-board-1987 {
+    background: var(--vintage-brown-dark);
+    color: var(--vintage-off-white);
+    border-radius: 6px;
+    padding: 1rem;
+    box-shadow: var(--vintage-shadow), inset 0 2px 4px rgba(0,0,0,0.2);
+}
+
+.status-board-1987 .status-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.5rem 0;
+    border-bottom: 1px solid rgba(245, 222, 179, 0.3);
+}
+
+.status-board-1987 .status-row:last-child {
+    border-bottom: none;
+}
+
+.status-board-1987 .status-label {
+    font-family: var(--font-1987-primary);
+    font-size: var(--text-1987-sm);
+    font-weight: bold;
+    text-transform: uppercase;
+    letter-spacing: var(--spacing-1987-normal);
+}
+
+.status-board-1987 .status-value {
+    font-family: var(--font-1987-mono);
+    font-size: var(--text-1987-md);
+    font-weight: bold;
+    color: var(--vintage-orange-light);
+}
+
+/* 1987 Course Information Header */
+.course-info-1987 {
+    background: linear-gradient(135deg, var(--vintage-brown) 0%, var(--vintage-brown-dark) 100%);
+    color: var(--vintage-off-white);
+    padding: 1rem;
+    border-radius: 8px 8px 0 0;
+    margin-bottom: 1rem;
+    text-align: center;
+    box-shadow: var(--vintage-shadow);
+}
+
+.course-info-1987 .course-name {
+    font-family: var(--font-1987-display);
+    font-size: var(--text-1987-lg);
+    font-weight: 900;
+    text-transform: uppercase;
+    letter-spacing: var(--spacing-1987-wide);
+    margin-bottom: 0.25rem;
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+}
+
+.course-info-1987 .course-subtitle {
+    font-family: var(--font-1987-primary);
+    font-size: var(--text-1987-sm);
+    font-weight: normal;
+    font-style: italic;
+    color: var(--vintage-orange-light);
+}
+
+/* 1987 Hole Information Display */
+.hole-info-1987 {
+    position: absolute;
+    top: 1rem;
+    left: 1rem;
+    background: rgba(139, 69, 19, 0.9);
+    color: var(--vintage-off-white);
+    padding: 0.75rem 1rem;
+    border-radius: 6px;
+    border: 2px solid var(--vintage-orange);
+    font-family: var(--font-1987-primary);
+    font-weight: bold;
+    backdrop-filter: none; /* Remove modern effect */
+    box-shadow: var(--vintage-shadow);
+}
+
+.hole-info-1987 .hole-number {
+    font-size: var(--text-1987-lg);
+    color: var(--vintage-orange-light);
+}
+
+.hole-info-1987 .hole-par,
+.hole-info-1987 .hole-yardage {
+    font-size: var(--text-1987-sm);
+    margin-top: 0.25rem;
+}
+
+/* 1987 Responsive Layout - Stack on Mobile */
+@media (max-width: 768px) {
+    .game-layout-1987 {
+        grid-template-columns: 1fr;
+        grid-template-rows: auto auto;
+        gap: 0.75rem;
+        padding: 0.5rem;
+    }
+    
+    .game-layout-1987 .course-area {
+        grid-column: 1;
+        grid-row: 1;
+        min-height: 400px;
+    }
+    
+    .game-layout-1987 .control-panel {
+        grid-column: 1;
+        grid-row: 2;
+    }
+    
+    .club-grid-1987 {
+        grid-template-columns: 1fr;
+        gap: 0.4rem;
+    }
+    
+    /* Larger touch targets for mobile */
+    .club-card-1987 {
+        padding: 1rem;
+        min-height: 44px;
+    }
+    
+    .action-button-1987 {
+        padding: 1.2rem 2rem;
+        width: 100%;
+        min-height: 56px;
+    }
+    
+    /* Adjust font sizes for mobile */
+    .game-title-1987 {
+        font-size: 2rem;
+    }
+    
+    .section-header-1987 {
+        font-size: var(--text-1987-md);
+    }
+    
+    .display-number-1987 {
+        font-size: 2.5rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .dice-container-1987 {
+        flex-direction: column;
+        gap: 0.75rem;
+    }
+    
+    .status-board-1987 .status-row {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.25rem;
+    }
+    
+    .game-title-1987 {
+        font-size: 1.5rem;
+        line-height: 1.3;
+    }
+}
+
+/* Print Styles - Authentic Scorecard Look */
+@media print {
+    body.authentic-1987 {
+        background: white;
+        color: black;
+    }
+    
+    .game-layout-1987 {
+        display: block;
+        max-width: none;
+        margin: 0;
+        padding: 1cm;
+    }
+    
+    .control-panel {
+        display: none; /* Hide interactive elements */
+    }
+    
+    .course-area {
+        border: 2px solid black;
+        page-break-inside: avoid;
+    }
+    
+    .section-header-1987,
+    .game-title-1987 {
+        color: black;
+        text-shadow: none;
+    }
+    
+    .shot-schedule-1987 th {
+        background: lightgray;
+        color: black;
+    }
+    
+    .shot-schedule-1987 td {
+        background: white;
+        border: 1px solid black;
+    }
+}

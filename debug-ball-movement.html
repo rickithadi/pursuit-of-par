@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Debug Ball Movement</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 20px;
+            font-family: Arial, sans-serif;
+        }
+        
+        .test-course {
+            width: 400px;
+            height: 300px;
+            background: linear-gradient(180deg, #228B22 0%, #32CD32 30%, #32CD32 70%, #228B22 100%);
+            border: 2px solid #1e6b1e;
+            border-radius: 8px;
+            position: relative;
+            margin: 20px 0;
+        }
+        
+        .test-ball {
+            position: absolute;
+            width: 16px;
+            height: 16px;
+            background: #FFD700;
+            border: 3px solid #000;
+            border-radius: 50%;
+            transition: all 1s ease;
+            z-index: 10;
+            left: 50%;
+            bottom: 5%;
+        }
+        
+        .controls {
+            margin: 20px 0;
+        }
+        
+        button {
+            margin: 5px;
+            padding: 10px 15px;
+            background: #D2691E;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        
+        .info {
+            background: #f0f0f0;
+            padding: 10px;
+            border-radius: 4px;
+            margin: 10px 0;
+            font-family: monospace;
+        }
+    </style>
+</head>
+<body>
+    <h1>Ball Movement Debug Test</h1>
+    
+    <div class="test-course" id="testCourse">
+        <div class="test-ball" id="testBall"></div>
+    </div>
+    
+    <div class="controls">
+        <button onclick="moveBallUp()">Move Up (Toward Green)</button>
+        <button onclick="moveBallDown()">Move Down (Toward Tee)</button>
+        <button onclick="moveBallLeft()">Move Left</button>
+        <button onclick="moveBallRight()">Move Right</button>
+        <button onclick="moveBallCenter()">Center Ball</button>
+        <button onclick="moveBallRandom()">Random Shot</button>
+    </div>
+    
+    <div class="info" id="ballInfo">
+        Ball Position: 50%, 5%
+    </div>
+    
+    <div class="info">
+        <h3>Test the actual game ball:</h3>
+        <button onclick="testGameBall()">Test Game Ball Movement</button>
+        <div id="gameTest"></div>
+    </div>
+
+    <script>
+        let currentX = 50;
+        let currentY = 5;
+        
+        function updateBallInfo() {
+            document.getElementById('ballInfo').textContent = `Ball Position: ${currentX}%, ${currentY}%`;
+        }
+        
+        function moveBall(x, y) {
+            currentX = x;
+            currentY = y;
+            const ball = document.getElementById('testBall');
+            ball.style.left = `${x}%`;
+            ball.style.bottom = `${y}%`;
+            updateBallInfo();
+            console.log(`Ball moved to: ${x}%, ${y}%`);
+        }
+        
+        function moveBallUp() {
+            moveBall(currentX, Math.min(95, currentY + 20));
+        }
+        
+        function moveBallDown() {
+            moveBall(currentX, Math.max(5, currentY - 20));
+        }
+        
+        function moveBallLeft() {
+            moveBall(Math.max(5, currentX - 15), currentY);
+        }
+        
+        function moveBallRight() {
+            moveBall(Math.min(95, currentX + 15), currentY);
+        }
+        
+        function moveBallCenter() {
+            moveBall(50, 5);
+        }
+        
+        function moveBallRandom() {
+            const randomX = Math.random() * 80 + 10; // 10-90%
+            const randomY = Math.random() * 80 + 10; // 10-90%
+            moveBall(randomX, randomY);
+        }
+        
+        function testGameBall() {
+            // Try to access the game ball from the main game
+            try {
+                const gameWindow = window.parent || window;
+                const gameBall = gameWindow.document.getElementById('ballPosition');
+                
+                if (gameBall) {
+                    const testResult = document.getElementById('gameTest');
+                    const currentStyle = window.getComputedStyle(gameBall);
+                    testResult.innerHTML = `
+                        <strong>Game Ball Found:</strong><br>
+                        Current left: ${gameBall.style.left}<br>
+                        Current bottom: ${gameBall.style.bottom}<br>
+                        Computed left: ${currentStyle.left}<br>
+                        Computed bottom: ${currentStyle.bottom}<br>
+                        <button onclick="forceMoveBall()">Force Move Game Ball</button>
+                    `;
+                } else {
+                    document.getElementById('gameTest').innerHTML = 'Game ball not found. Open this in the same browser as the game.';
+                }
+            } catch (e) {
+                document.getElementById('gameTest').innerHTML = `Error: ${e.message}`;
+            }
+        }
+        
+        function forceMoveBall() {
+            try {
+                const gameWindow = window.parent || window;
+                const gameBall = gameWindow.document.getElementById('ballPosition');
+                
+                if (gameBall) {
+                    // Force move the game ball
+                    gameBall.style.left = '75%';
+                    gameBall.style.bottom = '60%';
+                    gameBall.style.backgroundColor = '#FF0000'; // Make it red temporarily
+                    
+                    setTimeout(() => {
+                        gameBall.style.backgroundColor = '#FFD700'; // Back to gold
+                    }, 2000);
+                    
+                    document.getElementById('gameTest').innerHTML += '<br><strong>Forced game ball to move to 75%, 60%!</strong>';
+                }
+            } catch (e) {
+                document.getElementById('gameTest').innerHTML += `<br>Error moving game ball: ${e.message}`;
+            }
+        }
+        
+        // Auto-test on load
+        window.onload = function() {
+            updateBallInfo();
+            console.log('Debug page loaded. Test ball should be visible at bottom center.');
+        };
+    </script>
+</body>
+</html>

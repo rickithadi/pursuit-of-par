@@ -8,6 +8,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="tpc-hole-styles.css">
     <style>
         .enhanced-game-container {
             max-width: 1800px;
@@ -15,6 +16,32 @@
             padding: 1rem;
             background: var(--cream);
             min-height: 100vh;
+        }
+        
+        .dependency-error {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: #fee2e2;
+            border: 2px solid #dc2626;
+            border-radius: 8px;
+            padding: 2rem;
+            text-align: center;
+            box-shadow: 0 10px 25px rgba(220, 38, 38, 0.2);
+            z-index: 10000;
+            max-width: 400px;
+        }
+        
+        .dependency-error h3 {
+            color: #dc2626;
+            margin-top: 0;
+            margin-bottom: 1rem;
+        }
+        
+        .dependency-error p {
+            color: #7f1d1d;
+            margin-bottom: 1rem;
         }
         
         .enhanced-header {
@@ -587,11 +614,21 @@
             <div class="accessibility-info" style="margin-top: 1rem; font-size: 0.8rem; color: rgba(255,255,255,0.8);">
                 Accessibility: Ctrl+H (Hex Grid) | Ctrl+C (Colorblind) | Ctrl+K (High Contrast)
             </div>
+            <div style="margin-top: 1rem;">
+                <button id="startTutorial" class="btn btn-warning" style="background: #FF9800; border-color: #E68900;">
+                    📚 Start Tutorial - Learn 1987 Board Game Rules
+                </button>
+                <button id="quickHelp" class="btn btn-info" style="margin-left: 0.5rem;">
+                    ❓ Quick Help
+                </button>
+            </div>
         </div>
         
         <div class="enhanced-layout">
             <div class="course-3d-area">
-                <div class="course-3d-viewport" id="course3DViewport">
+                <div class="course-3d-viewport" id="course3DViewport" 
+                     data-intro="Welcome to TPC Sawgrass! This is your golf course view showing the authentic 1987 board game layout. You'll see your ball (white circle), the hole with TPC flag, water hazards, bunkers, and yardage markers - all exactly as designed 38 years ago." 
+                     data-step="2">
                     <div class="loading-overlay" id="loadingOverlay">
                         <div style="text-align: center;">
                             <div class="loading-spinner"></div>
@@ -647,7 +684,9 @@
                         <div class="control-group-title">
                             🏌️ Club Selection
                         </div>
-                        <div class="club-selector" id="clubSelector3D">
+                        <div class="club-selector" id="clubSelector3D"
+                             data-intro="Choose your golf club based on distance and lie conditions. Each club has authentic 1987 yardage ranges: Driver (220-270y), 7-Iron (120-140y), Wedge (50-80y). Available clubs change based on where your ball lies!" 
+                             data-step="4">
                             <div class="club-option" data-club="driver">Driver</div>
                             <div class="club-option" data-club="3wood">3 Wood</div>
                             <div class="club-option" data-club="5wood">5 Wood</div>
@@ -677,7 +716,9 @@
                         <div class="control-group-title">
                             🎨 Visual Settings
                         </div>
-                        <div class="visual-settings">
+                        <div class="visual-settings"
+                             data-intro="Visual enhancements: Hex Grid creates the board game feel (like Colonist.io), Colorblind mode adjusts colors for accessibility, High Contrast mode improves visibility. All preserve the authentic 1987 mechanics!" 
+                             data-step="5">
                             <label class="setting-toggle">
                                 <input type="checkbox" id="enableHexGrid" checked>
                                 <span class="toggle-slider"></span>
@@ -722,7 +763,9 @@
                         <div class="control-group-title">
                             🎲 Authentic Dice Roll
                         </div>
-                        <div class="enhanced-dice-display">
+                        <div class="enhanced-dice-display"
+                             data-intro="The heart of the 1987 board game! Green dice (6-sided) determines distance, Direction dice (12-sided) controls accuracy - 1-6 = left hook, 7-12 = right slice, 6-7 = straight. Problem dice appears for bad lies with penalties." 
+                             data-step="3">
                             <div class="enhanced-dice green" id="greenDice3D">
                                 ?
                                 <div class="dice-label">Distance</div>
@@ -737,13 +780,17 @@
                             </div>
                         </div>
                         
-                        <button class="enhanced-shot-button" id="takeShot3D">
+                        <button class="enhanced-shot-button" id="takeShot3D"
+                                data-intro="Ready to take your shot? This button rolls the authentic 1987 dice, calculates your shot result using original board game mechanics, and moves your ball to the new position. Watch the lie conditions change!" 
+                                data-step="6">
                             🏌️ Take Shot
                         </button>
                     </div>
                 </div>
                 
-                <div class="game-status">
+                <div class="game-status"
+                     data-intro="Your current game status shows: Player name, stroke count, distance to pin (updated in real-time), and lie condition (Tee/Fairway/Rough/Sand/Green). The lie determines which clubs you can use - authentic 1987 restrictions!" 
+                     data-step="7">
                     <div class="control-title">📊 Current Status</div>
                     <div class="status-item">
                         <span class="status-label">Player:</span>
@@ -783,30 +830,243 @@
         </div>
     </div>
     
-    <!-- Load Phaser.js CDN -->
-    <script src="https://cdn.jsdelivr.net/npm/phaser@3.80.1/dist/phaser.min.js"></script>
+    <!-- Load external dependencies first -->
+    <link rel="stylesheet" href="https://unpkg.com/intro.js/minified/introjs.min.css">
     
-    <!-- Load dependencies -->
-    <script src="authentic-mechanics.js"></script>
-    <script src="board-game-bridge.js"></script>
-    <script src="phaser-engine.js"></script>
-    <script type="module">
-        // Initialize Phaser engine instead of 3D engine
-        // import { Enhanced3DGolfEngine } from './game-engine-3d.js';
+    <!-- Load dependencies in correct order -->
+    <script>
+        // Global dependency loading with error handling
+        window.dependenciesLoaded = {
+            phaser: false,
+            intro: false,
+            authentic: false,
+            bridge: false,
+            holeData: false,
+            holeDisplay: false,
+            engine: false
+        };
         
-        // Initialize when DOM is ready
+        window.checkAllDependenciesLoaded = function() {
+            return Object.values(window.dependenciesLoaded).every(loaded => loaded);
+        };
+        
+        window.onDependencyLoaded = function(name) {
+            window.dependenciesLoaded[name] = true;
+            console.log(`✓ Loaded: ${name} (${Object.values(window.dependenciesLoaded).filter(Boolean).length}/7)`);
+            
+            if (window.checkAllDependenciesLoaded()) {
+                console.log('✓ All dependencies loaded successfully');
+                if (typeof window.initializeGame === 'function') {
+                    window.initializeGame();
+                } else {
+                    console.error('initializeGame function not found');
+                }
+            }
+        };
+        
+        window.onDependencyError = function(name, error) {
+            console.error(`✗ Failed to load: ${name}`, error);
+            // Hide loading overlay and show error
+            const loadingOverlay = document.getElementById('loadingOverlay');
+            if (loadingOverlay) {
+                loadingOverlay.innerHTML = `
+                    <div style="color: #dc2626; text-align: center;">
+                        <h3>⚠️ Loading Error</h3>
+                        <p>Failed to load ${name}. Please refresh the page or check your internet connection.</p>
+                        <button onclick="location.reload()" style="padding: 8px 16px; margin-top: 16px; background: #dc2626; color: white; border: none; border-radius: 4px; cursor: pointer;">
+                            🔄 Refresh Page
+                        </button>
+                    </div>
+                `;
+            }
+        };
+    </script>
+    
+    <!-- Load Phaser.js CDN with error handling -->
+    <script src="https://cdn.jsdelivr.net/npm/phaser@3.80.1/dist/phaser.min.js" 
+            onload="window.onDependencyLoaded('phaser')" 
+            onerror="window.onDependencyError('phaser', event)"></script>
+    
+    <!-- Load Intro.js with error handling -->
+    <script src="https://unpkg.com/intro.js/minified/intro.min.js"
+            onload="window.onDependencyLoaded('intro')" 
+            onerror="window.onDependencyError('intro', event)"></script>
+    
+    <!-- Load game dependencies in order -->
+    <script src="authentic-mechanics.js"
+            onload="window.onDependencyLoaded('authentic')" 
+            onerror="window.onDependencyError('authentic-mechanics', event)"></script>
+    <script src="board-game-bridge.js"
+            onload="window.onDependencyLoaded('bridge')" 
+            onerror="window.onDependencyError('board-game-bridge', event)"></script>
+    <script src="tpc-hole-data.js"
+            onload="window.onDependencyLoaded('holeData')" 
+            onerror="window.onDependencyError('tpc-hole-data', event)"></script>
+    <script src="hole-display-system.js"
+            onload="window.onDependencyLoaded('holeDisplay')" 
+            onerror="window.onDependencyError('hole-display-system', event)"></script>
+    <script src="phaser-engine.js"
+            onload="window.onDependencyLoaded('engine')" 
+            onerror="window.onDependencyError('phaser-engine', event)"></script>
+    <script>
+        // Game initialization function called when all dependencies are loaded
+        window.initializeGame = function() {
+            console.log('🎮 Initializing game with all dependencies loaded...');
+            
+            // Verify all required classes exist
+            const requiredClasses = [
+                'Phaser', 'introJs', 'AuthenticDiceSystem', 'BoardGameShotCalculator', 
+                'TPCHoleData', 'TPCHoleDisplaySystem', 'PhaserBoardGameEngine'
+            ];
+            
+            const missingClasses = requiredClasses.filter(className => !window[className]);
+            if (missingClasses.length > 0) {
+                console.error('✗ Missing required classes:', missingClasses);
+                return;
+            }
+            
+            try {
+                // Initialize the Phaser engine with authentic mechanics
+                window.phaserEngine = new PhaserBoardGameEngine();
+                console.log('✓ Phaser engine created');
+                
+                // Initialize game systems after all classes are loaded
+                if (window.phaserEngine.initializeGameSystems) {
+                    window.phaserEngine.initializeGameSystems();
+                    console.log('✓ Game systems initialized');
+                }
+                
+                // Initialize the scene after classes are loaded
+                if (window.phaserEngine.initializeScene) {
+                    window.phaserEngine.initializeScene();
+                    console.log('✓ Scene initialized');
+                }
+                
+                // Initialize club availability based on starting position
+                if (window.phaserEngine.updateClubAvailability) {
+                    setTimeout(() => {
+                        window.phaserEngine.updateClubAvailability();
+                        console.log('✓ Initial club availability set for tee position');
+                    }, 100);
+                }
+
+                // Initialize TPC Sawgrass hole display system
+                try {
+                    const holeData = new TPCHoleData();
+                    const holeDisplay = new TPCHoleDisplaySystem(window.phaserEngine, holeData);
+                    window.tpcHoleDisplay = holeDisplay;
+                    console.log('✓ TPC Sawgrass hole display system initialized');
+                } catch (error) {
+                    console.warn('TPC hole display system initialization failed:', error);
+                }
+                
+                // Try to load saved game state
+                const savedGameLoaded = window.phaserEngine.loadGameState();
+                if (savedGameLoaded) {
+                    console.log('🔄 Restored previous game session');
+                    // Show restore notification
+                    showGameRestoreNotification();
+                }
+                
+                // Setup enhanced UI interactions
+                setupEnhanced3DUI();
+                setupAccessibilityControls();
+                
+                // Hide loading overlay after successful initialization
+                setTimeout(() => {
+                    document.getElementById('loadingOverlay').style.display = 'none';
+                    console.log('✅ Game fully initialized and ready to play!');
+                }, 500);
+                
+            } catch (error) {
+                console.error('✗ Game initialization failed:', error);
+                // Show error to user
+                const errorOverlay = document.getElementById('loadingOverlay');
+                if (errorOverlay) {
+                    errorOverlay.innerHTML = `
+                        <div style="color: #dc2626; text-align: center;">
+                            <h3>⚠️ Initialization Error</h3>
+                            <p>Failed to start the game. Please refresh the page.</p>
+                            <button onclick="location.reload()" style="padding: 8px 16px; margin-top: 16px;">
+                                🔄 Refresh Page
+                            </button>
+                        </div>
+                    `;
+                }
+            }
+        };
+        
+        // Initialize when DOM is ready (fallback if dependency system fails)
         document.addEventListener('DOMContentLoaded', () => {
-            // Show loading for better UX
+            console.log('🎮 DOM ready, waiting for dependencies...');
+            
+            // If dependencies aren't loaded after 5 seconds, show progress and try anyway after 10 seconds
             setTimeout(() => {
+                const loaded = Object.values(window.dependenciesLoaded).filter(Boolean).length;
+                console.log(`⏳ Progress: ${loaded}/7 dependencies loaded`);
+                
+                if (!window.checkAllDependenciesLoaded()) {
+                    const loadingOverlay = document.getElementById('loadingOverlay');
+                    if (loadingOverlay) {
+                        loadingOverlay.innerHTML = `
+                            <div style="text-align: center;">
+                                <div class="loading-spinner" style="margin: 2rem auto;"></div>
+                                <h3 style="color: #1a5f3f; margin-bottom: 1rem;">Loading Dependencies...</h3>
+                                <p style="color: #666;">Progress: ${loaded}/7 components loaded</p>
+                                <p style="font-size: 0.9rem; color: #888; margin-top: 1rem;">
+                                    This may take a moment on slower connections...
+                                </p>
+                            </div>
+                        `;
+                    }
+                }
+            }, 5000);
+            
+            // If dependencies aren't loaded after 15 seconds, try anyway
+            setTimeout(() => {
+                if (!window.checkAllDependenciesLoaded()) {
+                    console.warn('⚠️ Not all dependencies loaded after 15s, attempting initialization anyway...');
+                    try {
+                        window.initializeGame();
+                    } catch (error) {
+                        console.error('Failed to initialize game even with fallback:', error);
+                        // Force hide loading overlay
+                        const overlay = document.getElementById('loadingOverlay');
+                        if (overlay) {
+                            overlay.innerHTML = `
+                                <div style="text-align: center; color: #dc2626;">
+                                    <h3>⚠️ Loading Issue</h3>
+                                    <p>The game encountered loading issues.</p>
+                                    <button onclick="forceStart()" style="background: #1a5f3f; color: white; border: none; padding: 12px 24px; border-radius: 6px; margin: 1rem; cursor: pointer;">
+                                        🚀 Start Game Anyway
+                                    </button>
+                                    <button onclick="location.reload()" style="background: #dc2626; color: white; border: none; padding: 12px 24px; border-radius: 6px; margin: 1rem; cursor: pointer;">
+                                        🔄 Refresh Page
+                                    </button>
+                                </div>
+                            `;
+                        }
+                    }
+                }
+            }, 8000); // Reduced from 15s to 8s
+            
+            // Force start function for emergency bypass
+            window.forceStart = function() {
+                console.log('🚀 Force starting game...');
                 document.getElementById('loadingOverlay').style.display = 'none';
-            }, 2000);
-            
-            // Initialize the Phaser engine with authentic mechanics
-            window.phaserEngine = new PhaserBoardGameEngine();
-            
-            // Setup enhanced UI interactions
-            setupEnhanced3DUI();
-            setupAccessibilityControls();
+                
+                // Initialize basic game functionality
+                try {
+                    if (window.PhaserBoardGameEngine) {
+                        window.phaserEngine = new PhaserBoardGameEngine();
+                        console.log('✓ Emergency game initialization successful');
+                    } else {
+                        console.warn('PhaserBoardGameEngine not available, showing basic interface');
+                    }
+                } catch (error) {
+                    console.error('Emergency initialization failed:', error);
+                }
+            };
         });
         
         function setupAccessibilityControls() {
@@ -899,6 +1159,40 @@
                 });
             });
             
+            // Setup shot button
+            const shotButton = document.getElementById('takeShot3D');
+            shotButton?.addEventListener('click', () => {
+                if (window.phaserEngine && typeof window.phaserEngine.takeShot === 'function') {
+                    try {
+                        window.phaserEngine.takeShot();
+                        console.log('✓ Shot executed successfully');
+                    } catch (error) {
+                        console.error('✗ Shot execution failed:', error.message);
+                    }
+                } else {
+                    console.warn('⚠️ Shot execution not available yet');
+                }
+            });
+            
+            // Setup club selection
+            document.querySelectorAll('.club-option').forEach(club => {
+                club.addEventListener('click', () => {
+                    // Remove selected class from all clubs
+                    document.querySelectorAll('.club-option').forEach(c => c.classList.remove('selected'));
+                    // Add selected class to clicked club
+                    club.classList.add('selected');
+                    
+                    if (window.phaserEngine && typeof window.phaserEngine.selectClub === 'function') {
+                        try {
+                            window.phaserEngine.selectClub(club.dataset.club);
+                            console.log(`✓ Club selected: ${club.dataset.club}`);
+                        } catch (error) {
+                            console.error('✗ Club selection failed:', error.message);
+                        }
+                    }
+                });
+            });
+            
             // Simulate dynamic wind
             simulateWeatherEffects();
             
@@ -979,6 +1273,259 @@
                 humidity.textContent = `${hum}%`;
             }, 30000);
         }
+        
+        // Tutorial System - Authentic 1987 Board Game Education
+        function initializeTutorialSystem() {
+            // Configure Intro.js with 1987 board game theme
+            introJs().setOptions({
+                nextLabel: 'Next Step →',
+                prevLabel: '← Previous',
+                skipLabel: 'Skip Tutorial',
+                doneLabel: 'Start Playing! 🏌️',
+                exitOnOverlayClick: false,
+                showStepNumbers: true,
+                tooltipClass: 'authentic-tutorial-tooltip',
+                highlightClass: 'authentic-tutorial-highlight'
+            });
+            
+            // Tutorial step 1 - Welcome (triggered manually)
+            const welcomeStep = {
+                intro: `
+                    <div style="text-align: center;">
+                        <h3>🎲 Welcome to "In Pursuit of Par" 🎲</h3>
+                        <p>This is an <strong>authentic recreation</strong> of the 1987 board game!</p>
+                        <img src="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='60' height='40' viewBox='0 0 60 40'><rect width='60' height='40' fill='%234CAF50'/><text x='30' y='25' text-anchor='middle' fill='white' font-size='12'>1987</text></svg>" style="margin: 10px;">
+                        <p>Every dice roll, distance calculation, and club restriction is <strong>exactly as designed 38 years ago</strong>.</p>
+                        <p>Ready to learn the authentic board game mechanics?</p>
+                    </div>
+                `
+            };
+            
+            // Add CSS for tutorial styling
+            const tutorialStyles = document.createElement('style');
+            tutorialStyles.innerHTML = `
+                .authentic-tutorial-tooltip {
+                    background: linear-gradient(135deg, #4CAF50, #2E7D32) !important;
+                    color: white !important;
+                    border: 2px solid #FFD700 !important;
+                    border-radius: 12px !important;
+                    font-family: 'Inter', sans-serif !important;
+                    box-shadow: 0 8px 24px rgba(0,0,0,0.3) !important;
+                }
+                
+                .authentic-tutorial-tooltip .introjs-tooltip-title {
+                    color: #FFD700 !important;
+                    font-weight: bold !important;
+                    border-bottom: 2px solid #FFD700 !important;
+                    padding-bottom: 8px !important;
+                    margin-bottom: 12px !important;
+                }
+                
+                .authentic-tutorial-highlight {
+                    border: 3px solid #FFD700 !important;
+                    border-radius: 8px !important;
+                    box-shadow: 0 0 15px #FFD700 !important;
+                }
+                
+                .introjs-button {
+                    background: #FFD700 !important;
+                    color: #2E7D32 !important;
+                    border: none !important;
+                    border-radius: 6px !important;
+                    font-weight: bold !important;
+                    padding: 8px 16px !important;
+                    margin: 4px !important;
+                }
+                
+                .introjs-button:hover {
+                    background: #FFC107 !important;
+                    transform: translateY(-1px) !important;
+                }
+            `;
+            document.head.appendChild(tutorialStyles);
+            
+            // Tutorial event handlers
+            document.getElementById('startTutorial')?.addEventListener('click', () => {
+                startFullTutorial();
+            });
+            
+            document.getElementById('quickHelp')?.addEventListener('click', () => {
+                showQuickHelp();
+            });
+            
+            // Check if first visit
+            if (!localStorage.getItem('tutorial-completed')) {
+                // Auto-start tutorial for first-time users after game loads
+                setTimeout(() => {
+                    if (confirm('Welcome to the 1987 board game recreation! Would you like to start the tutorial to learn the authentic mechanics?')) {
+                        startFullTutorial();
+                    }
+                }, 3000);
+            }
+        }
+        
+        function startFullTutorial() {
+            // Ensure game is loaded first
+            if (!window.phaserEngine) {
+                alert('Please wait for the game to finish loading, then try the tutorial again.');
+                return;
+            }
+            
+            // Custom intro step for welcome
+            introJs().setOption('steps', [{
+                intro: `
+                    <div style="text-align: center; padding: 20px;">
+                        <h2 style="color: #4CAF50; margin-bottom: 15px;">🎲 Authentic 1987 Board Game 🎲</h2>
+                        <p style="font-size: 16px; margin-bottom: 15px;">Welcome to <strong>"In Pursuit of Par"</strong></p>
+                        <div style="background: #f0f8ff; padding: 15px; border-radius: 8px; margin: 15px 0;">
+                            <p><strong>🏌️ This is a pixel-perfect recreation of the 1987 board game!</strong></p>
+                            <p>• Every dice mechanic is authentic<br>
+                            • All club distances match original charts<br>
+                            • Lie restrictions exactly as designed<br>
+                            • TPC Sawgrass hole layout</p>
+                        </div>
+                        <p style="color: #666;">Let's learn how to play the way golfers did in 1987!</p>
+                    </div>
+                `,
+                position: 'bottom'
+            }]).start().oncomplete(() => {
+                // Continue with main tutorial
+                introJs().start();
+            });
+        }
+        
+        function showQuickHelp() {
+            const helpContent = `
+                <div style="font-family: Inter, sans-serif; line-height: 1.6;">
+                    <h3>🎲 Quick Reference - 1987 Board Game Rules</h3>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 15px;">
+                        <div style="background: #f0f8ff; padding: 10px; border-radius: 6px;">
+                            <h4>🎯 Dice System</h4>
+                            <p><strong>Green (6-sided):</strong> Distance<br>
+                            <strong>Direction (12-sided):</strong><br>
+                            1-6 = Hook left<br>
+                            7-12 = Slice right<br>
+                            <strong>Problem (6-sided):</strong> Penalties</p>
+                        </div>
+                        <div style="background: #f0fff0; padding: 10px; border-radius: 6px;">
+                            <h4>🏌️ Club Ranges</h4>
+                            <p><strong>Driver:</strong> 220-270y<br>
+                            <strong>7-Iron:</strong> 120-140y<br>
+                            <strong>Wedge:</strong> 50-80y<br>
+                            <strong>Putter:</strong> 10-30y</p>
+                        </div>
+                        <div style="background: #fff8f0; padding: 10px; border-radius: 6px;">
+                            <h4>📍 Lie Conditions</h4>
+                            <p><strong>Tee:</strong> All clubs<br>
+                            <strong>Fairway:</strong> No driver<br>
+                            <strong>Rough:</strong> Irons only<br>
+                            <strong>Sand:</strong> Wedge/Putter<br>
+                            <strong>Green:</strong> Putter mainly</p>
+                        </div>
+                        <div style="background: #f8f0ff; padding: 10px; border-radius: 6px;">
+                            <h4>🏆 Scoring</h4>
+                            <p><strong>Par 4:</strong> 4 strokes<br>
+                            <strong>Gimme:</strong> Within 3 feet<br>
+                            <strong>Birdie:</strong> 1 under par<br>
+                            <strong>Eagle:</strong> 2 under par</p>
+                        </div>
+                    </div>
+                    <div style="text-align: center; margin-top: 15px;">
+                        <p style="color: #666; font-style: italic;">Click anywhere to close</p>
+                    </div>
+                </div>
+            `;
+            
+            // Create modal overlay
+            const modal = document.createElement('div');
+            modal.style.cssText = `
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: rgba(0,0,0,0.7);
+                z-index: 3000;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                cursor: pointer;
+            `;
+            
+            const content = document.createElement('div');
+            content.style.cssText = `
+                background: white;
+                border-radius: 12px;
+                padding: 30px;
+                max-width: 600px;
+                max-height: 80vh;
+                overflow-y: auto;
+                box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+                cursor: default;
+            `;
+            
+            content.innerHTML = helpContent;
+            content.addEventListener('click', (e) => e.stopPropagation());
+            
+            modal.appendChild(content);
+            modal.addEventListener('click', () => modal.remove());
+            
+            document.body.appendChild(modal);
+        }
+        
+        // Show game restore notification
+        function showGameRestoreNotification() {
+            const notification = document.createElement('div');
+            notification.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+                color: white;
+                padding: 1rem 1.5rem;
+                border-radius: 8px;
+                box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+                z-index: 10000;
+                font-family: Inter, sans-serif;
+                font-size: 0.9rem;
+                animation: slideInRight 0.5s ease;
+                cursor: pointer;
+            `;
+            
+            notification.innerHTML = `
+                <div style="display: flex; align-items: center; gap: 0.5rem;">
+                    <span style="font-size: 1.2rem;">🔄</span>
+                    <div>
+                        <div style="font-weight: 600; margin-bottom: 0.25rem;">Game Restored!</div>
+                        <div style="font-size: 0.8rem; opacity: 0.9;">Previous game session loaded</div>
+                    </div>
+                    <button onclick="window.phaserEngine.clearSavedGame(); location.reload();" 
+                            style="background: none; border: none; color: white; font-size: 0.8rem; opacity: 0.8; margin-left: 1rem; cursor: pointer;"
+                            title="Start new game">
+                        ✕ New Game
+                    </button>
+                </div>
+                <style>
+                    @keyframes slideInRight {
+                        from { transform: translateX(100%); }
+                        to { transform: translateX(0); }
+                    }
+                </style>
+            `;
+            
+            document.body.appendChild(notification);
+            
+            // Auto-remove after 5 seconds
+            setTimeout(() => {
+                notification.style.animation = 'slideInRight 0.5s ease reverse';
+                setTimeout(() => notification.remove(), 500);
+            }, 5000);
+        }
+
+        // Initialize tutorial system when page loads
+        document.addEventListener('DOMContentLoaded', () => {
+            initializeTutorialSystem();
+        });
     </script>
 </body>
 </html>

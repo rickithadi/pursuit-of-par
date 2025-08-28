@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Phaser Game Visual Analysis Tool</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: #f0f0f0;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        .test-header {
+            background: #2c3e50;
+            color: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+        .test-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        .game-frame {
+            border: 3px solid #3498db;
+            border-radius: 8px;
+            overflow: hidden;
+            background: white;
+            height: 600px;
+        }
+        .game-frame iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+        .game-info {
+            padding: 10px;
+            background: #ecf0f1;
+            border-top: 2px solid #bdc3c7;
+        }
+        .analysis-panel {
+            background: white;
+            border: 2px solid #e74c3c;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+        .test-result {
+            margin: 10px 0;
+            padding: 10px;
+            border-radius: 4px;
+        }
+        .test-pass {
+            background: #d4edda;
+            border: 1px solid #c3e6cb;
+            color: #155724;
+        }
+        .test-fail {
+            background: #f8d7da;
+            border: 1px solid #f5c6cb;
+            color: #721c24;
+        }
+        .console-output {
+            background: #2c3e50;
+            color: #ecf0f1;
+            font-family: monospace;
+            padding: 15px;
+            border-radius: 4px;
+            max-height: 400px;
+            overflow-y: auto;
+            white-space: pre-wrap;
+        }
+        button {
+            background: #3498db;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover {
+            background: #2980b9;
+        }
+        .error-button {
+            background: #e74c3c;
+        }
+        .error-button:hover {
+            background: #c0392b;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="test-header">
+            <h1>🎮 Phaser Golf Game Visual Analysis</h1>
+            <p>Testing three different implementations for rendering issues, canvas problems, and functionality</p>
+            <div>
+                <button onclick="runFullAnalysis()">🔍 Run Full Analysis</button>
+                <button onclick="testCanvasRendering()">🖼️ Test Canvas Rendering</button>
+                <button onclick="testJavaScriptErrors()" class="error-button">⚠️ Check Console Errors</button>
+                <button onclick="clearConsole()">🧹 Clear Console</button>
+            </div>
+        </div>
+
+        <div class="test-grid">
+            <div class="game-frame">
+                <div class="game-info">
+                    <strong>phaser-golf-working.html</strong><br>
+                    Simple working implementation
+                </div>
+                <iframe id="frame1" src="http://localhost:51400/phaser-golf-working.html"></iframe>
+            </div>
+            
+            <div class="game-frame">
+                <div class="game-info">
+                    <strong>enhanced-phaser-golf.html</strong><br>
+                    Enhanced version with physics
+                </div>
+                <iframe id="frame2" src="http://localhost:51400/enhanced-phaser-golf.html"></iframe>
+            </div>
+            
+            <div class="game-frame">
+                <div class="game-info">
+                    <strong>ultimate-pursuit-of-par.html</strong><br>
+                    Pure CSS implementation (no Phaser)
+                </div>
+                <iframe id="frame3" src="http://localhost:51400/ultimate-pursuit-of-par.html"></iframe>
+            </div>
+        </div>
+
+        <div class="analysis-panel">
+            <h2>🔬 Analysis Results</h2>
+            <div id="analysisResults">
+                <p><em>Click "Run Full Analysis" to start testing...</em></p>
+            </div>
+        </div>
+
+        <div class="analysis-panel">
+            <h2>📊 Console Output</h2>
+            <div id="consoleOutput" class="console-output">
+                Console output will appear here...
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const consoleDiv = document.getElementById('consoleOutput');
+        const resultsDiv = document.getElementById('analysisResults');
+        
+        // Capture console output
+        const originalConsoleLog = console.log;
+        const originalConsoleError = console.error;
+        const originalConsoleWarn = console.warn;
+        
+        function logToDiv(message, type = 'log') {
+            const timestamp = new Date().toLocaleTimeString();
+            const prefix = type === 'error' ? '❌' : type === 'warn' ? '⚠️' : '📝';
+            consoleDiv.textContent += `[${timestamp}] ${prefix} ${message}\n`;
+            consoleDiv.scrollTop = consoleDiv.scrollHeight;
+        }
+        
+        console.log = function(...args) {
+            originalConsoleLog.apply(console, args);
+            logToDiv(args.join(' '), 'log');
+        };
+        
+        console.error = function(...args) {
+            originalConsoleError.apply(console, args);
+            logToDiv(args.join(' '), 'error');
+        };
+        
+        console.warn = function(...args) {
+            originalConsoleWarn.apply(console, args);
+            logToDiv(args.join(' '), 'warn');
+        };
+        
+        function clearConsole() {
+            consoleDiv.textContent = '';
+            console.log('Console cleared');
+        }
+        
+        function createTestResult(testName, passed, details) {
+            const div = document.createElement('div');
+            div.className = `test-result ${passed ? 'test-pass' : 'test-fail'}`;
+            div.innerHTML = `
+                <strong>${passed ? '✅' : '❌'} ${testName}</strong>
+                <div style="margin-top: 5px; font-size: 0.9em;">${details}</div>
+            `;
+            return div;
+        }
+        
+        async function runFullAnalysis() {
+            console.log('🚀 Starting full visual analysis...');
+            resultsDiv.innerHTML = '<p><em>Running analysis...</em></p>';
+            
+            const results = [];
+            
+            // Test 1: Check if iframes loaded
+            console.log('📝 Testing iframe loading...');
+            const frame1 = document.getElementById('frame1');
+            const frame2 = document.getElementById('frame2');
+            const frame3 = document.getElementById('frame3');
+            
+            try {
+                const frame1Loaded = frame1.contentWindow && frame1.contentDocument;
+                const frame2Loaded = frame2.contentWindow && frame2.contentDocument;
+                const frame3Loaded = frame3.contentWindow && frame3.contentDocument;
+                
+                results.push(createTestResult('Iframe Loading', 
+                    frame1Loaded && frame2Loaded && frame3Loaded,
+                    `Frame 1: ${frame1Loaded ? 'OK' : 'FAIL'}, Frame 2: ${frame2Loaded ? 'OK' : 'FAIL'}, Frame 3: ${frame3Loaded ? 'OK' : 'FAIL'}`
+                ));
+                
+            } catch (e) {
+                results.push(createTestResult('Iframe Loading', false, `Error: ${e.message}`));
+            }
+            
+            // Test 2: Check for Phaser canvas elements
+            await new Promise(resolve => setTimeout(resolve, 2000)); // Wait for load
+            
+            console.log('📝 Checking for Phaser canvas elements...');
+            try {
+                let phaserCanvasCount = 0;
+                
+                [frame1, frame2, frame3].forEach((frame, index) => {
+                    try {
+                        const canvases = frame.contentDocument.querySelectorAll('canvas');
+                        console.log(`Frame ${index + 1} canvas count: ${canvases.length}`);
+                        if (canvases.length > 0) phaserCanvasCount++;
+                    } catch (e) {
+                        console.warn(`Cannot access frame ${index + 1} content: ${e.message}`);
+                    }
+                });
+                
+                results.push(createTestResult('Phaser Canvas Detection', 
+                    phaserCanvasCount >= 2,
+                    `Found canvas elements in ${phaserCanvasCount} frames (expected at least 2 Phaser implementations)`
+                ));
+                
+            } catch (e) {
+                results.push(createTestResult('Phaser Canvas Detection', false, `Error: ${e.message}`));
+            }
+            
+            // Test 3: Check for JavaScript errors in console
+            console.log('📝 Monitoring for JavaScript errors...');
+            const errorCount = await checkForJavaScriptErrors();
+            results.push(createTestResult('JavaScript Error Check', 
+                errorCount === 0,
+                `Found ${errorCount} JavaScript errors across all implementations`
+            ));
+            
+            // Test 4: Check implementation differences
+            console.log('📝 Analyzing implementation differences...');
+            const implementationAnalysis = analyzeImplementations();
+            results.push(createTestResult('Implementation Analysis', true, implementationAnalysis));
+            
+            // Display results
+            resultsDiv.innerHTML = '<h3>Analysis Complete</h3>';
+            results.forEach(result => resultsDiv.appendChild(result));
+            
+            console.log('✅ Full analysis complete');
+        }
+        
+        async function checkForJavaScriptErrors() {
+            let errorCount = 0;
+            
+            // Monitor console for errors
+            const originalError = window.onerror;
+            window.onerror = function(msg, url, line, col, error) {
+                console.error(`JS Error: ${msg} at ${url}:${line}:${col}`);
+                errorCount++;
+                if (originalError) originalError(msg, url, line, col, error);
+            };
+            
+            // Wait and count errors
+            await new Promise(resolve => setTimeout(resolve, 3000));
+            
+            console.log(`Error monitoring complete. Found ${errorCount} errors.`);
+            return errorCount;
+        }
+        
+        function analyzeImplementations() {
+            return `
+                Implementation 1 (phaser-golf-working.html): Simple Phaser 3.70.0 with basic course graphics and ball movement
+                Implementation 2 (enhanced-phaser-golf.html): Enhanced Phaser with physics engine, grid system, and multiple views
+                Implementation 3 (ultimate-pursuit-of-par.html): Pure CSS/HTML implementation with authentic 1987 board game mechanics
+                
+                Key Differences:
+                - Phaser versions use canvas rendering with WebGL/Canvas2D fallback
+                - CSS version uses DOM elements for visual representation
+                - Physics implementation varies between versions
+                - Ball movement mechanics differ significantly
+            `;
+        }
+        
+        function testCanvasRendering() {
+            console.log('🖼️ Testing canvas rendering capabilities...');
+            
+            const testCanvas = document.createElement('canvas');
+            testCanvas.width = 800;
+            testCanvas.height = 600;
+            
+            const ctx = testCanvas.getContext('2d');
+            if (!ctx) {
+                console.error('❌ Canvas 2D context not available');
+                return;
+            }
+            
+            // Test basic drawing
+            ctx.fillStyle = '#32CD32';
+            ctx.fillRect(0, 0, 800, 600);
+            ctx.fillStyle = '#FFFFFF';
+            ctx.beginPath();
+            ctx.arc(400, 300, 10, 0, Math.PI * 2);
+            ctx.fill();
+            
+            console.log('✅ Canvas 2D rendering test successful');
+            
+            // Test WebGL
+            const gl = testCanvas.getContext('webgl') || testCanvas.getContext('experimental-webgl');
+            if (gl) {
+                console.log('✅ WebGL context available');
+                console.log(`WebGL Version: ${gl.getParameter(gl.VERSION)}`);
+                console.log(`WebGL Vendor: ${gl.getParameter(gl.VENDOR)}`);
+                console.log(`WebGL Renderer: ${gl.getParameter(gl.RENDERER)}`);
+            } else {
+                console.warn('⚠️ WebGL context not available - Phaser will fall back to Canvas2D');
+            }
+        }
+        
+        function testJavaScriptErrors() {
+            console.log('⚠️ Checking for common JavaScript issues...');
+            
+            // Test Phaser availability
+            if (typeof Phaser === 'undefined') {
+                console.error('❌ Phaser library not loaded globally');
+            } else {
+                console.log('✅ Phaser library available');
+                console.log(`Phaser version: ${Phaser.VERSION}`);
+            }
+            
+            // Test common APIs
+            const apis = [
+                'requestAnimationFrame',
+                'WebGLRenderingContext',
+                'CanvasRenderingContext2D',
+                'addEventListener'
+            ];
+            
+            apis.forEach(api => {
+                if (window[api]) {
+                    console.log(`✅ ${api} available`);
+                } else {
+                    console.error(`❌ ${api} not available`);
+                }
+            });
+        }
+        
+        // Auto-start analysis after page loads
+        window.addEventListener('load', () => {
+            console.log('🔧 Visual Analysis Tool loaded');
+            console.log('📝 Ready to analyze Phaser golf game implementations');
+            
+            setTimeout(() => {
+                console.log('🔄 Auto-running basic checks...');
+                testCanvasRendering();
+                testJavaScriptErrors();
+            }, 1000);
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,1575 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>In Pursuit of Par - 1987 Authentic Golf Board Game</title>
+    <style>
+        /* 1987 AUTHENTIC COLOR PALETTE & FOUNDATION */
+        :root {
+            --orange-gauge: #D2691E;
+            --brown-box: #8B4513;
+            --cream-paper: #F5DEB3;
+            --muted-green: #228B22;
+            --fairway-green: #32CD32;
+            --rough-brown: #556B2F;
+            --sand-tan: #F4A460;
+            --water-blue: #4682B4;
+            --vintage-black: #2F2F2F;
+            --vintage-white: #FAFAFA;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Times New Roman', serif;
+            background: linear-gradient(135deg, var(--cream-paper) 0%, #E6D3A3 100%);
+            color: var(--vintage-black);
+            min-height: 100vh;
+            font-size: 16px;
+            line-height: 1.4;
+        }
+
+        /* AUTHENTIC 1987 TYPOGRAPHY & LAYOUT */
+        .game-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            display: grid;
+            grid-template-columns: 300px 1fr 250px;
+            grid-template-rows: auto 1fr auto;
+            gap: 20px;
+            min-height: 100vh;
+        }
+
+        .game-header {
+            grid-column: 1 / -1;
+            background: var(--brown-box);
+            color: var(--vintage-white);
+            padding: 20px;
+            border-radius: 8px;
+            border: 3px solid #654321;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+        }
+
+        .game-title {
+            font-size: 2.5em;
+            font-weight: bold;
+            text-align: center;
+            letter-spacing: 2px;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+        }
+
+        .game-subtitle {
+            text-align: center;
+            font-size: 1.2em;
+            font-style: italic;
+            opacity: 0.9;
+        }
+
+        /* COURSE VISUALIZATION */
+        .course-display {
+            background: var(--vintage-white);
+            border: 3px solid var(--brown-box);
+            border-radius: 8px;
+            padding: 20px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hole-layout {
+            width: 100%;
+            height: 400px;
+            position: relative;
+            background: linear-gradient(180deg, var(--muted-green) 0%, var(--fairway-green) 30%, var(--fairway-green) 70%, var(--muted-green) 100%);
+            border-radius: 20px;
+            border: 2px solid #1e6b1e;
+        }
+
+        .hole-info {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            background: rgba(139, 69, 19, 0.9);
+            color: var(--vintage-white);
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-weight: bold;
+            font-size: 0.9em;
+        }
+
+        .view-aerial-btn {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: var(--orange-gauge);
+            color: white;
+            border: 2px solid #B8860B;
+            border-radius: 6px;
+            padding: 8px 12px;
+            font-family: 'Times New Roman', serif;
+            font-size: 0.9em;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .view-aerial-btn:hover {
+            background: #CD853F;
+        }
+
+        /* Aerial Image Modal */
+        .aerial-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.8);
+            z-index: 2000;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .aerial-modal.show {
+            display: flex;
+        }
+
+        .aerial-content {
+            max-width: 90%;
+            max-height: 90%;
+            position: relative;
+        }
+
+        .aerial-image {
+            width: 100%;
+            height: auto;
+            border-radius: 8px;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.5);
+        }
+
+        .close-aerial {
+            position: absolute;
+            top: -10px;
+            right: -10px;
+            width: 40px;
+            height: 40px;
+            background: var(--brown-box);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            font-size: 1.5em;
+            font-weight: bold;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .tee-box {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 30px;
+            height: 30px;
+            background: #8B4513;
+            border-radius: 4px;
+            border: 2px solid #654321;
+        }
+
+        .fairway {
+            position: absolute;
+            bottom: 60px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 120px;
+            height: 280px;
+            background: linear-gradient(180deg, var(--fairway-green) 0%, var(--muted-green) 50%, var(--fairway-green) 100%);
+            border-radius: 60px;
+            border: 2px solid #1e6b1e;
+        }
+
+        .green-area {
+            position: absolute;
+            top: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 80px;
+            height: 80px;
+            background: radial-gradient(circle, #00FF00 0%, var(--muted-green) 100%);
+            border-radius: 50%;
+            border: 2px solid #006400;
+        }
+
+        .pin {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 4px;
+            height: 20px;
+            background: #FFD700;
+            border-radius: 2px;
+        }
+
+        .ball-position {
+            position: absolute;
+            width: 16px;
+            height: 16px;
+            background: #FFD700;
+            border: 3px solid #000;
+            border-radius: 50%;
+            transition: all 1.2s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            z-index: 10;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.5);
+        }
+
+        .ball-position.moving {
+            animation: ballBounce 0.3s ease-in-out;
+        }
+
+        @keyframes ballBounce {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.3); background: #FF6347; }
+            100% { transform: scale(1); }
+        }
+
+        .ball-position::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 8px;
+            height: 8px;
+            background: #FFF;
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+        .lie-indicator {
+            position: absolute;
+            bottom: -25px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0,0,0,0.7);
+            color: white;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 0.7em;
+            font-weight: bold;
+            white-space: nowrap;
+        }
+
+        /* GAME CONTROLS - LEFT PANEL */
+        .game-controls {
+            background: var(--cream-paper);
+            border: 3px solid var(--brown-box);
+            border-radius: 8px;
+            padding: 20px;
+            height: fit-content;
+        }
+
+        .control-section {
+            margin-bottom: 25px;
+            padding: 15px;
+            background: var(--vintage-white);
+            border: 2px solid var(--brown-box);
+            border-radius: 6px;
+        }
+
+        .section-title {
+            font-size: 1.3em;
+            font-weight: bold;
+            color: var(--brown-box);
+            margin-bottom: 12px;
+            text-align: center;
+            letter-spacing: 1px;
+        }
+
+        /* CLUB SELECTION */
+        .club-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+        }
+
+        .club-button {
+            padding: 12px 8px;
+            background: var(--orange-gauge);
+            color: white;
+            border: 3px solid #B8860B;
+            border-radius: 6px;
+            font-family: 'Times New Roman', serif;
+            font-size: 0.9em;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-align: center;
+        }
+
+        .club-button:hover {
+            background: #CD853F;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+
+        .club-button:active {
+            transform: translateY(0);
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.2);
+        }
+
+        .club-button.selected {
+            background: var(--brown-box);
+            border-color: #654321;
+            transform: translateY(-3px);
+            box-shadow: 0 6px 12px rgba(0,0,0,0.3);
+        }
+
+        .club-button:disabled {
+            background: #999;
+            color: #666;
+            cursor: not-allowed;
+            transform: none;
+            opacity: 0.5;
+        }
+
+        /* DICE DISPLAY */
+        .dice-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin: 15px 0;
+        }
+
+        .dice {
+            width: 50px;
+            height: 50px;
+            background: white;
+            border: 3px solid var(--vintage-black);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.8em;
+            font-weight: bold;
+            transition: all 0.6s ease;
+            position: relative;
+        }
+
+        .dice.green {
+            background: #90EE90;
+            border-color: var(--muted-green);
+        }
+
+        .dice.red {
+            background: #FFB6C1;
+            border-color: #DC143C;
+        }
+
+        .dice.rolling {
+            animation: diceRoll 0.6s ease-in-out;
+        }
+
+        @keyframes diceRoll {
+            0%, 100% { transform: rotate(0deg) scale(1); }
+            25% { transform: rotate(90deg) scale(1.1); }
+            50% { transform: rotate(180deg) scale(0.9); }
+            75% { transform: rotate(270deg) scale(1.1); }
+        }
+
+        /* SHOT BUTTON */
+        .take-shot-btn {
+            width: 100%;
+            padding: 20px;
+            background: linear-gradient(135deg, var(--orange-gauge) 0%, #B8860B 100%);
+            color: white;
+            border: 4px solid #8B4513;
+            border-radius: 12px;
+            font-family: 'Times New Roman', serif;
+            font-size: 1.4em;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 6px 12px rgba(0,0,0,0.2);
+            letter-spacing: 1px;
+        }
+
+        .take-shot-btn:hover {
+            background: linear-gradient(135deg, #CD853F 0%, #D2691E 100%);
+            transform: translateY(-3px);
+            box-shadow: 0 9px 18px rgba(0,0,0,0.3);
+        }
+
+        .take-shot-btn:active {
+            transform: translateY(0);
+            box-shadow: inset 0 4px 8px rgba(0,0,0,0.2);
+        }
+
+        .take-shot-btn:disabled {
+            background: #999;
+            cursor: not-allowed;
+            transform: none;
+            opacity: 0.6;
+        }
+
+        /* GAME STATUS - RIGHT PANEL */
+        .game-status {
+            background: var(--cream-paper);
+            border: 3px solid var(--brown-box);
+            border-radius: 8px;
+            padding: 20px;
+            height: fit-content;
+        }
+
+        .status-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 0;
+            border-bottom: 1px solid var(--brown-box);
+            font-size: 1.1em;
+        }
+
+        .status-item:last-child {
+            border-bottom: none;
+        }
+
+        .status-label {
+            font-weight: bold;
+            color: var(--brown-box);
+        }
+
+        .status-value {
+            font-weight: bold;
+            color: var(--vintage-black);
+        }
+
+        /* SHOT RESULT DISPLAY */
+        .shot-result {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: var(--vintage-white);
+            border: 4px solid var(--brown-box);
+            border-radius: 12px;
+            padding: 30px;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.4);
+            z-index: 1000;
+            text-align: center;
+            min-width: 300px;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .shot-result.show {
+            opacity: 1;
+        }
+
+        .result-title {
+            font-size: 1.6em;
+            font-weight: bold;
+            color: var(--brown-box);
+            margin-bottom: 15px;
+        }
+
+        .result-details {
+            font-size: 1.2em;
+            margin-bottom: 20px;
+            line-height: 1.6;
+        }
+
+        .continue-btn {
+            padding: 12px 24px;
+            background: var(--orange-gauge);
+            color: white;
+            border: 2px solid #B8860B;
+            border-radius: 6px;
+            font-family: 'Times New Roman', serif;
+            font-size: 1.1em;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        /* TUTORIAL OVERLAY */
+        .tutorial-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.8);
+            z-index: 2000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .tutorial-content {
+            background: var(--vintage-white);
+            border: 4px solid var(--brown-box);
+            border-radius: 12px;
+            padding: 40px;
+            max-width: 500px;
+            text-align: center;
+        }
+
+        .tutorial-title {
+            font-size: 2em;
+            font-weight: bold;
+            color: var(--brown-box);
+            margin-bottom: 20px;
+        }
+
+        .tutorial-text {
+            font-size: 1.2em;
+            line-height: 1.6;
+            margin-bottom: 25px;
+        }
+
+        .tutorial-buttons {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+        }
+
+        .tutorial-btn {
+            padding: 12px 24px;
+            border: 2px solid var(--brown-box);
+            border-radius: 6px;
+            font-family: 'Times New Roman', serif;
+            font-size: 1.1em;
+            font-weight: bold;
+            cursor: pointer;
+            background: var(--cream-paper);
+            color: var(--brown-box);
+        }
+
+        .tutorial-btn.primary {
+            background: var(--orange-gauge);
+            color: white;
+            border-color: #B8860B;
+        }
+
+        /* MOBILE RESPONSIVENESS */
+        @media (max-width: 768px) {
+            .game-container {
+                grid-template-columns: 1fr;
+                grid-template-rows: auto auto 1fr auto;
+                gap: 15px;
+            }
+            
+            .game-title {
+                font-size: 2em;
+            }
+            
+            .hole-layout {
+                height: 300px;
+            }
+            
+            .club-grid {
+                grid-template-columns: 1fr 1fr 1fr;
+            }
+            
+            .club-button {
+                padding: 10px 6px;
+                font-size: 0.8em;
+            }
+            
+            .dice {
+                width: 40px;
+                height: 40px;
+                font-size: 1.4em;
+            }
+        }
+
+        /* ACCESSIBILITY */
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after {
+                animation-duration: 0.01ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: 0.01ms !important;
+                scroll-behavior: auto !important;
+            }
+        }
+
+        .sr-only {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            padding: 0;
+            margin: -1px;
+            overflow: hidden;
+            clip: rect(0, 0, 0, 0);
+            white-space: nowrap;
+            border: 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="game-container">
+        <!-- Game Header -->
+        <header class="game-header">
+            <h1 class="game-title">"In Pursuit of Par"</h1>
+            <p class="game-subtitle">1987 Authentic Golf Board Game Experience</p>
+        </header>
+
+        <!-- Game Controls -->
+        <aside class="game-controls">
+            <div class="control-section">
+                <h3 class="section-title">Club Selection</h3>
+                <div class="club-grid" id="clubGrid">
+                    <button class="club-button" data-club="driver" data-category="woods">Driver</button>
+                    <button class="club-button" data-club="3wood" data-category="woods">3-Wood</button>
+                    <button class="club-button" data-club="5wood" data-category="woods">5-Wood</button>
+                    <button class="club-button" data-club="2iron" data-category="irons">2-Iron</button>
+                    <button class="club-button" data-club="5iron" data-category="irons">5-Iron</button>
+                    <button class="club-button" data-club="7iron" data-category="irons">7-Iron</button>
+                    <button class="club-button" data-club="9iron" data-category="irons">9-Iron</button>
+                    <button class="club-button" data-club="wedge" data-category="wedge">Wedge</button>
+                    <button class="club-button" data-club="putter" data-category="putter">Putter</button>
+                </div>
+            </div>
+
+            <div class="control-section">
+                <h3 class="section-title">Dice Results</h3>
+                <div class="dice-container">
+                    <div class="dice green" id="distanceDice">
+                        <span class="sr-only">Distance dice result:</span>
+                        ?
+                    </div>
+                    <div class="dice green" id="directionDice">
+                        <span class="sr-only">Direction dice result:</span>
+                        ?
+                    </div>
+                    <div class="dice red" id="problemDice">
+                        <span class="sr-only">Problem dice result:</span>
+                        ?
+                    </div>
+                </div>
+            </div>
+
+            <button class="take-shot-btn" id="takeShot" disabled>
+                Select Club to Take Shot
+            </button>
+        </aside>
+
+        <!-- Course Display -->
+        <main class="course-display">
+            <div class="hole-layout" id="holeLayout">
+                <div class="hole-info" id="holeInfo">
+                    Hole 1 - Par 4 - "Opening Statement"
+                </div>
+                <button class="view-aerial-btn" id="viewAerialBtn">View Course</button>
+                
+                <!-- Course Elements -->
+                <div class="tee-box"></div>
+                <div class="fairway"></div>
+                <div class="green-area">
+                    <div class="pin"></div>
+                </div>
+                <div class="ball-position" id="ballPosition">
+                    <div class="lie-indicator" id="lieIndicator">Tee</div>
+                </div>
+            </div>
+        </main>
+
+        <!-- Game Status -->
+        <aside class="game-status">
+            <div class="control-section">
+                <h3 class="section-title">Current Status</h3>
+                <div class="status-item">
+                    <span class="status-label">Hole:</span>
+                    <span class="status-value" id="currentHole">1</span>
+                </div>
+                <div class="status-item">
+                    <span class="status-label">Par:</span>
+                    <span class="status-value" id="holePar">4</span>
+                </div>
+                <div class="status-item">
+                    <span class="status-label">Strokes:</span>
+                    <span class="status-value" id="strokeCount">0</span>
+                </div>
+                <div class="status-item">
+                    <span class="status-label">Distance:</span>
+                    <span class="status-value" id="distanceToPin">350 yds</span>
+                </div>
+                <div class="status-item">
+                    <span class="status-label">Lie:</span>
+                    <span class="status-value" id="currentLie">Tee</span>
+                </div>
+            </div>
+
+            <div class="control-section">
+                <h3 class="section-title">Round Progress</h3>
+                <div class="status-item">
+                    <span class="status-label">Total Score:</span>
+                    <span class="status-value" id="totalScore">E</span>
+                </div>
+                <div class="status-item">
+                    <span class="status-label">Holes Played:</span>
+                    <span class="status-value" id="holesPlayed">0/18</span>
+                </div>
+            </div>
+        </aside>
+    </div>
+
+    <!-- Tutorial Overlay -->
+    <div class="tutorial-overlay" id="tutorialOverlay">
+        <div class="tutorial-content">
+            <h2 class="tutorial-title">Welcome to "In Pursuit of Par"</h2>
+            <p class="tutorial-text">Experience the authentic 1987 golf board game with original dice mechanics, club restrictions, and shot schedules. Roll three dice - green for distance, green for direction, and red for problems!</p>
+            <div class="tutorial-buttons">
+                <button class="tutorial-btn" id="skipTutorial">Skip Tutorial</button>
+                <button class="tutorial-btn primary" id="startTutorial">Learn to Play</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Shot Result Modal -->
+    <div class="shot-result" id="shotResult">
+        <h3 class="result-title" id="resultTitle">Shot Result</h3>
+        <div class="result-details" id="resultDetails"></div>
+        <button class="continue-btn" id="continueBtn">Continue</button>
+    </div>
+
+    <!-- Aerial Image Modal -->
+    <div class="aerial-modal" id="aerialModal">
+        <div class="aerial-content">
+            <img class="aerial-image" id="aerialImage" src="./assets/tpc-aerials/hole1_aerial.jpg" alt="Hole Aerial View">
+            <button class="close-aerial" id="closeAerial">×</button>
+        </div>
+    </div>
+
+    <script>
+        // AUTHENTIC 1987 BOARD GAME MECHANICS
+        class AuthenticBoardGameEngine {
+            constructor() {
+                this.courseData = this.initializeCourseData();
+                this.shotSchedules = this.initializeShotSchedules();
+                this.clubRestrictions = this.initializeClubRestrictions();
+                this.problemEffects = this.initializeProblemEffects();
+                
+                const firstHole = this.courseData[1];
+                this.gameState = {
+                    currentHole: 1,
+                    strokeCount: 0,
+                    totalScore: 0,
+                    distanceToPin: firstHole.yardages.blue || firstHole.yardage || 400,
+                    ballPosition: { x: 50, y: 5 }, // Start at tee (bottom of hole layout)
+                    currentLie: 'tee',
+                    selectedClub: null,
+                    holesCompleted: 0
+                };
+                
+                this.initializeUI();
+                this.setupAerialModal();
+                this.showTutorial();
+            }
+
+            initializeCourseData() {
+                return {
+                    1: { par: 4, name: "Opening Statement", yardages: { blue: 394 } },
+                    2: { par: 5, name: "The Long Drive", yardages: { blue: 507 } },
+                    3: { par: 3, name: "Water Carry", yardages: { blue: 160 } },
+                    4: { par: 4, name: "Dogleg Left", yardages: { blue: 384 } },
+                    5: { par: 4, name: "Risk/Reward", yardages: { blue: 466 } },
+                    6: { par: 4, name: "Bunker Challenge", yardages: { blue: 393 } },
+                    7: { par: 4, name: "Strategic Placement", yardages: { blue: 442 } },
+                    8: { par: 5, name: "Reachable Par 5", yardages: { blue: 537 } },
+                    9: { par: 4, name: "Front Nine Finish", yardages: { blue: 424 } },
+                    10: { par: 4, name: "Back Nine Start", yardages: { blue: 424 } },
+                    11: { par: 5, name: "Water All Around", yardages: { blue: 535 } },
+                    12: { par: 4, name: "Pete's Corner", yardages: { blue: 358 } },
+                    13: { par: 3, name: "Demanding Par 3", yardages: { blue: 181 } },
+                    14: { par: 4, name: "The Bear Trap Start", yardages: { blue: 467 } },
+                    15: { par: 4, name: "Bear Trap Middle", yardages: { blue: 449 } },
+                    16: { par: 5, name: "Bear Trap Finish", yardages: { blue: 507 } },
+                    17: { par: 3, name: "Island Green", yardages: { blue: 137 } },
+                    18: { par: 4, name: "Home Hole", yardages: { blue: 447 } }
+                };
+            }
+
+            initializeShotSchedules() {
+                return {
+                    woods: {
+                        driver: {
+                            1: { min: 200, max: 240, accuracy: 0.7 },
+                            2: { min: 210, max: 250, accuracy: 0.75 },
+                            3: { min: 220, max: 260, accuracy: 0.8 },
+                            4: { min: 230, max: 270, accuracy: 0.85 },
+                            5: { min: 240, max: 280, accuracy: 0.8 },
+                            6: { min: 250, max: 290, accuracy: 0.75 }
+                        },
+                        '3wood': {
+                            1: { min: 180, max: 210, accuracy: 0.75 },
+                            2: { min: 190, max: 220, accuracy: 0.8 },
+                            3: { min: 200, max: 230, accuracy: 0.85 },
+                            4: { min: 210, max: 240, accuracy: 0.9 },
+                            5: { min: 200, max: 230, accuracy: 0.85 },
+                            6: { min: 190, max: 220, accuracy: 0.8 }
+                        },
+                        '5wood': {
+                            1: { min: 160, max: 185, accuracy: 0.8 },
+                            2: { min: 170, max: 195, accuracy: 0.85 },
+                            3: { min: 180, max: 205, accuracy: 0.9 },
+                            4: { min: 185, max: 210, accuracy: 0.95 },
+                            5: { min: 180, max: 205, accuracy: 0.9 },
+                            6: { min: 170, max: 195, accuracy: 0.85 }
+                        }
+                    },
+                    irons: {
+                        '2iron': {
+                            1: { min: 140, max: 165, accuracy: 0.8 },
+                            2: { min: 150, max: 175, accuracy: 0.85 },
+                            3: { min: 160, max: 185, accuracy: 0.9 },
+                            4: { min: 170, max: 195, accuracy: 0.95 },
+                            5: { min: 165, max: 185, accuracy: 0.9 },
+                            6: { min: 155, max: 175, accuracy: 0.85 }
+                        },
+                        '5iron': {
+                            1: { min: 100, max: 125, accuracy: 0.85 },
+                            2: { min: 110, max: 135, accuracy: 0.9 },
+                            3: { min: 120, max: 145, accuracy: 0.95 },
+                            4: { min: 130, max: 155, accuracy: 1.0 },
+                            5: { min: 125, max: 145, accuracy: 0.95 },
+                            6: { min: 115, max: 135, accuracy: 0.9 }
+                        },
+                        '7iron': {
+                            1: { min: 80, max: 105, accuracy: 0.9 },
+                            2: { min: 90, max: 115, accuracy: 0.95 },
+                            3: { min: 100, max: 125, accuracy: 1.0 },
+                            4: { min: 110, max: 135, accuracy: 1.0 },
+                            5: { min: 105, max: 125, accuracy: 1.0 },
+                            6: { min: 95, max: 115, accuracy: 0.95 }
+                        },
+                        '9iron': {
+                            1: { min: 60, max: 85, accuracy: 0.95 },
+                            2: { min: 70, max: 95, accuracy: 1.0 },
+                            3: { min: 80, max: 105, accuracy: 1.0 },
+                            4: { min: 90, max: 115, accuracy: 1.0 },
+                            5: { min: 85, max: 105, accuracy: 1.0 },
+                            6: { min: 75, max: 95, accuracy: 1.0 }
+                        }
+                    },
+                    wedge: {
+                        wedge: {
+                            1: { min: 30, max: 55, accuracy: 1.0 },
+                            2: { min: 40, max: 65, accuracy: 1.0 },
+                            3: { min: 50, max: 75, accuracy: 1.0 },
+                            4: { min: 60, max: 85, accuracy: 1.0 },
+                            5: { min: 55, max: 75, accuracy: 1.0 },
+                            6: { min: 45, max: 65, accuracy: 1.0 }
+                        }
+                    },
+                    putter: {
+                        putter: {
+                            1: { min: 5, max: 15, accuracy: 1.0 },
+                            2: { min: 10, max: 20, accuracy: 1.0 },
+                            3: { min: 15, max: 25, accuracy: 1.0 },
+                            4: { min: 20, max: 30, accuracy: 1.0 },
+                            5: { min: 25, max: 35, accuracy: 1.0 },
+                            6: { min: 30, max: 40, accuracy: 1.0 }
+                        }
+                    }
+                };
+            }
+
+            initializeClubRestrictions() {
+                return {
+                    tee: ['driver', '3wood', '5wood', '2iron', '5iron', '7iron', '9iron', 'wedge'],
+                    fairway: ['driver', '3wood', '5wood', '2iron', '5iron', '7iron', '9iron', 'wedge'],
+                    rough: ['5iron', '7iron', '9iron', 'wedge'],
+                    sand: ['wedge'],
+                    green: ['putter']
+                };
+            }
+
+            initializeProblemEffects() {
+                return {
+                    rough: {
+                        1: { distanceMultiplier: 0.6, accuracyPenalty: 0.3 },
+                        2: { distanceMultiplier: 0.7, accuracyPenalty: 0.25 },
+                        3: { distanceMultiplier: 0.8, accuracyPenalty: 0.2 },
+                        4: { distanceMultiplier: 0.85, accuracyPenalty: 0.15 },
+                        5: { distanceMultiplier: 0.9, accuracyPenalty: 0.1 },
+                        6: { distanceMultiplier: 1.0, accuracyPenalty: 0 }
+                    },
+                    sand: {
+                        1: { distanceMultiplier: 0.3, accuracyPenalty: 0.3, stayInSand: true },
+                        2: { distanceMultiplier: 0.4, accuracyPenalty: 0.25 },
+                        3: { distanceMultiplier: 0.5, accuracyPenalty: 0.2 },
+                        4: { distanceMultiplier: 0.6, accuracyPenalty: 0.2 },
+                        5: { distanceMultiplier: 0.5, accuracyPenalty: 0.25 },
+                        6: { distanceMultiplier: 0.4, accuracyPenalty: 0.3 }
+                    },
+                    fairway: {
+                        1: { distanceMultiplier: 0.9, accuracyPenalty: 0.1 },
+                        2: { distanceMultiplier: 0.95, accuracyPenalty: 0.05 },
+                        3: { distanceMultiplier: 1.0, accuracyPenalty: 0 },
+                        4: { distanceMultiplier: 1.0, accuracyPenalty: 0 },
+                        5: { distanceMultiplier: 1.0, accuracyPenalty: 0 },
+                        6: { distanceMultiplier: 1.0, accuracyPenalty: 0 }
+                    },
+                    tee: {
+                        1: { distanceMultiplier: 1.0, accuracyPenalty: 0 },
+                        2: { distanceMultiplier: 1.0, accuracyPenalty: 0 },
+                        3: { distanceMultiplier: 1.0, accuracyPenalty: 0 },
+                        4: { distanceMultiplier: 1.0, accuracyPenalty: 0 },
+                        5: { distanceMultiplier: 1.0, accuracyPenalty: 0 },
+                        6: { distanceMultiplier: 1.0, accuracyPenalty: 0 }
+                    }
+                };
+            }
+
+            initializeUI() {
+                // Initialize ball position with debugging
+                console.log('Initializing UI...');
+                console.log('Initial game state:', this.gameState);
+                
+                this.updateBallPosition();
+                this.updateGameStatus();
+                this.setupClubSelection();
+                this.setupShotButton();
+                this.updateAvailableClubs();
+                
+                // Add a manual test function to global scope
+                window.testBallMove = () => {
+                    const ball = document.getElementById('ballPosition');
+                    if (ball) {
+                        console.log('Manual test: moving ball');
+                        ball.style.left = '75%';
+                        ball.style.bottom = '60%';
+                        ball.style.backgroundColor = 'red';
+                    } else {
+                        console.error('Ball element not found for manual test');
+                    }
+                };
+                
+                console.log('UI initialized. Use testBallMove() to manually test ball movement');
+            }
+
+            setupClubSelection() {
+                const clubButtons = document.querySelectorAll('.club-button');
+                clubButtons.forEach(button => {
+                    button.addEventListener('click', (e) => {
+                        if (!button.disabled) {
+                            // Remove previous selection
+                            clubButtons.forEach(b => b.classList.remove('selected'));
+                            // Select current club
+                            button.classList.add('selected');
+                            this.gameState.selectedClub = button.dataset.club;
+                            this.updateShotButton();
+                        }
+                    });
+                });
+            }
+
+            setupShotButton() {
+                const shotButton = document.getElementById('takeShot');
+                shotButton.addEventListener('click', () => {
+                    if (!shotButton.disabled) {
+                        this.takeShot();
+                    }
+                });
+            }
+
+            updateAvailableClubs() {
+                const availableClubs = this.clubRestrictions[this.gameState.currentLie];
+                const clubButtons = document.querySelectorAll('.club-button');
+                
+                clubButtons.forEach(button => {
+                    const club = button.dataset.club;
+                    if (availableClubs.includes(club)) {
+                        button.disabled = false;
+                        button.title = `Available from ${this.gameState.currentLie}`;
+                    } else {
+                        button.disabled = true;
+                        button.classList.remove('selected');
+                        button.title = `Not available from ${this.gameState.currentLie}`;
+                        if (this.gameState.selectedClub === club) {
+                            this.gameState.selectedClub = null;
+                        }
+                    }
+                });
+                
+                this.updateShotButton();
+            }
+
+            updateShotButton() {
+                const shotButton = document.getElementById('takeShot');
+                if (this.gameState.selectedClub) {
+                    shotButton.disabled = false;
+                    shotButton.textContent = `Take Shot with ${this.gameState.selectedClub.toUpperCase()}`;
+                } else {
+                    shotButton.disabled = true;
+                    shotButton.textContent = 'Select Club to Take Shot';
+                }
+            }
+
+            async takeShot() {
+                const club = this.gameState.selectedClub;
+                if (!club) return;
+
+                // Roll dice with animation
+                const diceResults = await this.rollDice();
+                
+                // Calculate shot result
+                const shotResult = this.calculateShotResult(club, diceResults);
+                
+                // Update game state
+                this.gameState.strokeCount++;
+                this.gameState.distanceToPin = Math.max(0, shotResult.newDistance);
+                
+                // Determine new lie and position
+                const newLie = this.determineLie(shotResult);
+                this.gameState.currentLie = newLie;
+                
+                // Update ball position (pass the new lie to avoid timing issues)
+                this.updateBallPositionAfterShot(shotResult, newLie);
+                
+                // Show shot result with detailed info
+                this.showShotResult(club, diceResults, shotResult);
+                
+                // Update UI
+                this.updateGameStatus();
+                this.updateAvailableClubs();
+                
+                // Debug ball position
+                console.log('Shot taken:', {
+                    club,
+                    distance: shotResult.distance,
+                    direction: shotResult.direction,
+                    newPosition: this.gameState.ballPosition,
+                    newLie: this.gameState.currentLie
+                });
+                
+                // Clear club selection
+                document.querySelectorAll('.club-button').forEach(b => b.classList.remove('selected'));
+                this.gameState.selectedClub = null;
+                this.updateShotButton();
+                
+                // Check if hole is completed
+                if (shotResult.holeCompleted) {
+                    setTimeout(() => this.completeHole(), 2000);
+                }
+            }
+
+            async rollDice() {
+                const distanceDie = document.getElementById('distanceDice');
+                const directionDie = document.getElementById('directionDice');
+                const problemDie = document.getElementById('problemDice');
+                
+                // Check if we need to roll problem dice (only for hazards)
+                const needsProblemDice = ['rough', 'sand'].includes(this.gameState.currentLie);
+                
+                // Start rolling animation
+                const dicesToRoll = [distanceDie, directionDie];
+                if (needsProblemDice) dicesToRoll.push(problemDie);
+                
+                dicesToRoll.forEach(die => {
+                    die.classList.add('rolling');
+                    die.textContent = '?';
+                });
+                
+                // Clear problem die if not needed
+                if (!needsProblemDice) {
+                    problemDie.textContent = '-';
+                    problemDie.classList.remove('rolling');
+                }
+                
+                // Wait for animation
+                await new Promise(resolve => setTimeout(resolve, 600));
+                
+                // Generate results
+                const results = {
+                    distance: Math.floor(Math.random() * 6) + 1,
+                    direction: Math.floor(Math.random() * 12) + 1,
+                    problem: needsProblemDice ? Math.floor(Math.random() * 6) + 1 : null
+                };
+                
+                // Display results
+                distanceDie.textContent = results.distance;
+                directionDie.textContent = results.direction;
+                if (needsProblemDice) {
+                    problemDie.textContent = results.problem;
+                } else {
+                    problemDie.textContent = '-';
+                }
+                
+                // Remove animation
+                dicesToRoll.forEach(die => {
+                    die.classList.remove('rolling');
+                });
+                
+                return results;
+            }
+
+            calculateShotResult(club, diceResults) {
+                // Get club category
+                const clubCategory = this.getClubCategory(club);
+                const shotSchedule = this.shotSchedules[clubCategory][club];
+                const shotData = shotSchedule[diceResults.distance];
+                
+                // Calculate base distance
+                let distance = shotData.min + Math.random() * (shotData.max - shotData.min);
+                
+                // Apply problem dice effects (only if rolled)
+                if (diceResults.problem) {
+                    const problemModifier = this.getProblemDiceModifier(diceResults.problem);
+                    distance += problemModifier;
+                    distance = Math.max(5, distance); // Minimum 5 yards
+                }
+                
+                // Calculate direction
+                const direction = this.calculateDirection(diceResults.direction);
+                
+                // Calculate new distance to pin
+                const newDistance = Math.max(0, this.gameState.distanceToPin - distance);
+                
+                // Check if hole is completed
+                // On green: putting can complete hole if within reasonable putting distance
+                // Off green: need to get on green first
+                let holeCompleted = false;
+                if (this.gameState.currentLie === 'green' || newDistance <= 2) {
+                    // If putting or very close, check if ball goes in hole
+                    if (club === 'putter' && newDistance <= 5) {
+                        // Putting has higher success rate for hole completion
+                        holeCompleted = newDistance <= 2;
+                    } else if (newDistance <= 2) {
+                        // Very close shots can go in regardless of lie
+                        holeCompleted = true;
+                    }
+                }
+                
+                // Calculate problem effect info for display
+                let problemEffectInfo = null;
+                if (diceResults.problem) {
+                    const problemModifier = this.getProblemDiceModifier(diceResults.problem);
+                    problemEffectInfo = {
+                        diceRoll: diceResults.problem,
+                        modifier: problemModifier,
+                        applied: true
+                    };
+                }
+
+                return {
+                    club,
+                    distance: Math.round(distance),
+                    direction,
+                    newDistance,
+                    problemEffect: problemEffectInfo,
+                    holeCompleted,
+                    diceResults
+                };
+            }
+
+            getClubCategory(club) {
+                if (['driver', '3wood', '5wood'].includes(club)) return 'woods';
+                if (['2iron', '5iron', '7iron', '9iron'].includes(club)) return 'irons';
+                if (club === 'wedge') return 'wedge';
+                if (club === 'putter') return 'putter';
+                return 'irons';
+            }
+
+            getProblemDiceModifier(problemRoll) {
+                // Simple problem dice modifiers: +/-10, +/-20, no effect
+                const modifiers = {
+                    1: -20,  // Bad result: -20 yards
+                    2: -10,  // Poor result: -10 yards  
+                    3: 0,    // No effect
+                    4: 0,    // No effect
+                    5: 10,   // Good result: +10 yards
+                    6: 20    // Great result: +20 yards
+                };
+                return modifiers[problemRoll] || 0;
+            }
+
+            calculateDirection(directionRoll) {
+                const directionTable = {
+                    1: { text: 'Hard Left', deviation: -45 },
+                    2: { text: 'Left', deviation: -30 },
+                    3: { text: 'Slight Left', deviation: -15 },
+                    4: { text: 'Straight', deviation: 0 },
+                    5: { text: 'Straight', deviation: 0 },
+                    6: { text: 'Straight', deviation: 0 },
+                    7: { text: 'Straight', deviation: 0 },
+                    8: { text: 'Straight', deviation: 0 },
+                    9: { text: 'Slight Right', deviation: 15 },
+                    10: { text: 'Right', deviation: 30 },
+                    11: { text: 'Hard Right', deviation: 45 },
+                    12: { text: 'Hook/Slice', deviation: Math.random() > 0.5 ? -60 : 60 }
+                };
+                
+                return directionTable[directionRoll];
+            }
+
+            determineLie(shotResult) {
+                if (shotResult.holeCompleted) return 'green';
+                
+                const distance = shotResult.newDistance;
+                const absDeviation = Math.abs(shotResult.direction.deviation);
+                
+                // Green area - need good accuracy AND close distance
+                if (distance <= 20 && absDeviation <= 15) {
+                    return 'green';  // Accurate shot close to pin
+                }
+                if (distance <= 10 && absDeviation <= 30) {
+                    return 'green';  // Very close even with some deviation
+                }
+                
+                // Bunkers and hazards - based on direction errors
+                if (absDeviation > 45) {
+                    // Very wayward shots
+                    if (Math.random() > 0.5) return 'sand';  // Bunker
+                    else return 'rough';
+                }
+                if (absDeviation > 30) {
+                    // Moderately wayward shots
+                    if (Math.random() > 0.7) return 'sand';  // Some bunkers
+                    else return 'rough';
+                }
+                
+                // Fairway vs rough - depends on accuracy
+                if (absDeviation <= 15) {
+                    return 'fairway';  // Straight shots hit fairway
+                }
+                
+                // Slight misses might stay in fairway or go to rough
+                return Math.random() > 0.6 ? 'rough' : 'fairway';
+            }
+
+            updateBallPositionAfterShot(shotResult, newLie) {
+                const ball = document.getElementById('ballPosition');
+                const holeLayout = document.getElementById('holeLayout');
+                
+                if (!ball) {
+                    console.error('Ball element not found during shot update!');
+                    return;
+                }
+                
+                console.log('Ball element found, updating position...');
+                
+                // Calculate position based on remaining distance to pin and direction
+                const totalHoleDistance = this.courseData[this.gameState.currentHole].yardages.blue || 400;
+                const progressAlongHole = 1 - (shotResult.newDistance / totalHoleDistance);
+                
+                // Y position: 5% (bottom/tee) to 95% (top/green) based on progress
+                let newY = Math.max(5, Math.min(95, progressAlongHole * 85 + 5));
+                
+                // X position: 50% (center) +/- direction deviation  
+                const maxDeviation = 35; // Maximum percentage deviation from center
+                let newX = 50 + (shotResult.direction.deviation / 45) * maxDeviation;
+                newX = Math.max(10, Math.min(90, newX));
+                
+                // Special positioning for green
+                if (newLie === 'green') {
+                    newY = Math.max(80, newY); // Keep on green area (top portion)
+                    // Tighten X range on green
+                    newX = 50 + (shotResult.direction.deviation / 45) * 20;
+                    newX = Math.max(30, Math.min(70, newX));
+                }
+                
+                console.log(`Ball movement calculation:`, {
+                    totalDistance: totalHoleDistance,
+                    remainingDistance: shotResult.newDistance,
+                    progress: progressAlongHole,
+                    direction: shotResult.direction.deviation,
+                    oldPosition: this.gameState.ballPosition,
+                    newPosition: { x: newX, y: newY }
+                });
+                
+                this.gameState.ballPosition = { x: newX, y: newY };
+                
+                // Add movement animation
+                ball.classList.add('moving');
+                setTimeout(() => ball.classList.remove('moving'), 300);
+                
+                // Force update the DOM
+                ball.style.left = `${newX}%`;
+                ball.style.bottom = `${newY}%`;
+                
+                // Also update the lie indicator
+                const lieIndicator = document.getElementById('lieIndicator');
+                lieIndicator.textContent = newLie.charAt(0).toUpperCase() + newLie.slice(1);
+            }
+
+            updateBallPosition() {
+                const ball = document.getElementById('ballPosition');
+                const lieIndicator = document.getElementById('lieIndicator');
+                
+                ball.style.left = `${this.gameState.ballPosition.x}%`;
+                ball.style.bottom = `${this.gameState.ballPosition.y}%`;
+                
+                lieIndicator.textContent = this.gameState.currentLie.charAt(0).toUpperCase() + this.gameState.currentLie.slice(1);
+                console.log(`Ball positioned at: ${this.gameState.ballPosition.x}%, ${this.gameState.ballPosition.y}% - ${this.gameState.currentLie}`);
+            }
+
+            showShotResult(club, diceResults, shotResult) {
+                const resultModal = document.getElementById('shotResult');
+                const resultTitle = document.getElementById('resultTitle');
+                const resultDetails = document.getElementById('resultDetails');
+                
+                resultTitle.textContent = shotResult.holeCompleted ? 'Hole Completed!' : 'Shot Result';
+                
+                // Show detailed shot information
+                let detailText = `
+                    <strong>🎯 Shot Details:</strong><br>
+                    <strong>Club:</strong> ${club.toUpperCase()}<br>
+                    <strong>Distance Dice:</strong> ${diceResults.distance} → ${shotResult.distance} yards<br>
+                    <strong>Direction Dice:</strong> ${diceResults.direction} → ${shotResult.direction.text} (${shotResult.direction.deviation}°)<br>
+                `;
+                
+                // Show problem dice if it was rolled
+                if (diceResults.problem) {
+                    const modifier = this.getProblemDiceModifier(diceResults.problem);
+                    detailText += `<strong>Problem Dice:</strong> ${diceResults.problem} → ${modifier >= 0 ? '+' : ''}${modifier} yards<br>`;
+                }
+                
+                detailText += `<br><strong>📍 Ball Position:</strong><br>`;
+                detailText += `<strong>Distance to Pin:</strong> ${this.gameState.distanceToPin} → ${shotResult.newDistance} yards<br>`;
+                detailText += `<strong>New Lie:</strong> ${this.gameState.currentLie}<br>`;
+                
+                // Show ball coordinates for debugging
+                detailText += `<br><strong>🎱 Ball Moved:</strong><br>`;
+                detailText += `<strong>Position:</strong> ${this.gameState.ballPosition.x.toFixed(1)}%, ${this.gameState.ballPosition.y.toFixed(1)}%<br>`;
+                
+                if (shotResult.holeCompleted) {
+                    const par = this.courseData[this.gameState.currentHole].par;
+                    const scoreToPar = this.gameState.strokeCount - par;
+                    let scoreText = '';
+                    
+                    if (scoreToPar === -3) scoreText = 'Albatross!';
+                    else if (scoreToPar === -2) scoreText = 'Eagle!';
+                    else if (scoreToPar === -1) scoreText = 'Birdie!';
+                    else if (scoreToPar === 0) scoreText = 'Par';
+                    else if (scoreToPar === 1) scoreText = 'Bogey';
+                    else if (scoreToPar === 2) scoreText = 'Double Bogey';
+                    else scoreText = `${scoreToPar > 0 ? '+' : ''}${scoreToPar}`;
+                    
+                    detailText += `<br><br><strong>🏆 Score:</strong> ${scoreText} (${this.gameState.strokeCount} strokes)`;
+                }
+                
+                resultDetails.innerHTML = detailText;
+                resultModal.classList.add('show');
+                
+                document.getElementById('continueBtn').onclick = () => {
+                    resultModal.classList.remove('show');
+                };
+            }
+
+            completeHole() {
+                const currentHole = this.courseData[this.gameState.currentHole];
+                const par = currentHole.par;
+                const scoreToPar = this.gameState.strokeCount - par;
+                
+                console.log(`Hole ${this.gameState.currentHole} completed:`, {
+                    strokes: this.gameState.strokeCount,
+                    par: par,
+                    scoreToPar: scoreToPar
+                });
+                
+                // Update total score and statistics  
+                this.gameState.totalScore += scoreToPar;
+                this.gameState.holesCompleted++;
+                
+                // Show hole completion message
+                this.showHoleCompletionMessage(scoreToPar, par);
+                
+                // Move to next hole or finish round after delay
+                setTimeout(() => {
+                    if (this.gameState.currentHole < 18) {
+                        this.moveToNextHole();
+                    } else {
+                        this.finishRound();
+                    }
+                }, 3000); // Show completion message for 3 seconds
+            }
+
+            showHoleCompletionMessage(scoreToPar, par) {
+                const resultModal = document.getElementById('shotResult');
+                const resultTitle = document.getElementById('resultTitle');
+                const resultDetails = document.getElementById('resultDetails');
+                
+                let scoreText = '';
+                if (scoreToPar === -3) scoreText = '🦅 ALBATROSS!';
+                else if (scoreToPar === -2) scoreText = '🦅 EAGLE!';
+                else if (scoreToPar === -1) scoreText = '🐦 BIRDIE!';
+                else if (scoreToPar === 0) scoreText = '📍 PAR';
+                else if (scoreToPar === 1) scoreText = '➕ BOGEY';
+                else if (scoreToPar === 2) scoreText = '➕➕ DOUBLE BOGEY';
+                else scoreText = `➕ ${scoreToPar} OVER PAR`;
+                
+                resultTitle.textContent = `Hole ${this.gameState.currentHole} Complete!`;
+                
+                resultDetails.innerHTML = `
+                    <div style="text-align: center; font-size: 1.4em; margin: 20px 0;">
+                        <strong>${scoreText}</strong>
+                    </div>
+                    <strong>Hole ${this.gameState.currentHole} Summary:</strong><br>
+                    <strong>Par:</strong> ${par}<br>
+                    <strong>Your Score:</strong> ${this.gameState.strokeCount} strokes<br>
+                    <strong>Score to Par:</strong> ${scoreToPar > 0 ? '+' : ''}${scoreToPar}<br>
+                    <br>
+                    <strong>Round Progress:</strong><br>
+                    <strong>Total Score:</strong> ${this.gameState.totalScore > 0 ? '+' : ''}${this.gameState.totalScore}<br>
+                    <strong>Holes Completed:</strong> ${this.gameState.holesCompleted} of 18<br>
+                    <br>
+                    ${this.gameState.currentHole < 18 ? 'Moving to next hole...' : 'Calculating final score...'}
+                `;
+                
+                resultModal.classList.add('show');
+                
+                // Auto-close after delay
+                setTimeout(() => {
+                    resultModal.classList.remove('show');
+                }, 2800);
+            }
+
+            moveToNextHole() {
+                console.log(`Moving from hole ${this.gameState.currentHole} to ${this.gameState.currentHole + 1}`);
+                
+                // Reset for next hole
+                this.gameState.currentHole++;
+                this.gameState.strokeCount = 0;
+                
+                const nextHole = this.courseData[this.gameState.currentHole];
+                this.gameState.distanceToPin = nextHole.yardages.blue || nextHole.yardage || 400;
+                this.gameState.currentLie = 'tee';
+                this.gameState.ballPosition = { x: 50, y: 5 }; // Reset to tee position
+                
+                console.log(`Started hole ${this.gameState.currentHole}:`, {
+                    par: nextHole.par,
+                    distance: this.gameState.distanceToPin,
+                    name: nextHole.name
+                });
+                
+                // Update UI
+                this.updateBallPosition();
+                this.updateGameStatus();
+                this.updateAvailableClubs();
+                
+                // Clear any selected clubs
+                document.querySelectorAll('.club-button').forEach(b => b.classList.remove('selected'));
+                this.gameState.selectedClub = null;
+                this.updateShotButton();
+            }
+
+            finishRound() {
+                const resultModal = document.getElementById('shotResult');
+                const resultTitle = document.getElementById('resultTitle');
+                const resultDetails = document.getElementById('resultDetails');
+                
+                resultTitle.textContent = 'Round Complete!';
+                
+                let scoreText = '';
+                if (this.gameState.totalScore === 0) scoreText = 'Even Par';
+                else if (this.gameState.totalScore < 0) scoreText = `${this.gameState.totalScore} Under Par`;
+                else scoreText = `+${this.gameState.totalScore} Over Par`;
+                
+                resultDetails.innerHTML = `
+                    <strong>Final Score:</strong> ${scoreText}<br>
+                    <strong>Total Strokes:</strong> ${72 + this.gameState.totalScore}<br>
+                    <br>
+                    Congratulations on completing your round at TPC Sawgrass!<br>
+                    <br>
+                    <em>Thanks for playing the authentic 1987 "In Pursuit of Par" experience!</em>
+                `;
+                
+                resultModal.classList.add('show');
+                
+                document.getElementById('continueBtn').onclick = () => {
+                    location.reload();
+                };
+            }
+
+            updateGameStatus() {
+                const currentHole = this.courseData[this.gameState.currentHole];
+                
+                document.getElementById('currentHole').textContent = this.gameState.currentHole;
+                document.getElementById('holePar').textContent = currentHole.par;
+                document.getElementById('strokeCount').textContent = this.gameState.strokeCount;
+                document.getElementById('distanceToPin').textContent = `${this.gameState.distanceToPin} yds`;
+                document.getElementById('currentLie').textContent = this.gameState.currentLie.charAt(0).toUpperCase() + this.gameState.currentLie.slice(1);
+                
+                // Update total score
+                let scoreText = 'E';
+                if (this.gameState.totalScore > 0) scoreText = `+${this.gameState.totalScore}`;
+                else if (this.gameState.totalScore < 0) scoreText = `${this.gameState.totalScore}`;
+                document.getElementById('totalScore').textContent = scoreText;
+                
+                document.getElementById('holesPlayed').textContent = `${this.gameState.holesCompleted}/18`;
+                
+                // Update hole display
+                this.updateHoleDisplay();
+            }
+
+            updateHoleDisplay() {
+                const currentHole = this.courseData[this.gameState.currentHole];
+                const holeInfo = document.getElementById('holeInfo');
+                const aerialImage = document.getElementById('aerialImage');
+                
+                // Update hole info
+                holeInfo.textContent = `Hole ${this.gameState.currentHole} - Par ${currentHole.par} - "${currentHole.name}"`;
+                
+                // Update aerial modal image
+                aerialImage.src = `./assets/tpc-aerials/hole${this.gameState.currentHole}_aerial.jpg`;
+            }
+
+            setupAerialModal() {
+                const viewAerialBtn = document.getElementById('viewAerialBtn');
+                const aerialModal = document.getElementById('aerialModal');
+                const closeAerial = document.getElementById('closeAerial');
+                
+                viewAerialBtn.addEventListener('click', () => {
+                    aerialModal.classList.add('show');
+                });
+                
+                closeAerial.addEventListener('click', () => {
+                    aerialModal.classList.remove('show');
+                });
+                
+                // Close on background click
+                aerialModal.addEventListener('click', (e) => {
+                    if (e.target === aerialModal) {
+                        aerialModal.classList.remove('show');
+                    }
+                });
+            }
+
+            showTutorial() {
+                const tutorialOverlay = document.getElementById('tutorialOverlay');
+                
+                document.getElementById('skipTutorial').onclick = () => {
+                    tutorialOverlay.style.display = 'none';
+                };
+                
+                document.getElementById('startTutorial').onclick = () => {
+                    tutorialOverlay.style.display = 'none';
+                    this.runTutorial();
+                };
+            }
+
+            runTutorial() {
+                // Simple tutorial highlighting key elements
+                alert('Welcome! Click on a club to select it, then click "Take Shot" to roll the dice and play!');
+            }
+        }
+
+        // Initialize the game when page loads
+        document.addEventListener('DOMContentLoaded', () => {
+            window.game = new AuthenticBoardGameEngine();
+        });
+    </script>
+    
+    <!-- Ball Movement Test Suite -->
+    <script src="./test-ball-movement.js"></script>
+</body>
+</html>

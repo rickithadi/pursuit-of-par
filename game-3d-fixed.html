@@ -1,0 +1,1106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>In Pursuit of Par - Enhanced Golf Simulation</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Load Phaser.js CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/phaser@3.80.1/dist/phaser.min.js"></script>
+    <script src="authentic-mechanics.js"></script>
+    <script src="board-game-bridge.js"></script>
+    
+    <style>
+        :root {
+            --cream: #f5f5dc;
+            --primary-green: #4CAF50;
+            --dark-green: #2E7D32;
+            --light-green: #C8E6C9;
+            --accent-blue: #2196F3;
+            --white: #ffffff;
+            --black: #000000;
+            --shadow-sm: 0 1px 3px rgba(0,0,0,0.12);
+            --shadow-md: 0 4px 6px rgba(0,0,0,0.1);
+            --shadow-lg: 0 10px 25px rgba(0,0,0,0.15);
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--cream);
+            color: var(--black);
+            line-height: 1.6;
+        }
+        
+        .enhanced-game-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 1rem;
+            min-height: 100vh;
+        }
+        
+        .enhanced-header {
+            background: linear-gradient(135deg, var(--primary-green), var(--dark-green));
+            color: var(--white);
+            padding: 2rem;
+            border-radius: 12px;
+            text-align: center;
+            margin-bottom: 2rem;
+            box-shadow: var(--shadow-lg);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .enhanced-header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="20" cy="20" r="2" fill="rgba(255,255,255,0.1)"/><circle cx="80" cy="30" r="1.5" fill="rgba(255,255,255,0.08)"/><circle cx="60" cy="70" r="1" fill="rgba(255,255,255,0.06)"/></svg>');
+            pointer-events: none;
+        }
+        
+        .enhanced-title {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+            position: relative;
+            z-index: 1;
+        }
+        
+        .enhanced-subtitle {
+            font-size: 1.1rem;
+            opacity: 0.9;
+            font-weight: 400;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .settings-btn {
+            position: absolute;
+            top: 50%;
+            right: 2rem;
+            transform: translateY(-50%);
+            background: rgba(255,255,255,0.2);
+            border: 1px solid rgba(255,255,255,0.3);
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            z-index: 2;
+            transition: all 0.3s ease;
+        }
+        
+        .settings-btn:hover {
+            background: rgba(255,255,255,0.3);
+            transform: translateY(-50%) scale(1.05);
+        }
+        
+        .main-game-layout {
+            display: grid;
+            grid-template-columns: 1fr 350px;
+            gap: 2rem;
+            align-items: start;
+        }
+        
+        .course-3d-viewport {
+            background: linear-gradient(135deg, #87CEEB, #B0E0E6);
+            border: 3px solid var(--primary-green);
+            border-radius: 12px;
+            height: 600px;
+            box-shadow: var(--shadow-lg);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .loading-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(245, 245, 220, 0.9);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            z-index: 10;
+        }
+        
+        .loading-spinner {
+            width: 50px;
+            height: 50px;
+            border: 4px solid var(--light-green);
+            border-top: 4px solid var(--primary-green);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-bottom: 1rem;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .game-control-panel {
+            background: var(--white);
+            border: 3px solid var(--primary-green);
+            border-radius: 12px;
+            padding: 1.5rem;
+            box-shadow: var(--shadow-lg);
+            height: fit-content;
+        }
+        
+        .control-section {
+            margin-bottom: 1.5rem;
+            padding-bottom: 1.5rem;
+            border-bottom: 1px solid #e0e0e0;
+        }
+        
+        .control-section:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+            padding-bottom: 0;
+        }
+        
+        .section-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--dark-green);
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .club-selection {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+        
+        .club-option {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0.75rem 1rem;
+            border: 2px solid transparent;
+            border-radius: 8px;
+            background: #f8f9fa;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 0.9rem;
+        }
+        
+        .club-option:hover {
+            background: var(--light-green);
+            border-color: var(--primary-green);
+            transform: translateY(-1px);
+        }
+        
+        .club-option.selected {
+            background: var(--primary-green);
+            color: var(--white);
+            border-color: var(--dark-green);
+        }
+        
+        .club-option.recommended {
+            background: var(--accent-blue);
+            color: var(--white);
+            border-color: #1976D2;
+        }
+        
+        .club-option.disabled {
+            background: #f5f5f5;
+            color: #999;
+            cursor: not-allowed;
+            opacity: 0.5;
+        }
+        
+        .club-name {
+            font-weight: 500;
+        }
+        
+        .club-range {
+            font-size: 0.8rem;
+            opacity: 0.8;
+        }
+        
+        .short-game-section {
+            background: #e8f5e8;
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            border: 1px solid var(--primary-green);
+        }
+        
+        .short-game-options {
+            display: flex;
+            gap: 0.5rem;
+            margin-top: 0.5rem;
+        }
+        
+        .short-game-btn {
+            flex: 1;
+            padding: 0.5rem;
+            background: var(--white);
+            border: 1px solid var(--primary-green);
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.8rem;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+        
+        .short-game-btn:hover {
+            background: var(--primary-green);
+            color: var(--white);
+        }
+        
+        .short-game-btn.active {
+            background: var(--primary-green);
+            color: var(--white);
+        }
+        
+        .shot-controls {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+        
+        .shot-button {
+            background: linear-gradient(135deg, var(--accent-blue), #1976D2);
+            color: var(--white);
+            border: none;
+            padding: 1rem 1.5rem;
+            border-radius: 10px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: var(--shadow-md);
+        }
+        
+        .shot-button:hover:not(:disabled) {
+            background: linear-gradient(135deg, #1976D2, #0D47A1);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-lg);
+        }
+        
+        .shot-button:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .dice-display {
+            background: #fff3e0;
+            padding: 1rem;
+            border-radius: 8px;
+            border: 2px solid #ff9800;
+            text-align: center;
+            margin: 1rem 0;
+        }
+        
+        .dice-result {
+            font-size: 1.2rem;
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+        }
+        
+        .shot-analysis {
+            background: #e3f2fd;
+            padding: 1rem;
+            border-radius: 8px;
+            border: 2px solid var(--accent-blue);
+            font-size: 0.9rem;
+            line-height: 1.4;
+        }
+        
+        .game-stats {
+            background: #f9f9f9;
+            padding: 1rem;
+            border-radius: 8px;
+            border: 1px solid #ddd;
+        }
+        
+        .stat-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 0.5rem;
+            padding: 0.25rem 0;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .stat-row:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+        }
+        
+        .stat-label {
+            font-weight: 500;
+            color: var(--dark-green);
+        }
+        
+        .settings-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.5);
+            z-index: 1000;
+        }
+        
+        .settings-content {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: var(--white);
+            padding: 2rem;
+            border-radius: 12px;
+            width: 500px;
+            max-height: 80vh;
+            overflow-y: auto;
+            box-shadow: var(--shadow-lg);
+        }
+        
+        .settings-section {
+            margin-bottom: 1.5rem;
+            padding-bottom: 1.5rem;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .settings-section:last-child {
+            border-bottom: none;
+        }
+        
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 50px;
+            height: 24px;
+        }
+        
+        .switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+        
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            transition: .4s;
+            border-radius: 24px;
+        }
+        
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 18px;
+            width: 18px;
+            left: 3px;
+            bottom: 3px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+        
+        input:checked + .slider {
+            background-color: var(--primary-green);
+        }
+        
+        input:checked + .slider:before {
+            transform: translateX(26px);
+        }
+        
+        .units-toggle {
+            background: #f0f0f0;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            padding: 4px;
+            display: inline-block;
+        }
+        
+        .units-option {
+            padding: 8px 16px;
+            cursor: pointer;
+            border-radius: 4px;
+            display: inline-block;
+            transition: all 0.3s ease;
+        }
+        
+        .units-option.active {
+            background: var(--primary-green);
+            color: var(--white);
+        }
+        
+        @media (max-width: 768px) {
+            .main-game-layout {
+                grid-template-columns: 1fr;
+                gap: 1rem;
+            }
+            
+            .enhanced-title {
+                font-size: 1.8rem;
+            }
+            
+            .settings-btn {
+                position: relative;
+                top: auto;
+                right: auto;
+                transform: none;
+                margin-top: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="enhanced-game-container">
+        <!-- Enhanced Header -->
+        <header class="enhanced-header">
+            <h1 class="enhanced-title">🏌️ In Pursuit of Par</h1>
+            <p class="enhanced-subtitle">Authentic 1987 Board Game with Enhanced Digital Experience</p>
+            <button class="settings-btn" onclick="openSettings()">⚙️ Settings</button>
+        </header>
+
+        <!-- Main Game Layout -->
+        <div class="main-game-layout">
+            <!-- Golf Course 3D Viewport -->
+            <div class="course-3d-viewport" id="course3DViewport">
+                <div class="loading-overlay" id="loadingOverlay">
+                    <div class="loading-spinner"></div>
+                    <p>Loading Authentic Golf Experience...</p>
+                </div>
+            </div>
+
+            <!-- Game Control Panel -->
+            <div class="game-control-panel">
+                <!-- Short Game Section -->
+                <div id="short-game-section" class="short-game-section" style="display: none;">
+                    <div class="section-title">🏑 Short Game Options</div>
+                    <p style="margin: 0 0 0.5rem 0; font-size: 0.85rem;">Choose your greenside shot type:</p>
+                    <div class="short-game-options">
+                        <button class="short-game-btn" data-type="chip" onclick="selectShortGame('chip')">
+                            Chip<br><small>10-30y</small>
+                        </button>
+                        <button class="short-game-btn" data-type="pitch" onclick="selectShortGame('pitch')">
+                            Pitch<br><small>30-60y</small>
+                        </button>
+                        <button class="short-game-btn active" data-type="normal" onclick="selectShortGame('normal')">
+                            Normal<br><small>Full Shot</small>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Club Selection -->
+                <div class="control-section">
+                    <div class="section-title">🏌️ Club Selection</div>
+                    <div class="club-selection" id="club-selection">
+                        <!-- Clubs populated by JavaScript -->
+                    </div>
+                </div>
+
+                <!-- Shot Controls -->
+                <div class="control-section">
+                    <div class="section-title">⚡ Shot Controls</div>
+                    <div class="shot-controls">
+                        <button class="shot-button" onclick="takeShot()" id="takeShot3D">
+                            🎲 Take Authentic Shot
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Dice Display -->
+                <div id="dice-display" class="dice-display" style="display: none;">
+                    <div class="dice-result" id="dice-result"></div>
+                    <small>Distance: <span id="distance-dice"></span> | Direction: <span id="direction-dice"></span></small>
+                </div>
+
+                <!-- Shot Analysis -->
+                <div id="shot-analysis" class="shot-analysis" style="display: none;">
+                    <strong>Shot Analysis:</strong>
+                    <div id="analysis-content"></div>
+                </div>
+
+                <!-- Game Information -->
+                <div class="control-section">
+                    <div class="section-title">📊 Game Information</div>
+                    <div class="game-stats" id="game-stats">
+                        <!-- Game stats populated by JavaScript -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Settings Modal -->
+    <div id="settings-modal" class="settings-modal">
+        <div class="settings-content">
+            <h2>⚙️ Game Settings</h2>
+            
+            <div class="settings-section">
+                <h3>Units & Display</h3>
+                <div style="margin: 10px 0;">
+                    <label>Distance Units:</label>
+                    <div class="units-toggle">
+                        <span class="units-option active" onclick="setUnits('yards')">Yards</span>
+                        <span class="units-option" onclick="setUnits('meters')">Meters</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="settings-section">
+                <h3>Accessibility</h3>
+                <div style="display: flex; justify-content: space-between; align-items: center; margin: 10px 0;">
+                    <label>High Contrast Mode:</label>
+                    <label class="switch">
+                        <input type="checkbox" id="high-contrast" onchange="toggleHighContrast()">
+                        <span class="slider"></span>
+                    </label>
+                </div>
+                <div style="display: flex; justify-content: space-between; align-items: center; margin: 10px 0;">
+                    <label>Colorblind Mode:</label>
+                    <label class="switch">
+                        <input type="checkbox" id="colorblind-mode" onchange="toggleColorblind()">
+                        <span class="slider"></span>
+                    </label>
+                </div>
+            </div>
+            
+            <div class="settings-section">
+                <h3>Game Options</h3>
+                <div style="display: flex; justify-content: space-between; align-items: center; margin: 10px 0;">
+                    <label>Auto Club Selection:</label>
+                    <label class="switch">
+                        <input type="checkbox" id="auto-club" checked onchange="toggleAutoClub()">
+                        <span class="slider"></span>
+                    </label>
+                </div>
+                <div style="display: flex; justify-content: space-between; align-items: center; margin: 10px 0;">
+                    <label>Shot Analysis:</label>
+                    <label class="switch">
+                        <input type="checkbox" id="shot-analysis" checked onchange="toggleShotAnalysis()">
+                        <span class="slider"></span>
+                    </label>
+                </div>
+            </div>
+            
+            <div style="text-align: center; margin-top: 30px;">
+                <button onclick="closeSettings()" style="background: var(--primary-green); color: white; border: none; padding: 12px 24px; border-radius: 6px; cursor: pointer;">
+                    ✓ Save Settings
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        console.log('🏌️ Starting Enhanced Authentic Golf Game');
+        
+        // Enhanced game state with all working features
+        let gameState = {
+            currentHole: 1,
+            strokes: 0,
+            playerPosition: { x: 50, y: 300 },
+            selectedClub: 'driver',
+            lie: 'tee',
+            distanceToPin: 394,
+            shortGameMode: 'normal',
+            units: 'yards',
+            settings: {
+                autoClubSelection: true,
+                shotAnalysis: true,
+                highContrast: false,
+                colorblindMode: false
+            },
+            lastShot: null
+        };
+        
+        let game = null;
+        let scene = null;
+        
+        // Course data
+        const holes = [
+            { number: 1, par: 4, yardage: 394, layout: 'straight', difficulty: 13 },
+            { number: 2, par: 5, yardage: 532, layout: 'straight', difficulty: 7 }
+        ];
+        
+        // Initialize enhanced Phaser game
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('🎮 Initializing Enhanced Phaser Game...');
+            setTimeout(() => {
+                initializeEnhancedGame();
+                populateClubSelection();
+                updateGameStats();
+            }, 100);
+        });
+        
+        function initializeEnhancedGame() {
+            const config = {
+                type: Phaser.AUTO,
+                width: 800,
+                height: 600,
+                parent: 'course3DViewport',
+                backgroundColor: '#87CEEB',
+                scene: {
+                    create: createEnhancedGolfCourse,
+                    update: updateGame
+                }
+            };
+            
+            try {
+                game = new Phaser.Game(config);
+                console.log('✅ Enhanced Phaser game created successfully');
+                
+                // Hide loading overlay
+                setTimeout(() => {
+                    const overlay = document.getElementById('loadingOverlay');
+                    if (overlay) overlay.style.display = 'none';
+                }, 1000);
+            } catch (error) {
+                console.error('❌ Failed to create Phaser game:', error);
+                const viewport = document.getElementById('course3DViewport');
+                viewport.innerHTML = `
+                    <div style="display: flex; align-items: center; justify-content: center; height: 100%; color: #d32f2f; text-align: center; padding: 2rem;">
+                        <div>
+                            <h3>🚫 Canvas Creation Error</h3>
+                            <p>Failed to initialize game: ${error.message}</p>
+                            <button onclick="location.reload()" style="margin-top: 1rem; padding: 0.5rem 1rem; background: #f44336; color: white; border: none; border-radius: 4px; cursor: pointer;">
+                                Reload Page
+                            </button>
+                        </div>
+                    </div>
+                `;
+            }
+        }
+        
+        function createEnhancedGolfCourse() {
+            scene = this;
+            console.log('🏞️ Creating enhanced top-down golf course...');
+            
+            // Create detailed top-down course layout
+            
+            // Background (sky)
+            this.add.rectangle(400, 300, 800, 600, 0x87CEEB);
+            
+            // Fairway (main playing area)
+            const fairway = this.add.rectangle(400, 300, 650, 120, 0x228B22);
+            fairway.setOrigin(0.5, 0.5);
+            
+            // Rough areas
+            const rough1 = this.add.rectangle(400, 200, 650, 80, 0x9ACD32);
+            rough1.setOrigin(0.5, 0.5);
+            
+            const rough2 = this.add.rectangle(400, 400, 650, 80, 0x9ACD32);
+            rough2.setOrigin(0.5, 0.5);
+            
+            // Sand bunkers (strategically placed)
+            const bunker1 = this.add.ellipse(300, 250, 70, 45, 0xF4A460);
+            const bunker2 = this.add.ellipse(500, 350, 90, 55, 0xF4A460);
+            const bunker3 = this.add.ellipse(650, 280, 60, 40, 0xF4A460);
+            
+            // Water hazard
+            const water = this.add.ellipse(580, 230, 120, 70, 0x4682B4);
+            const waterReflection = this.add.ellipse(580, 230, 100, 50, 0x87CEEB);
+            waterReflection.setAlpha(0.5);
+            
+            // Green (detailed with multiple shades)
+            const greenOuter = this.add.circle(720, 300, 60, 0x00AA00);
+            const green = this.add.circle(720, 300, 55, 0x00FF32);
+            const greenInner = this.add.circle(720, 300, 45, 0x00CC00);
+            greenInner.setAlpha(0.3);
+            
+            // Pin and flag
+            const pinShadow = this.add.circle(722, 302, 3, 0x000000);
+            pinShadow.setAlpha(0.3);
+            const pin = this.add.circle(720, 300, 3, 0xFF0000);
+            const flagPole = this.add.rectangle(720, 285, 2, 25, 0x000000);
+            const flag = this.add.triangle(722, 280, 0, 0, 20, -4, 20, 4, 0xFF0000);
+            
+            // Tee box (detailed)
+            const teeBox = this.add.rectangle(80, 300, 30, 30, 0x8B4513);
+            const teeMarkers = this.add.rectangle(80, 285, 25, 6, 0xFFFFFF);
+            const teeSign = this.add.rectangle(80, 320, 20, 8, 0x000000);
+            this.add.text(72, 318, '1', {
+                fontSize: '12px',
+                color: '#FFFFFF',
+                fontWeight: 'bold'
+            });
+            
+            // Yardage markers (authentic board game style)
+            const yardageMarkers = [100, 150, 200, 250, 300];
+            yardageMarkers.forEach((yards, index) => {
+                const markerX = 80 + ((yards / 394) * 640);
+                
+                // Marker post
+                this.add.circle(markerX, 320, 5, 0xFFFF00);
+                this.add.circle(markerX, 320, 3, 0xFF6600);
+                
+                // Yardage text
+                this.add.text(markerX - 8, 330, yards.toString(), {
+                    fontSize: '10px',
+                    color: '#000000',
+                    backgroundColor: '#FFFF00',
+                    padding: { x: 2, y: 1 }
+                });
+            });
+            
+            // Trees and landscaping
+            const tree1 = this.add.circle(200, 150, 25, 0x228B22);
+            const tree2 = this.add.circle(350, 450, 30, 0x006400);
+            const tree3 = this.add.circle(600, 150, 20, 0x228B22);
+            
+            // Cart path
+            const path = this.add.rectangle(400, 520, 600, 15, 0x808080);
+            path.setAlpha(0.7);
+            
+            // Player ball (enhanced with shadow)
+            const ballShadow = this.add.circle(gameState.playerPosition.x + 2, gameState.playerPosition.y + 2, 7, 0x000000);
+            ballShadow.setAlpha(0.3);
+            gameState.ballGraphics = this.add.circle(gameState.playerPosition.x, gameState.playerPosition.y, 6, 0xFFFFFF);
+            gameState.ballGraphics.setStroke(0x000000, 2);
+            gameState.ballShadow = ballShadow;
+            
+            // Hole information display
+            this.add.text(20, 20, `Hole ${gameState.currentHole} - Par ${holes[gameState.currentHole - 1].par} - ${holes[gameState.currentHole - 1].yardage} ${gameState.units}`, {
+                fontSize: '16px',
+                color: '#000000',
+                backgroundColor: 'rgba(255,255,255,0.9)',
+                padding: { x: 10, y: 5 },
+                borderRadius: 5
+            });
+            
+            // Wind indicator (future feature)
+            this.add.text(20, 50, '🍃 Wind: Calm', {
+                fontSize: '14px',
+                color: '#000000',
+                backgroundColor: 'rgba(255,255,255,0.8)',
+                padding: { x: 8, y: 4 }
+            });
+            
+            console.log('✅ Enhanced top-down golf course created successfully');
+        }
+        
+        function updateGame() {
+            // Game loop for animations
+        }
+        
+        // Include all the enhanced game functions from enhanced-golf.html
+        // (Club selection, shot mechanics, UI updates, etc.)
+        
+        // Club selection system with authentic mechanics
+        function populateClubSelection() {
+            const clubSelection = document.getElementById('club-selection');
+            clubSelection.innerHTML = '';
+            
+            const clubs = [
+                { id: 'driver', name: 'Driver', range: [200, 290], lies: ['tee', 'fairway'] },
+                { id: '3wood', name: '3 Wood', range: [180, 240], lies: ['tee', 'fairway'] },
+                { id: '5wood', name: '5 Wood', range: [160, 205], lies: ['tee', 'fairway', 'rough'] },
+                { id: '3iron', name: '3 Iron', range: [140, 185], lies: ['tee', 'fairway', 'rough'] },
+                { id: '5iron', name: '5 Iron', range: [120, 165], lies: ['tee', 'fairway', 'rough'] },
+                { id: '7iron', name: '7 Iron', range: [100, 145], lies: ['tee', 'fairway', 'rough', 'sand'] },
+                { id: '9iron', name: '9 Iron', range: [80, 125], lies: ['tee', 'fairway', 'rough', 'sand'] },
+                { id: 'wedge', name: 'Wedge', range: [40, 85], lies: ['tee', 'fairway', 'rough', 'sand'] },
+                { id: 'putter', name: 'Putter', range: [5, 40], lies: ['green'] }
+            ];
+            
+            clubs.forEach(club => {
+                const isAvailable = club.lies.includes(gameState.lie);
+                const isRecommended = isClubRecommended(club);
+                
+                const clubDiv = document.createElement('div');
+                clubDiv.className = 'club-option';
+                clubDiv.dataset.club = club.id;
+                
+                if (!isAvailable) {
+                    clubDiv.className += ' disabled';
+                } else if (isRecommended && gameState.settings.autoClubSelection) {
+                    clubDiv.className += ' recommended';
+                } else if (club.id === gameState.selectedClub) {
+                    clubDiv.className += ' selected';
+                }
+                
+                const unitLabel = gameState.units === 'yards' ? 'y' : 'm';
+                const convertedMin = gameState.units === 'yards' ? club.range[0] : Math.round(club.range[0] * 0.9144);
+                const convertedMax = gameState.units === 'yards' ? club.range[1] : Math.round(club.range[1] * 0.9144);
+                
+                clubDiv.innerHTML = `
+                    <div class="club-name">${club.name}</div>
+                    <div class="club-range">${convertedMin}-${convertedMax} ${unitLabel}</div>
+                `;
+                
+                if (isAvailable) {
+                    clubDiv.addEventListener('click', () => selectClub(club.id));
+                }
+                
+                clubSelection.appendChild(clubDiv);
+            });
+            
+            updateShortGameVisibility();
+        }
+        
+        function isClubRecommended(club) {
+            const distance = gameState.distanceToPin;
+            return distance >= club.range[0] * 0.8 && distance <= club.range[1] * 1.2;
+        }
+        
+        function updateShortGameVisibility() {
+            const shortGameSection = document.getElementById('short-game-section');
+            const isNearGreen = gameState.distanceToPin <= 80 && 
+                              ['fairway', 'rough', 'green'].includes(gameState.lie);
+            
+            shortGameSection.style.display = isNearGreen ? 'block' : 'none';
+        }
+        
+        function selectShortGame(type) {
+            gameState.shortGameMode = type;
+            
+            document.querySelectorAll('.short-game-btn').forEach(btn => {
+                btn.classList.remove('active');
+                if (btn.dataset.type === type) {
+                    btn.classList.add('active');
+                }
+            });
+            
+            populateClubSelection();
+        }
+        
+        function selectClub(clubId) {
+            gameState.selectedClub = clubId;
+            populateClubSelection();
+        }
+        
+        function takeShot() {
+            console.log('🎲 Taking authentic shot...');
+            
+            // Authentic 1987 dice mechanics
+            const distanceDice = Math.floor(Math.random() * 6) + 1;
+            const directionDice = Math.floor(Math.random() * 12) + 1;
+            
+            // Calculate shot using board game mechanics
+            const shotResult = calculateAuthenticShot(gameState.selectedClub, distanceDice, directionDice);
+            
+            // Update ball position with animation
+            updateBallPosition(shotResult);
+            
+            // Update game state
+            gameState.strokes++;
+            gameState.lastShot = shotResult;
+            gameState.distanceToPin = calculateDistanceToPin(gameState.playerPosition);
+            gameState.lie = determineLie(gameState.playerPosition);
+            
+            // Display results
+            displayDiceResult(distanceDice, directionDice);
+            if (gameState.settings.shotAnalysis) {
+                displayShotAnalysis(shotResult);
+            }
+            
+            // Update UI
+            updateGameStats();
+            populateClubSelection();
+        }
+        
+        function calculateAuthenticShot(club, distanceDice, directionDice) {
+            // Simplified authentic shot calculation
+            const baseRanges = {
+                'driver': { 1: [200, 240], 6: [250, 290] },
+                'wedge': { 1: [40, 60], 6: [45, 65] },
+                'putter': { 1: [5, 15], 6: [30, 40] }
+            };
+            
+            const range = baseRanges[club] || baseRanges['wedge'];
+            const shotRange = range[distanceDice] || range[1];
+            
+            let distance = shotRange[0] + Math.random() * (shotRange[1] - shotRange[0]);
+            
+            // Apply short game modifier
+            if (gameState.shortGameMode === 'chip') distance *= 0.3;
+            else if (gameState.shortGameMode === 'pitch') distance *= 0.6;
+            
+            // Direction calculation
+            const directions = {
+                1: -45, 2: -30, 3: -15,
+                4: 0, 5: 0, 6: 0, 7: 0, 8: 0,
+                9: 15, 10: 30, 11: 45, 12: (Math.random() < 0.5 ? -60 : 60)
+            };
+            
+            return {
+                distance: Math.round(distance),
+                direction: directions[directionDice] || 0,
+                club: club,
+                shortGameMode: gameState.shortGameMode
+            };
+        }
+        
+        function updateBallPosition(shotResult) {
+            if (!gameState.ballGraphics || !scene) return;
+            
+            const radians = shotResult.direction * (Math.PI / 180);
+            const scaledDistance = (shotResult.distance / 394) * 640;
+            
+            const newX = gameState.playerPosition.x + Math.cos(radians) * scaledDistance;
+            const newY = gameState.playerPosition.y + Math.sin(radians) * scaledDistance * 0.2;
+            
+            gameState.playerPosition.x = Math.max(40, Math.min(760, newX));
+            gameState.playerPosition.y = Math.max(80, Math.min(520, newY));
+            
+            // Animate ball and shadow
+            scene.tweens.add({
+                targets: gameState.ballGraphics,
+                x: gameState.playerPosition.x,
+                y: gameState.playerPosition.y,
+                duration: 1200,
+                ease: 'Power2'
+            });
+            
+            scene.tweens.add({
+                targets: gameState.ballShadow,
+                x: gameState.playerPosition.x + 2,
+                y: gameState.playerPosition.y + 2,
+                duration: 1200,
+                ease: 'Power2'
+            });
+        }
+        
+        function calculateDistanceToPin(position) {
+            const dx = 720 - position.x;
+            const dy = 300 - position.y;
+            const screenDistance = Math.sqrt(dx * dx + dy * dy);
+            return Math.max(0, Math.round((screenDistance / 640) * 394));
+        }
+        
+        function determineLie(position) {
+            if (position.x > 665 && Math.abs(position.y - 300) < 55) return 'green';
+            if (position.y > 240 && position.y < 360) return 'fairway';
+            return 'rough';
+        }
+        
+        function displayDiceResult(distanceDice, directionDice) {
+            const diceDisplay = document.getElementById('dice-display');
+            document.getElementById('dice-result').textContent = `🎲 Distance: ${distanceDice} | Direction: ${directionDice}`;
+            document.getElementById('distance-dice').textContent = distanceDice;
+            document.getElementById('direction-dice').textContent = directionDice;
+            diceDisplay.style.display = 'block';
+        }
+        
+        function displayShotAnalysis(shotResult) {
+            const analysisDiv = document.getElementById('shot-analysis');
+            const unitLabel = gameState.units === 'yards' ? 'yards' : 'meters';
+            const convertedDistance = gameState.units === 'yards' ? 
+                shotResult.distance : 
+                Math.round(shotResult.distance * 0.9144);
+            
+            document.getElementById('analysis-content').innerHTML = `
+                <strong>Shot Result:</strong><br>
+                • Distance: ${convertedDistance} ${unitLabel}<br>
+                • Direction: ${shotResult.direction}°<br>
+                • Club: ${shotResult.club}<br>
+                • Shot Type: ${shotResult.shortGameMode}
+            `;
+            
+            analysisDiv.style.display = 'block';
+        }
+        
+        function updateGameStats() {
+            const gameStats = document.getElementById('game-stats');
+            const hole = holes[gameState.currentHole - 1];
+            const unitLabel = gameState.units === 'yards' ? 'yards' : 'meters';
+            const convertedYardage = gameState.units === 'yards' ? hole.yardage : Math.round(hole.yardage * 0.9144);
+            const convertedDistance = gameState.units === 'yards' ? gameState.distanceToPin : Math.round(gameState.distanceToPin * 0.9144);
+            
+            gameStats.innerHTML = `
+                <div class="stat-row">
+                    <span class="stat-label">Hole:</span>
+                    <span>${hole.number} - Par ${hole.par}</span>
+                </div>
+                <div class="stat-row">
+                    <span class="stat-label">Total Distance:</span>
+                    <span>${convertedYardage} ${unitLabel}</span>
+                </div>
+                <div class="stat-row">
+                    <span class="stat-label">Current Lie:</span>
+                    <span>${gameState.lie.charAt(0).toUpperCase() + gameState.lie.slice(1)}</span>
+                </div>
+                <div class="stat-row">
+                    <span class="stat-label">Distance to Pin:</span>
+                    <span>${convertedDistance} ${unitLabel}</span>
+                </div>
+                <div class="stat-row">
+                    <span class="stat-label">Strokes:</span>
+                    <span>${gameState.strokes}</span>
+                </div>
+                <div class="stat-row">
+                    <span class="stat-label">Score vs Par:</span>
+                    <span>${gameState.strokes === 0 ? 'Even' : (gameState.strokes > hole.par ? '+' + (gameState.strokes - hole.par) : 'Under par')}</span>
+                </div>
+            `;
+        }
+        
+        // Settings functions
+        function openSettings() {
+            document.getElementById('settings-modal').style.display = 'block';
+        }
+        
+        function closeSettings() {
+            document.getElementById('settings-modal').style.display = 'none';
+        }
+        
+        function setUnits(units) {
+            gameState.units = units;
+            document.querySelectorAll('.units-option').forEach(opt => {
+                opt.classList.remove('active');
+                if (opt.textContent.toLowerCase() === units) {
+                    opt.classList.add('active');
+                }
+            });
+            updateGameStats();
+            populateClubSelection();
+        }
+        
+        function toggleAutoClub() {
+            gameState.settings.autoClubSelection = document.getElementById('auto-club').checked;
+            populateClubSelection();
+        }
+        
+        function toggleShotAnalysis() {
+            gameState.settings.shotAnalysis = document.getElementById('shot-analysis').checked;
+        }
+        
+        function toggleHighContrast() {
+            gameState.settings.highContrast = document.getElementById('high-contrast').checked;
+        }
+        
+        function toggleColorblind() {
+            gameState.settings.colorblindMode = document.getElementById('colorblind-mode').checked;
+        }
+        
+        // Close settings modal when clicking outside
+        document.getElementById('settings-modal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeSettings();
+            }
+        });
+    </script>
+</body>
+</html>

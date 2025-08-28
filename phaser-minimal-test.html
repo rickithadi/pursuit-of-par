@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Phaser Minimal Test</title>
+    <style>
+        body { 
+            margin: 0; 
+            padding: 20px; 
+            background: #f0f0f0; 
+            font-family: Arial, sans-serif; 
+        }
+        #gameContainer { 
+            width: 800px; 
+            height: 600px; 
+            border: 2px solid #333; 
+            margin: 20px auto; 
+            background: white;
+        }
+        .info {
+            text-align: center;
+            margin: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="info">
+        <h1>Phaser Minimal Test</h1>
+        <p>Testing basic Phaser scene rendering...</p>
+    </div>
+    
+    <div id="gameContainer"></div>
+    
+    <div class="info">
+        <button onclick="runDiagnostics()">Run Diagnostics</button>
+        <div id="diagnostics"></div>
+    </div>
+
+    <!-- Load Phaser -->
+    <script src="https://cdn.jsdelivr.net/npm/phaser@3.70.0/dist/phaser.min.js"></script>
+    
+    <script>
+        // Global diagnostics
+        let game = null;
+        let scene = null;
+        
+        // Minimal Scene
+        class TestScene extends Phaser.Scene {
+            constructor() {
+                super({ key: 'TestScene' });
+                console.log('🎮 TestScene constructor called');
+            }
+            
+            preload() {
+                console.log('🔄 TestScene preload called');
+                // No assets needed for basic test
+            }
+            
+            create() {
+                console.log('🎨 TestScene create called - STARTING GRAPHICS');
+                
+                // Store scene reference
+                scene = this;
+                window.testScene = this;
+                
+                // Test 1: Background rectangle (should fill entire canvas)
+                console.log('Drawing background...');
+                const bg = this.add.rectangle(400, 300, 800, 600, 0x87CEEB);
+                console.log('Background created:', bg);
+                
+                // Test 2: Visible shapes
+                console.log('Drawing test shapes...');
+                
+                // Red rectangle
+                const redRect = this.add.rectangle(200, 150, 100, 100, 0xFF0000);
+                console.log('Red rectangle:', redRect);
+                
+                // Green circle  
+                const greenCircle = this.add.circle(400, 300, 50, 0x00FF00);
+                console.log('Green circle:', greenCircle);
+                
+                // Blue triangle (using graphics)
+                const graphics = this.add.graphics();
+                graphics.fillStyle(0x0000FF);
+                graphics.fillTriangle(550, 100, 600, 200, 650, 100);
+                console.log('Graphics object:', graphics);
+                
+                // Test 3: Text
+                const text = this.add.text(400, 500, 'PHASER IS WORKING!', {
+                    fontSize: '32px',
+                    fill: '#FFFFFF',
+                    backgroundColor: '#000000',
+                    padding: { x: 10, y: 5 }
+                });
+                text.setOrigin(0.5);
+                console.log('Text object:', text);
+                
+                // Test 4: Interactive element
+                const button = this.add.rectangle(400, 400, 200, 50, 0xFFFF00);
+                button.setInteractive();
+                button.on('pointerdown', () => {
+                    console.log('✅ Button clicked - Phaser interaction working!');
+                    button.setFillStyle(0xFF00FF); // Change to magenta
+                });
+                console.log('Interactive button:', button);
+                
+                console.log('✅ TestScene create completed - All graphics should be visible');
+                
+                // Verify scene contents
+                console.log('Scene children count:', this.children.list.length);
+                this.children.list.forEach((child, index) => {
+                    console.log(`Child ${index}:`, child.type || child.constructor.name);
+                });
+            }
+            
+            update() {
+                // Simple animation test
+                if (this.children && this.children.list.length > 2) {
+                    const circle = this.children.list.find(child => child.fillColor === 0x00FF00);
+                    if (circle && circle.scaleX) {
+                        circle.scaleX = 1 + 0.1 * Math.sin(this.time.now * 0.005);
+                        circle.scaleY = 1 + 0.1 * Math.sin(this.time.now * 0.005);
+                    }
+                }
+            }
+        }
+        
+        // Initialize Phaser
+        window.addEventListener('load', () => {
+            console.log('🚀 Page loaded, starting Phaser...');
+            console.log('Phaser version:', Phaser.VERSION);
+            
+            const config = {
+                type: Phaser.AUTO,
+                width: 800,
+                height: 600,
+                parent: 'gameContainer',
+                backgroundColor: 0x333333, // Dark gray as fallback
+                scene: TestScene,
+                render: {
+                    antialias: true,
+                    pixelArt: false
+                }
+            };
+            
+            try {
+                game = new Phaser.Game(config);
+                console.log('✅ Phaser Game created successfully');
+                window.testGame = game;
+            } catch (error) {
+                console.error('❌ Failed to create Phaser Game:', error);
+                document.getElementById('diagnostics').innerHTML = 
+                    '<p style="color: red;">ERROR: ' + error.message + '</p>';
+            }
+        });
+        
+        // Diagnostic function
+        function runDiagnostics() {
+            const diagnostics = document.getElementById('diagnostics');
+            let html = '<h3>Diagnostic Results:</h3>';
+            
+            // Check Phaser
+            html += '<p>Phaser loaded: ' + (typeof Phaser !== 'undefined' ? '✅' : '❌') + '</p>';
+            if (typeof Phaser !== 'undefined') {
+                html += '<p>Phaser version: ' + Phaser.VERSION + '</p>';
+            }
+            
+            // Check game
+            html += '<p>Game created: ' + (game ? '✅' : '❌') + '</p>';
+            html += '<p>Scene created: ' + (scene ? '✅' : '❌') + '</p>';
+            
+            // Check canvas
+            const canvas = document.querySelector('#gameContainer canvas');
+            html += '<p>Canvas element: ' + (canvas ? '✅' : '❌') + '</p>';
+            if (canvas) {
+                html += '<p>Canvas size: ' + canvas.width + 'x' + canvas.height + '</p>';
+                
+                // Test canvas rendering
+                const ctx = canvas.getContext('2d');
+                if (ctx) {
+                    const imageData = ctx.getImageData(100, 100, 1, 1);
+                    const pixel = imageData.data;
+                    html += '<p>Canvas has pixels: ' + 
+                        (pixel[0] + pixel[1] + pixel[2] > 0 ? '✅' : '❌') + '</p>';
+                }
+            }
+            
+            // Check scene children
+            if (scene && scene.children) {
+                html += '<p>Scene objects: ' + scene.children.list.length + '</p>';
+            }
+            
+            diagnostics.innerHTML = html;
+        }
+        
+        // Auto-run diagnostics after 2 seconds
+        setTimeout(runDiagnostics, 2000);
+    </script>
+</body>
+</html>

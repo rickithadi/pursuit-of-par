@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Ball Movement Debug</title>
+    <style>
+        body { 
+            margin: 0; 
+            padding: 20px; 
+            background: #f0f0f0; 
+            font-family: Arial, sans-serif; 
+        }
+        #gameContainer { 
+            width: 800px; 
+            height: 600px; 
+            border: 2px solid #333; 
+            margin: 20px auto; 
+            background: white;
+        }
+        .controls {
+            text-align: center;
+            margin: 10px;
+        }
+        button {
+            padding: 10px 15px;
+            margin: 5px;
+            background: #007acc;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        button:hover {
+            background: #005999;
+        }
+        #debug {
+            max-height: 300px;
+            overflow-y: auto;
+            background: #f9f9f9;
+            border: 1px solid #ccc;
+            padding: 10px;
+            margin: 10px auto;
+            width: 800px;
+            font-family: monospace;
+            font-size: 12px;
+        }
+    </style>
+</head>
+<body>
+    <div class="controls">
+        <h1>Ball Movement Debug Test</h1>
+        <button onclick="testBallCreation()">Test Ball Creation</button>
+        <button onclick="testManualMove()">Test Manual Move</button>
+        <button onclick="testAnimatedMove()">Test Animated Move</button>
+        <button onclick="testShotLogic()">Test Shot Logic</button>
+        <button onclick="clearDebug()">Clear Debug</button>
+    </div>
+    
+    <div id="gameContainer"></div>
+    
+    <div id="debug"></div>
+
+    <script src="https://cdn.jsdelivr.net/npm/phaser@3.70.0/dist/phaser.min.js"></script>
+    
+    <script>
+        let game = null;
+        let debugScene = null;
+        
+        function debug(message) {
+            const debugDiv = document.getElementById('debug');
+            const timestamp = new Date().toLocaleTimeString();
+            debugDiv.innerHTML += `<div>${timestamp}: ${message}</div>`;
+            debugDiv.scrollTop = debugDiv.scrollHeight;
+            console.log(message);
+        }
+        
+        class BallDebugScene extends Phaser.Scene {
+            constructor() {
+                super({ key: 'BallDebugScene' });
+                this.ball = null;
+                this.ballShadow = null;
+            }
+            
+            create() {
+                debug('🎮 BallDebugScene.create() started');
+                
+                debugScene = this;
+                window.debugScene = this;
+                
+                // Simple background
+                this.add.rectangle(400, 300, 800, 600, 0x87CEEB);
+                debug('✅ Background created');
+                
+                // Simple course outline
+                const graphics = this.add.graphics();
+                graphics.fillStyle(0x32CD32);
+                graphics.fillRect(200, 100, 400, 400);
+                debug('✅ Course outline created');
+                
+                // Create ball
+                this.createBall();
+                
+                debug('✅ Scene creation complete');
+            }
+            
+            createBall() {
+                debug('🏌️ Creating ball...');
+                
+                try {
+                    // Ball shadow
+                    this.ballShadow = this.add.ellipse(400, 553, 12, 6, 0x000000, 0.3);
+                    debug(`✅ Ball shadow created at (${this.ballShadow.x}, ${this.ballShadow.y})`);
+                    
+                    // Golf ball
+                    this.ball = this.add.circle(400, 550, 8, 0xFFFFFF);
+                    this.ball.setStroke(0x000000, 2);
+                    debug(`✅ Ball created at (${this.ball.x}, ${this.ball.y})`);
+                    
+                    // Verify ball exists
+                    debug(`Ball object exists: ${!!this.ball}`);
+                    debug(`Ball visible: ${this.ball.visible}`);
+                    debug(`Ball alpha: ${this.ball.alpha}`);
+                    debug(`Ball scale: ${this.ball.scaleX}, ${this.ball.scaleY}`);
+                    
+                } catch (error) {
+                    debug(`❌ Error creating ball: ${error.message}`);
+                    debug(`Stack: ${error.stack}`);
+                }
+            }
+            
+            testManualMove(x, y) {
+                debug(`🔧 Testing manual move to (${x}, ${y})`);
+                
+                if (!this.ball) {
+                    debug('❌ Ball not found for manual move');
+                    return;
+                }
+                
+                try {
+                    // Direct position change
+                    const oldX = this.ball.x;
+                    const oldY = this.ball.y;
+                    
+                    this.ball.setPosition(x, y);
+                    this.ballShadow.setPosition(x, y + 3);
+                    
+                    debug(`✅ Ball moved from (${oldX}, ${oldY}) to (${this.ball.x}, ${this.ball.y})`);
+                    
+                } catch (error) {
+                    debug(`❌ Manual move error: ${error.message}`);
+                }
+            }
+            
+            testAnimatedMove(x, y) {
+                debug(`🎬 Testing animated move to (${x}, ${y})`);
+                
+                if (!this.ball) {
+                    debug('❌ Ball not found for animated move');
+                    return;
+                }
+                
+                try {
+                    const startX = this.ball.x;
+                    const startY = this.ball.y;
+                    
+                    debug(`Starting animation from (${startX}, ${startY})`);
+                    
+                    // Test tween
+                    this.tweens.add({
+                        targets: [this.ball, this.ballShadow],
+                        x: x,
+                        y: y,
+                        duration: 2000,
+                        ease: 'Power2',
+                        onStart: () => {
+                            debug('🎬 Animation started');
+                        },
+                        onUpdate: (tween, target) => {
+                            if (target === this.ball) {
+                                debug(`Animation progress: ${Math.round(tween.progress * 100)}% - Ball at (${Math.round(target.x)}, ${Math.round(target.y)})`);
+                            }
+                        },
+                        onComplete: () => {
+                            debug(`✅ Animation completed - Ball at (${this.ball.x}, ${this.ball.y})`);
+                        }
+                    });
+                    
+                } catch (error) {
+                    debug(`❌ Animation error: ${error.message}`);
+                    debug(`Stack: ${error.stack}`);
+                }
+            }
+            
+            testShotCalculation() {
+                debug('🎯 Testing shot calculation...');
+                
+                const distance = 150;
+                const deviation = 25;
+                const currentX = this.ball.x;
+                const currentY = this.ball.y;
+                
+                // Calculate target position
+                const targetY = Math.max(100, currentY - distance * 0.8);
+                const targetX = Math.max(50, Math.min(750, currentX + deviation));
+                
+                debug(`Shot calculation:`);
+                debug(`  Distance: ${distance}y`);
+                debug(`  Deviation: ${deviation}y`);
+                debug(`  Current: (${currentX}, ${currentY})`);
+                debug(`  Target: (${targetX}, ${targetY})`);
+                
+                return { targetX, targetY };
+            }
+        }
+        
+        // Initialize Phaser
+        window.addEventListener('load', () => {
+            debug('🚀 Initializing Ball Debug Test...');
+            debug('Phaser version: ' + Phaser.VERSION);
+            
+            const config = {
+                type: Phaser.AUTO,
+                width: 800,
+                height: 600,
+                parent: 'gameContainer',
+                backgroundColor: 0x87CEEB,
+                scene: BallDebugScene
+            };
+            
+            try {
+                game = new Phaser.Game(config);
+                debug('✅ Phaser Game created');
+            } catch (error) {
+                debug('❌ Failed to create game: ' + error.message);
+            }
+        });
+        
+        // Test functions
+        function testBallCreation() {
+            debug('🔍 Testing ball creation...');
+            
+            if (!debugScene) {
+                debug('❌ Scene not ready');
+                return;
+            }
+            
+            if (debugScene.ball) {
+                debug('✅ Ball exists');
+                debug(`Ball position: (${debugScene.ball.x}, ${debugScene.ball.y})`);
+                debug(`Ball visible: ${debugScene.ball.visible}`);
+                debug(`Ball in scene: ${debugScene.children.exists(debugScene.ball)}`);
+            } else {
+                debug('❌ Ball does not exist');
+            }
+        }
+        
+        function testManualMove() {
+            debug('🔧 Testing manual ball move...');
+            
+            if (!debugScene) {
+                debug('❌ Scene not ready');
+                return;
+            }
+            
+            const targetX = 200 + Math.random() * 400;
+            const targetY = 200 + Math.random() * 200;
+            
+            debugScene.testManualMove(targetX, targetY);
+        }
+        
+        function testAnimatedMove() {
+            debug('🎬 Testing animated ball move...');
+            
+            if (!debugScene) {
+                debug('❌ Scene not ready');
+                return;
+            }
+            
+            const targetX = 200 + Math.random() * 400;
+            const targetY = 200 + Math.random() * 200;
+            
+            debugScene.testAnimatedMove(targetX, targetY);
+        }
+        
+        function testShotLogic() {
+            debug('🎯 Testing full shot logic...');
+            
+            if (!debugScene) {
+                debug('❌ Scene not ready');
+                return;
+            }
+            
+            // Calculate shot
+            const shotData = debugScene.testShotCalculation();
+            
+            // Execute animated move
+            debugScene.testAnimatedMove(shotData.targetX, shotData.targetY);
+        }
+        
+        function clearDebug() {
+            document.getElementById('debug').innerHTML = '';
+        }
+    </script>
+</body>
+</html>

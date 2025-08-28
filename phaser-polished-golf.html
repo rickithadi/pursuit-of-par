@@ -1,0 +1,811 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Polished Golf Course - Hex-Tile System</title>
+    <style>
+        :root {
+            --vintage-cream: #F5DEB3;
+            --brown-wood: #8B4513;
+            --fairway-green: #2E7D32;
+            --rough-dark: #33691E;
+            --sand-tan: #D7B899;
+            --water-blue: #1976D2;
+            --pin-red: #D32F2F;
+        }
+
+        body { 
+            margin: 0; 
+            padding: 0; 
+            background: linear-gradient(135deg, var(--vintage-cream) 0%, #E6D3A3 100%);
+            font-family: 'Times New Roman', serif; 
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+        }
+        
+        .header {
+            background: var(--brown-wood);
+            color: white;
+            padding: 15px;
+            text-align: center;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+        }
+        
+        .game-container {
+            display: flex;
+            flex: 1;
+            padding: 20px;
+            gap: 20px;
+            max-width: 1400px;
+            margin: 0 auto;
+            width: 100%;
+        }
+        
+        .left-panel {
+            width: 320px;
+            background: white;
+            border: 3px solid var(--brown-wood);
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+            height: fit-content;
+        }
+        
+        .right-panel {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        #gameCanvas {
+            flex: 1;
+            border: 3px solid var(--brown-wood);
+            border-radius: 8px;
+            background: #87CEEB;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+        }
+        
+        .distance-info {
+            background: var(--brown-wood);
+            color: white;
+            padding: 10px;
+            border-radius: 0 0 8px 8px;
+            display: flex;
+            justify-content: space-around;
+            font-weight: bold;
+        }
+        
+        h2 {
+            color: var(--brown-wood);
+            margin: 0 0 15px 0;
+            text-align: center;
+            font-size: 1.4em;
+            border-bottom: 2px solid var(--brown-wood);
+            padding-bottom: 8px;
+        }
+        
+        .club-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin: 15px 0;
+        }
+        
+        .club-btn {
+            padding: 12px 8px;
+            background: linear-gradient(145deg, #D2691E, #CD853F);
+            color: white;
+            border: 2px solid var(--brown-wood);
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 0.9em;
+            transition: all 0.3s ease;
+            text-align: center;
+        }
+        
+        .club-btn:hover {
+            background: linear-gradient(145deg, #CD853F, #D2691E);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+        
+        .club-btn.selected {
+            background: var(--brown-wood);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(0,0,0,0.3);
+        }
+        
+        .shot-info {
+            background: #f5f5f5;
+            border: 2px solid #ddd;
+            border-radius: 6px;
+            padding: 15px;
+            margin: 15px 0;
+        }
+        
+        .distance-display {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin: 10px 0;
+        }
+        
+        .distance-item {
+            background: var(--fairway-green);
+            color: white;
+            padding: 8px;
+            border-radius: 4px;
+            text-align: center;
+            font-weight: bold;
+            font-size: 0.9em;
+        }
+        
+        .take-shot-btn {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(145deg, #4CAF50, #45a049);
+            color: white;
+            border: 3px solid #2E7D32;
+            border-radius: 8px;
+            font-size: 1.2em;
+            font-weight: bold;
+            cursor: pointer;
+            margin: 15px 0;
+            transition: all 0.3s ease;
+        }
+        
+        .take-shot-btn:hover:not(:disabled) {
+            background: linear-gradient(145deg, #45a049, #4CAF50);
+            transform: translateY(-2px);
+        }
+        
+        .take-shot-btn:disabled {
+            background: #999;
+            cursor: not-allowed;
+            opacity: 0.6;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>🏌️ TPC Sawgrass - Hole 1 "Opening Statement"</h1>
+        <p>Par 4 • 394 Yards • Authentic 1987 Board Game</p>
+    </div>
+    
+    <div class="game-container">
+        <div class="left-panel">
+            <h2>Club Selection</h2>
+            <div class="club-grid">
+                <button class="club-btn" data-club="driver">Driver<br><small>220-280y</small></button>
+                <button class="club-btn" data-club="3wood">3-Wood<br><small>190-230y</small></button>
+                <button class="club-btn" data-club="5iron">5-Iron<br><small>120-160y</small></button>
+                <button class="club-btn" data-club="7iron">7-Iron<br><small>90-130y</small></button>
+                <button class="club-btn" data-club="9iron">9-Iron<br><small>70-100y</small></button>
+                <button class="club-btn" data-club="wedge">Wedge<br><small>40-70y</small></button>
+                <button class="club-btn" data-club="putter">Putter<br><small>5-30y</small></button>
+            </div>
+            
+            <button class="take-shot-btn" id="takeShotBtn" disabled>
+                Select Club First
+            </button>
+            
+            <div class="shot-info">
+                <h2>Shot Information</h2>
+                <div class="distance-display">
+                    <div class="distance-item" id="distanceToPin">To Pin: 394y</div>
+                    <div class="distance-item" id="distanceToGreen">To Green: 374y</div>
+                    <div class="distance-item" id="currentLie">Lie: Tee</div>
+                    <div class="distance-item" id="strokeCount">Strokes: 0</div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="right-panel">
+            <div id="gameCanvas"></div>
+            <div class="distance-info">
+                <span id="ballCoords">Ball: Tee Box</span>
+                <span id="windInfo">Wind: Calm</span>
+                <span id="holeInfo">394 Yards Par 4</span>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/phaser@3.70.0/dist/phaser.min.js"></script>
+    
+    <script>
+        // Game state
+        let gameState = {
+            ballPosition: { x: 400, y: 550 },
+            distanceToPin: 394,
+            currentLie: 'tee',
+            strokeCount: 0,
+            selectedClub: null
+        };
+        
+        // Club data
+        const clubData = {
+            driver: { min: 220, max: 280, accuracy: 0.7 },
+            '3wood': { min: 190, max: 230, accuracy: 0.8 },
+            '5iron': { min: 120, max: 160, accuracy: 0.9 },
+            '7iron': { min: 90, max: 130, accuracy: 0.95 },
+            '9iron': { min: 70, max: 100, accuracy: 1.0 },
+            wedge: { min: 40, max: 70, accuracy: 1.0 },
+            putter: { min: 5, max: 30, accuracy: 1.0 }
+        };
+        
+        let game = null;
+        let golfScene = null;
+        
+        class PolishedGolfScene extends Phaser.Scene {
+            constructor() {
+                super({ key: 'PolishedGolfScene' });
+                this.ball = null;
+                this.distanceMarkers = [];
+                this.hexTiles = [];
+                this.greenBoundary = null;
+            }
+            
+            create() {
+                console.log('🏌️ Creating Polished Golf Course...');
+                
+                golfScene = this;
+                window.golfScene = this;
+                
+                // Create course elements in layers
+                this.createBackground();
+                this.createHexTileSystem();
+                this.createCourseFeatures();
+                this.createDistanceSystem();
+                this.createBall();
+                this.updateDistanceDisplay();
+                
+                console.log('✅ Polished course created');
+            }
+            
+            createBackground() {
+                // Sky gradient
+                const gradient = this.add.graphics();
+                gradient.fillGradientStyle(0x87CEEB, 0x98FB98, 0x87CEEB, 0x98FB98, 1);
+                gradient.fillRect(0, 0, 1000, 700);
+            }
+            
+            createHexTileSystem() {
+                console.log('Creating hex tile system...');
+                
+                // Create hex pattern for course texture
+                const hexSize = 25;
+                const cols = Math.ceil(1000 / (hexSize * 1.5));
+                const rows = Math.ceil(700 / (hexSize * Math.sqrt(3)));
+                
+                for (let row = 0; row < rows; row++) {
+                    for (let col = 0; col < cols; col++) {
+                        const x = col * hexSize * 1.5;
+                        const y = row * hexSize * Math.sqrt(3) + (col % 2) * hexSize * Math.sqrt(3) / 2;
+                        
+                        if (x < 1000 && y < 700) {
+                            this.createHexTile(x, y, hexSize);
+                        }
+                    }
+                }
+            }
+            
+            createHexTile(x, y, size) {
+                const graphics = this.add.graphics();
+                
+                // Determine tile type based on position
+                const tileType = this.getTileType(x, y);
+                let color, alpha;
+                
+                switch (tileType) {
+                    case 'tee':
+                        color = 0x8B4513;
+                        alpha = 0.3;
+                        break;
+                    case 'fairway':
+                        color = 0x2E7D32;
+                        alpha = 0.2;
+                        break;
+                    case 'rough':
+                        color = 0x33691E;
+                        alpha = 0.3;
+                        break;
+                    case 'sand':
+                        color = 0xD7B899;
+                        alpha = 0.4;
+                        break;
+                    case 'water':
+                        color = 0x1976D2;
+                        alpha = 0.3;
+                        break;
+                    case 'green':
+                        color = 0x4CAF50;
+                        alpha = 0.2;
+                        break;
+                    default:
+                        color = 0x33691E;
+                        alpha = 0.1;
+                }
+                
+                // Draw hexagon
+                graphics.fillStyle(color, alpha);
+                graphics.lineStyle(1, color, 0.5);
+                this.drawHexagon(graphics, x, y, size);
+                
+                this.hexTiles.push({ x, y, type: tileType, graphics });
+            }
+            
+            drawHexagon(graphics, x, y, size) {
+                const points = [];
+                for (let i = 0; i < 6; i++) {
+                    const angle = (i * Math.PI) / 3;
+                    points.push(x + size * Math.cos(angle));
+                    points.push(y + size * Math.sin(angle));
+                }
+                graphics.fillPoints(points);
+                graphics.strokePoints(points, true);
+            }
+            
+            getTileType(x, y) {
+                // Define course areas
+                const centerX = 500;
+                const distanceFromCenter = Math.abs(x - centerX);
+                
+                // Tee area
+                if (y > 640) return 'tee';
+                
+                // Green area (circular)
+                const greenDistance = Phaser.Math.Distance.Between(x, y, 500, 100);
+                if (greenDistance < 80) return 'green';
+                
+                // Water hazard (left side)
+                const waterDistance = Phaser.Math.Distance.Between(x, y, 200, 450);
+                if (waterDistance < 70) return 'water';
+                
+                // Sand bunkers
+                const bunker1Distance = Phaser.Math.Distance.Between(x, y, 300, 300);
+                const bunker2Distance = Phaser.Math.Distance.Between(x, y, 700, 380);
+                const bunker3Distance = Phaser.Math.Distance.Between(x, y, 550, 150);
+                if (bunker1Distance < 50 || bunker2Distance < 60 || bunker3Distance < 40) return 'sand';
+                
+                // Fairway (center corridor)
+                if (distanceFromCenter < 120 && y < 640 && y > 160) return 'fairway';
+                
+                // Everything else is rough
+                return 'rough';
+            }
+            
+            createCourseFeatures() {
+                console.log('Creating course features...');
+                
+                // Main course features with gradients and shadows
+                this.createWaterHazard();
+                this.createBunkers();
+                this.createGreen();
+                this.createTeeBox();
+                this.createPin();
+            }
+            
+            createWaterHazard() {
+                // Water hazard with reflection effect
+                const water = this.add.graphics();
+                water.fillGradientStyle(0x1976D2, 0x1976D2, 0x0D47A1, 0x0D47A1, 1);
+                water.fillEllipse(200, 450, 140, 100);
+                
+                // Water shimmer
+                const shimmer = this.add.graphics();
+                shimmer.fillStyle(0x42A5F5, 0.3);
+                shimmer.fillEllipse(190, 440, 120, 80);
+                
+                // Animate shimmer
+                this.tweens.add({
+                    targets: shimmer,
+                    alpha: 0.1,
+                    duration: 2000,
+                    yoyo: true,
+                    repeat: -1
+                });
+            }
+            
+            createBunkers() {
+                // Sand bunkers with depth shading
+                const bunkers = [
+                    { x: 300, y: 300, width: 100, height: 70 },
+                    { x: 700, y: 380, width: 120, height: 80 },
+                    { x: 550, y: 150, width: 80, height: 60 }
+                ];
+                
+                bunkers.forEach(bunker => {
+                    // Shadow
+                    const shadow = this.add.graphics();
+                    shadow.fillStyle(0x8D6E63, 0.4);
+                    shadow.fillEllipse(bunker.x + 5, bunker.y + 5, bunker.width, bunker.height);
+                    
+                    // Main bunker
+                    const sand = this.add.graphics();
+                    sand.fillGradientStyle(0xD7B899, 0xD7B899, 0xBCAAA4, 0xBCAAA4, 1);
+                    sand.fillEllipse(bunker.x, bunker.y, bunker.width, bunker.height);
+                    
+                    // Texture lines
+                    const texture = this.add.graphics();
+                    texture.lineStyle(1, 0xBCAAA4, 0.5);
+                    for (let i = 0; i < 5; i++) {
+                        const startX = bunker.x - bunker.width / 3 + (i * 10);
+                        const endX = startX + 20;
+                        const y = bunker.y + (Math.random() - 0.5) * bunker.height / 2;
+                        texture.lineBetween(startX, y, endX, y);
+                    }
+                });
+            }
+            
+            createGreen() {
+                // Green with multiple shades and contours
+                const green = this.add.graphics();
+                
+                // Outer green (darker)
+                green.fillGradientStyle(0x2E7D32, 0x2E7D32, 0x1B5E20, 0x1B5E20, 1);
+                green.fillCircle(500, 100, 90);
+                
+                // Inner green (lighter)
+                green.fillGradientStyle(0x4CAF50, 0x4CAF50, 0x2E7D32, 0x2E7D32, 1);
+                green.fillCircle(500, 100, 70);
+                
+                // Putting surface (lightest)
+                green.fillStyle(0x66BB6A, 0.8);
+                green.fillCircle(500, 100, 50);
+                
+                // Store green boundary for distance calculations
+                this.greenBoundary = { x: 500, y: 100, radius: 90 };
+                
+                // Green contour lines
+                const contours = this.add.graphics();
+                contours.lineStyle(1, 0x4CAF50, 0.3);
+                contours.strokeCircle(500, 100, 60);
+                contours.strokeCircle(500, 100, 75);
+            }
+            
+            createTeeBox() {
+                // Elevated tee box
+                const tee = this.add.graphics();
+                
+                // Shadow
+                tee.fillStyle(0x5D4037, 0.5);
+                tee.fillRoundedRect(353, 653, 194, 34, 8);
+                
+                // Main tee box
+                tee.fillGradientStyle(0x8D6E63, 0x8D6E63, 0x5D4037, 0x5D4037, 1);
+                tee.fillRoundedRect(350, 650, 194, 34, 8);
+                
+                // Tee markers
+                const markers = this.add.graphics();
+                markers.fillStyle(0xFFFFFF);
+                markers.fillCircle(370, 667, 4);
+                markers.fillCircle(530, 667, 4);
+                
+                // Tee box label
+                this.add.text(450, 667, 'TEE', {
+                    fontSize: '12px',
+                    fill: '#FFFFFF',
+                    fontWeight: 'bold'
+                }).setOrigin(0.5);
+            }
+            
+            createPin() {
+                // Pin shadow
+                const shadow = this.add.graphics();
+                shadow.fillStyle(0x000000, 0.3);
+                shadow.fillRect(502, 62, 8, 48);
+                
+                // Pin pole
+                const pin = this.add.graphics();
+                pin.fillStyle(0x424242);
+                pin.fillRect(500, 60, 8, 48);
+                
+                // Flag
+                const flag = this.add.graphics();
+                flag.fillGradientStyle(0xD32F2F, 0xFF5722, 0xD32F2F, 0xFF5722, 1);
+                flag.beginPath();
+                flag.moveTo(508, 65);
+                flag.lineTo(508, 85);
+                flag.lineTo(535, 75);
+                flag.closePath();
+                flag.fillPath();
+                
+                // Flag animation
+                this.tweens.add({
+                    targets: flag,
+                    scaleX: 0.9,
+                    duration: 1500,
+                    yoyo: true,
+                    repeat: -1,
+                    ease: 'Sine.easeInOut'
+                });
+            }
+            
+            createDistanceSystem() {
+                console.log('Creating distance markers...');
+                
+                // Yardage markers along fairway
+                const yardages = [100, 150, 200, 250, 300, 350];
+                yardages.forEach(yard => {
+                    const progress = (394 - yard) / 394;
+                    const y = 650 - (progress * 550);
+                    
+                    this.createYardageMarker(500, y, yard);
+                });
+                
+                // Create distance lines (initially hidden)
+                this.distanceLines = this.add.graphics();
+                this.distanceTexts = [];
+            }
+            
+            createYardageMarker(x, y, distance) {
+                // Marker post
+                const post = this.add.graphics();
+                post.fillStyle(0xFFFFFF);
+                post.fillCircle(x, y, 6);
+                post.lineStyle(2, 0x000000);
+                post.strokeCircle(x, y, 6);
+                
+                // Distance text
+                const text = this.add.text(x + 15, y - 5, distance + 'y', {
+                    fontSize: '14px',
+                    fill: '#000000',
+                    backgroundColor: '#FFFFFF',
+                    padding: { x: 4, y: 2 },
+                    fontWeight: 'bold'
+                });
+                
+                this.distanceMarkers.push({ post, text, distance });
+            }
+            
+            createBall() {
+                console.log('Creating golf ball...');
+                
+                // Ball shadow (larger and softer)
+                this.ballShadow = this.add.graphics();
+                this.ballShadow.fillStyle(0x000000, 0.2);
+                this.ballShadow.fillEllipse(400, 655, 16, 8);
+                
+                // Golf ball with dimples
+                this.ball = this.add.graphics();
+                this.ball.fillGradientStyle(0xFFFFFF, 0xFFFFFF, 0xE0E0E0, 0xE0E0E0, 1);
+                this.ball.fillCircle(400, 650, 8);
+                this.ball.lineStyle(1, 0xBDBDBD);
+                this.ball.strokeCircle(400, 650, 8);
+                
+                // Ball dimples
+                const dimples = this.add.graphics();
+                dimples.fillStyle(0xE0E0E0, 0.5);
+                for (let i = 0; i < 8; i++) {
+                    const angle = (i / 8) * Math.PI * 2;
+                    const x = 400 + Math.cos(angle) * 4;
+                    const y = 650 + Math.sin(angle) * 4;
+                    dimples.fillCircle(x, y, 1);
+                }
+                
+                // Lie indicator (larger and more visible)
+                this.lieIndicator = this.add.graphics();
+                this.lieIndicator.lineStyle(3, 0x8D6E63, 0.6);
+                this.lieIndicator.strokeCircle(400, 650, 18);
+                
+                this.updateLieIndicator();
+            }
+            
+            updateLieIndicator() {
+                const lieColors = {
+                    tee: 0x8D6E63,
+                    fairway: 0x4CAF50,
+                    rough: 0x33691E,
+                    sand: 0xD7B899,
+                    green: 0x2E7D32,
+                    water: 0x1976D2
+                };
+                
+                const color = lieColors[gameState.currentLie] || 0x8D6E63;
+                this.lieIndicator.clear();
+                this.lieIndicator.lineStyle(3, color, 0.6);
+                this.lieIndicator.strokeCircle(this.ball.x, this.ball.y, 18);
+            }
+            
+            moveBall(targetX, targetY) {
+                console.log(`Moving ball to (${targetX}, ${targetY})`);
+                
+                // Update game state
+                gameState.ballPosition = { x: targetX, y: targetY };
+                gameState.currentLie = this.determineLie(targetX, targetY);
+                gameState.distanceToPin = this.calculateDistanceToPin(targetX, targetY);
+                
+                // Animate ball movement
+                this.tweens.add({
+                    targets: [this.ball, this.ballShadow, this.lieIndicator],
+                    x: targetX,
+                    y: targetY,
+                    duration: 2000,
+                    ease: 'Cubic.easeOut',
+                    onComplete: () => {
+                        this.updateLieIndicator();
+                        this.updateDistanceDisplay();
+                        this.showDistanceLines();
+                    }
+                });
+            }
+            
+            calculateDistanceToPin(x, y) {
+                const distance = Phaser.Math.Distance.Between(x, y, 500, 100);
+                return Math.round(distance * 0.7); // Scale factor for yardage
+            }
+            
+            calculateDistanceToGreen(x, y) {
+                const distance = Phaser.Math.Distance.Between(x, y, 500, 100);
+                return Math.max(0, Math.round((distance - 90) * 0.7)); // Distance to green edge
+            }
+            
+            determineLie(x, y) {
+                return this.getTileType(x, y);
+            }
+            
+            showDistanceLines() {
+                // Clear previous lines
+                this.distanceLines.clear();
+                
+                const ballX = this.ball.x;
+                const ballY = this.ball.y;
+                
+                // Line to pin
+                this.distanceLines.lineStyle(2, 0xFF5722, 0.8);
+                this.distanceLines.lineBetween(ballX, ballY, 500, 100);
+                
+                // Line to green edge
+                const greenEdgeAngle = Phaser.Math.Angle.Between(ballX, ballY, 500, 100);
+                const greenEdgeX = 500 - Math.cos(greenEdgeAngle) * 90;
+                const greenEdgeY = 100 - Math.sin(greenEdgeAngle) * 90;
+                
+                this.distanceLines.lineStyle(2, 0x4CAF50, 0.6);
+                this.distanceLines.lineBetween(ballX, ballY, greenEdgeX, greenEdgeY);
+                
+                // Distance text
+                const pinDistance = this.calculateDistanceToPin(ballX, ballY);
+                const greenDistance = this.calculateDistanceToGreen(ballX, ballY);
+                
+                const midX = (ballX + 500) / 2;
+                const midY = (ballY + 100) / 2;
+                
+                // Clear previous distance texts
+                this.distanceTexts.forEach(text => text.destroy());
+                this.distanceTexts = [];
+                
+                // Pin distance text
+                const pinText = this.add.text(midX, midY - 10, `${pinDistance}y to pin`, {
+                    fontSize: '14px',
+                    fill: '#FF5722',
+                    backgroundColor: 'rgba(255,255,255,0.9)',
+                    padding: { x: 4, y: 2 },
+                    fontWeight: 'bold'
+                }).setOrigin(0.5);
+                
+                this.distanceTexts.push(pinText);
+                
+                if (greenDistance > 0) {
+                    const greenText = this.add.text(midX, midY + 15, `${greenDistance}y to green`, {
+                        fontSize: '12px',
+                        fill: '#4CAF50',
+                        backgroundColor: 'rgba(255,255,255,0.9)',
+                        padding: { x: 4, y: 2 },
+                        fontWeight: 'bold'
+                    }).setOrigin(0.5);
+                    
+                    this.distanceTexts.push(greenText);
+                }
+                
+                // Fade out distance lines after 3 seconds
+                this.time.delayedCall(3000, () => {
+                    this.distanceLines.clear();
+                    this.distanceTexts.forEach(text => {
+                        this.tweens.add({
+                            targets: text,
+                            alpha: 0,
+                            duration: 1000,
+                            onComplete: () => text.destroy()
+                        });
+                    });
+                    this.distanceTexts = [];
+                });
+            }
+            
+            updateDistanceDisplay() {
+                const ballX = this.ball.x;
+                const ballY = this.ball.y;
+                
+                document.getElementById('distanceToPin').textContent = 
+                    `To Pin: ${this.calculateDistanceToPin(ballX, ballY)}y`;
+                document.getElementById('distanceToGreen').textContent = 
+                    `To Green: ${this.calculateDistanceToGreen(ballX, ballY)}y`;
+                document.getElementById('currentLie').textContent = 
+                    `Lie: ${gameState.currentLie.charAt(0).toUpperCase() + gameState.currentLie.slice(1)}`;
+                document.getElementById('ballCoords').textContent = 
+                    `Ball: ${Math.round(ballX)}, ${Math.round(ballY)}`;
+            }
+            
+            takeShot(club) {
+                const clubInfo = clubData[club];
+                const distance = clubInfo.min + Math.random() * (clubInfo.max - clubInfo.min);
+                const accuracy = clubInfo.accuracy;
+                const deviation = (Math.random() - 0.5) * (1 - accuracy) * 100;
+                
+                const currentX = this.ball.x;
+                const currentY = this.ball.y;
+                
+                // Calculate new position
+                const targetY = Math.max(100, currentY - distance * 0.8);
+                const targetX = Math.max(50, Math.min(950, currentX + deviation));
+                
+                this.moveBall(targetX, targetY);
+                
+                gameState.strokeCount++;
+                document.getElementById('strokeCount').textContent = `Strokes: ${gameState.strokeCount}`;
+                
+                return { distance: Math.round(distance), deviation: Math.round(deviation) };
+            }
+        }
+        
+        // Initialize game
+        window.addEventListener('load', () => {
+            console.log('🏌️ Starting Polished Golf Game...');
+            
+            const config = {
+                type: Phaser.AUTO,
+                width: 1000,
+                height: 700,
+                parent: 'gameCanvas',
+                backgroundColor: 0x87CEEB,
+                scene: PolishedGolfScene
+            };
+            
+            game = new Phaser.Game(config);
+            
+            setupControls();
+        });
+        
+        function setupControls() {
+            // Club selection
+            document.querySelectorAll('.club-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    document.querySelectorAll('.club-btn').forEach(b => b.classList.remove('selected'));
+                    btn.classList.add('selected');
+                    gameState.selectedClub = btn.dataset.club;
+                    updateTakeShotButton();
+                });
+            });
+            
+            // Take shot button
+            document.getElementById('takeShotBtn').addEventListener('click', takeShot);
+        }
+        
+        function updateTakeShotButton() {
+            const btn = document.getElementById('takeShotBtn');
+            if (gameState.selectedClub) {
+                btn.disabled = false;
+                btn.textContent = `Take Shot with ${gameState.selectedClub.toUpperCase()}`;
+            } else {
+                btn.disabled = true;
+                btn.textContent = 'Select Club First';
+            }
+        }
+        
+        function takeShot() {
+            if (!gameState.selectedClub || !golfScene) return;
+            
+            const result = golfScene.takeShot(gameState.selectedClub);
+            
+            // Clear selection
+            document.querySelectorAll('.club-btn').forEach(b => b.classList.remove('selected'));
+            gameState.selectedClub = null;
+            updateTakeShotButton();
+            
+            console.log(`Shot result: ${result.distance}y with ${result.deviation}y deviation`);
+        }
+    </script>
+</body>
+</html>

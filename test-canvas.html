@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Canvas Test</title>
+    <script src="https://cdn.jsdelivr.net/npm/phaser@3.80.1/dist/phaser.min.js"></script>
+</head>
+<body>
+    <div id="test-container" style="width: 800px; height: 600px; margin: 20px auto; border: 1px solid #ccc;"></div>
+    
+    <script>
+        console.log('🧪 Testing Phaser canvas creation...');
+        
+        const config = {
+            type: Phaser.WEBGL,
+            width: 800,
+            height: 600,
+            parent: 'test-container',
+            backgroundColor: '#F5F5DC',
+            scene: {
+                create: function() {
+                    console.log('✅ Scene created successfully');
+                    
+                    // Add test shapes
+                    this.add.circle(100, 100, 30, 0xFF0000);
+                    this.add.rectangle(200, 100, 60, 40, 0x00FF00);
+                    
+                    console.log('✅ Test shapes added');
+                }
+            }
+        };
+        
+        try {
+            const game = new Phaser.Game(config);
+            console.log('✅ WEBGL game created successfully');
+        } catch (error) {
+            console.error('❌ WEBGL failed:', error.message);
+            
+            // Try Canvas fallback
+            config.type = Phaser.CANVAS;
+            try {
+                const game = new Phaser.Game(config);
+                console.log('✅ Canvas fallback successful');
+            } catch (canvasError) {
+                console.error('❌ Canvas fallback failed:', canvasError.message);
+            }
+        }
+    </script>
+</body>
+</html>

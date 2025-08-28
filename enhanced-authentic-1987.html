@@ -1,0 +1,612 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>In Pursuit of Par - Enhanced 1987 Authentic Recreation</title>
+    
+    <!-- Load 1987 Authentic Styles -->
+    <link rel="stylesheet" href="1987-authentic-colors.css">
+    <link rel="stylesheet" href="1987-typography-layout.css">
+    <link rel="stylesheet" href="1987-interactions.css">
+    <link rel="stylesheet" href="1987-responsive.css">
+    
+    <style>
+        /* Integration styles to combine all 1987 enhancements */
+        body {
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+        }
+        
+        /* Apply 1987 mode by default */
+        .enhanced-1987-game {
+            /* This class triggers all our 1987 authentic styling */
+        }
+    </style>
+</head>
+<body class="vintage-1987 authentic-1987-mode">
+    <div class="enhanced-1987-game">
+        <!-- 1987 Authentic Game Header -->
+        <div class="course-info-1987">
+            <div class="course-name">"In Pursuit of Par"</div>
+            <div class="course-subtitle">Authentic 1987 Board Game Recreation</div>
+        </div>
+
+        <!-- Main Game Layout -->
+        <div class="game-layout-1987">
+            <!-- Golf Course Board -->
+            <div class="course-area course-area-1987">
+                <div class="golf-course-1987">
+                    <!-- Hole Information -->
+                    <div class="hole-info-1987">
+                        <div class="hole-number" id="holeNumber">1</div>
+                        <div class="hole-par">Par <span id="holePar">4</span></div>
+                        <div class="hole-yardage"><span id="holeYardage">394</span> Yards</div>
+                    </div>
+                    
+                    <!-- Current Lie Indicator -->
+                    <div class="lie-indicator-1987 tee" id="lieIndicator">
+                        TEE BOX
+                    </div>
+                    
+                    <!-- Golf Course Elements -->
+                    <div class="tee-box-1987" style="position: absolute; bottom: 30px; left: 50%; transform: translateX(-50%); width: 100px; height: 50px; display: flex; align-items: center; justify-content: center;">
+                        TEE
+                    </div>
+                    
+                    <!-- Fairway -->
+                    <div style="position: absolute; bottom: 100px; left: 50%; transform: translateX(-50%); width: 120px; height: 350px; background: linear-gradient(180deg, var(--vintage-green-light) 0%, var(--vintage-green) 50%, var(--vintage-green-dark) 100%); border-radius: 60px; border: var(--vintage-border);"></div>
+                    
+                    <!-- Rough Areas -->
+                    <div style="position: absolute; bottom: 100px; left: 15%; width: 80px; height: 350px; background: var(--vintage-green-dark); border-radius: 40px; border: var(--vintage-border-light);"></div>
+                    <div style="position: absolute; bottom: 100px; right: 15%; width: 80px; height: 350px; background: var(--vintage-green-dark); border-radius: 40px; border: var(--vintage-border-light);"></div>
+                    
+                    <!-- Water Hazard -->
+                    <div class="water-hazard-1987 hazard-1987" style="position: absolute; left: 25%; bottom: 250px; width: 50%; height: 60px; border-radius: 30px;"></div>
+                    
+                    <!-- Sand Traps -->
+                    <div class="sand-trap-1987 hazard-1987" style="position: absolute; left: 20%; bottom: 180px; width: 40px; height: 50px; border-radius: 20px;"></div>
+                    <div class="sand-trap-1987 hazard-1987" style="position: absolute; right: 20%; bottom: 200px; width: 45px; height: 40px; border-radius: 20px;"></div>
+                    
+                    <!-- Putting Green -->
+                    <div style="position: absolute; top: 40px; left: 50%; transform: translateX(-50%); width: 100px; height: 100px; background: radial-gradient(circle, var(--vintage-green-light) 0%, var(--vintage-green) 70%, var(--vintage-green-dark) 100%); border-radius: 50px; border: var(--vintage-border); display: flex; align-items: center; justify-content: center;">
+                        <!-- Hole and Flag -->
+                        <div style="width: 16px; height: 16px; background: #000; border-radius: 50%; position: relative;">
+                            <!-- Flag -->
+                            <div style="position: absolute; top: -30px; left: 50%; transform: translateX(-50%); width: 2px; height: 30px; background: var(--vintage-brown);"></div>
+                            <div style="position: absolute; top: -28px; left: 2px; width: 16px; height: 8px; background: var(--vintage-red); border-radius: 0 2px 2px 0;"></div>
+                        </div>
+                    </div>
+                    
+                    <!-- Golf Ball -->
+                    <div class="golf-ball-1987" id="golfBall" style="bottom: 55px; left: 50%; transform: translateX(-50%);"></div>
+                </div>
+            </div>
+
+            <!-- Control Panel -->
+            <div class="control-panel control-panel-1987">
+                <!-- Game Status -->
+                <div class="control-section-1987">
+                    <div class="section-title">Game Status</div>
+                    <div class="status-board-1987">
+                        <div class="status-row">
+                            <span class="status-label">Strokes</span>
+                            <span class="status-value" id="strokeCount">0</span>
+                        </div>
+                        <div class="status-row">
+                            <span class="status-label">Distance</span>
+                            <span class="status-value" id="distanceToPin">394y</span>
+                        </div>
+                        <div class="status-row">
+                            <span class="status-label">Score</span>
+                            <span class="status-value" id="scoreDisplay">E</span>
+                        </div>
+                        <div class="status-row">
+                            <span class="status-label">Lie</span>
+                            <span class="status-value" id="currentLie">Tee</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Authentic Shot Schedule -->
+                <div class="control-section-1987">
+                    <div class="section-title">Wood Shot Schedule</div>
+                    <div class="shot-schedule-container-1987">
+                        <div class="shot-schedule-title-1987">Distance Chart (Yards)</div>
+                        <table class="shot-schedule-1987">
+                            <thead>
+                                <tr>
+                                    <th>Dice</th>
+                                    <th>Driver</th>
+                                    <th>3-Wood</th>
+                                    <th>5-Wood</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr><td>1</td><td>200</td><td>180</td><td>160</td></tr>
+                                <tr><td>2</td><td>210</td><td>190</td><td>170</td></tr>
+                                <tr><td>3</td><td>220</td><td>200</td><td>180</td></tr>
+                                <tr><td>4</td><td>230</td><td>210</td><td>190</td></tr>
+                                <tr><td>5</td><td>240</td><td>220</td><td>200</td></tr>
+                                <tr><td>6</td><td>250</td><td>230</td><td>210</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Club Selection -->
+                <div class="control-section-1987">
+                    <div class="section-title">Club Selection</div>
+                    <div class="club-grid-1987">
+                        <div class="club-card-1987-interactive selected" data-club="driver">
+                            <div class="text-1987-body">DRIVER</div>
+                            <div style="font-size: 0.8rem; color: var(--vintage-text-medium);">Wood</div>
+                        </div>
+                        <div class="club-card-1987-interactive" data-club="3wood">
+                            <div class="text-1987-body">3-WOOD</div>
+                            <div style="font-size: 0.8rem; color: var(--vintage-text-medium);">Wood</div>
+                        </div>
+                        <div class="club-card-1987-interactive" data-club="5iron">
+                            <div class="text-1987-body">5-IRON</div>
+                            <div style="font-size: 0.8rem; color: var(--vintage-text-medium);">Iron</div>
+                        </div>
+                        <div class="club-card-1987-interactive" data-club="7iron">
+                            <div class="text-1987-body">7-IRON</div>
+                            <div style="font-size: 0.8rem; color: var(--vintage-text-medium);">Iron</div>
+                        </div>
+                        <div class="club-card-1987-interactive" data-club="9iron">
+                            <div class="text-1987-body">9-IRON</div>
+                            <div style="font-size: 0.8rem; color: var(--vintage-text-medium);">Iron</div>
+                        </div>
+                        <div class="club-card-1987-interactive" data-club="wedge">
+                            <div class="text-1987-body">WEDGE</div>
+                            <div style="font-size: 0.8rem; color: var(--vintage-text-medium);">Wedge</div>
+                        </div>
+                        <div class="club-card-1987-interactive" data-club="sand">
+                            <div class="text-1987-body">SAND</div>
+                            <div style="font-size: 0.8rem; color: var(--vintage-text-medium);">Sand</div>
+                        </div>
+                        <div class="club-card-1987-interactive" data-club="putter">
+                            <div class="text-1987-body">PUTTER</div>
+                            <div style="font-size: 0.8rem; color: var(--vintage-text-medium);">Putt</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Authentic Dice System -->
+                <div class="control-section-1987">
+                    <div class="section-title">Dice Roll</div>
+                    <div class="dice-container-1987">
+                        <div style="text-align: center;">
+                            <div class="dice-1987" id="distanceDie">?</div>
+                            <div class="dice-label-1987">Distance</div>
+                        </div>
+                        <div style="text-align: center;">
+                            <div class="dice-1987" id="directionDie">?</div>
+                            <div class="dice-label-1987">Direction</div>
+                        </div>
+                        <div style="text-align: center; display: none;" id="problemDiceContainer">
+                            <div class="dice-1987 problem" id="problemDie">?</div>
+                            <div class="dice-label-1987">Problem</div>
+                        </div>
+                    </div>
+                    <div style="text-align: center; font-size: 0.75rem; color: var(--vintage-text-medium); margin-top: 0.5rem; font-family: var(--font-1987-primary);">
+                        Distance (6-sided) | Direction (12-sided)<br>
+                        Problem Die appears in rough/sand
+                    </div>
+                </div>
+
+                <!-- Take Shot Button -->
+                <button id="takeShotBtn" class="button-1987">
+                    <span class="button-text-1987">Take Shot</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- Shot Result Popup -->
+        <div id="shotResult" class="shot-result-1987">
+            <div class="result-title" id="resultTitle">Shot Result</div>
+            <div class="result-details" id="resultDetails">Select a club and take your shot!</div>
+        </div>
+    </div>
+
+    <script>
+        // Enhanced 1987 Authentic Game State
+        const gameState = {
+            currentHole: 1,
+            strokes: 0,
+            distanceToPin: 394,
+            ballPosition: { x: 50, y: 8 }, // Percentage from left/bottom
+            lie: 'tee',
+            selectedClub: 'driver'
+        };
+
+        // TPC Sawgrass Holes (1987 Original Data)
+        const holes = [
+            { number: 1, par: 4, yardage: 394 },
+            { number: 2, par: 5, yardage: 532 },
+            { number: 3, par: 3, yardage: 177 },
+            { number: 4, par: 4, yardage: 384 },
+            { number: 5, par: 4, yardage: 466 },
+            { number: 6, par: 4, yardage: 393 },
+            { number: 7, par: 4, yardage: 442 },
+            { number: 8, par: 5, yardage: 537 },
+            { number: 9, par: 4, yardage: 440 },
+            { number: 10, par: 4, yardage: 424 },
+            { number: 11, par: 5, yardage: 535 },
+            { number: 12, par: 4, yardage: 358 },
+            { number: 13, par: 3, yardage: 181 },
+            { number: 14, par: 4, yardage: 467 },
+            { number: 15, par: 4, yardage: 449 },
+            { number: 16, par: 5, yardage: 507 },
+            { number: 17, par: 3, yardage: 137 },
+            { number: 18, par: 4, yardage: 447 }
+        ];
+
+        // Authentic 1987 Shot Schedules
+        const shotSchedules = {
+            woods: {
+                driver: [200, 210, 220, 230, 240, 250],
+                '3wood': [180, 190, 200, 210, 220, 230],
+                '5wood': [160, 170, 180, 190, 200, 210]
+            },
+            irons: {
+                '3iron': [165, 175, 185, 195, 205, 215],
+                '4iron': [155, 165, 175, 185, 195, 205],
+                '5iron': [145, 155, 165, 175, 185, 195],
+                '6iron': [135, 145, 155, 165, 175, 185],
+                '7iron': [125, 135, 145, 155, 165, 175],
+                '8iron': [115, 125, 135, 145, 155, 165],
+                '9iron': [105, 115, 125, 135, 145, 155]
+            },
+            wedges: {
+                wedge: [90, 95, 100, 105, 110, 115],
+                sand: [70, 75, 80, 85, 90, 95]
+            },
+            putts: {
+                putter: [2, 4, 6, 8, 6, 4] // Authentic putting from original
+            }
+        };
+
+        // Club Selection with 1987 Authentic Feel
+        document.querySelectorAll('.club-card-1987-interactive').forEach(card => {
+            card.addEventListener('click', () => {
+                // Remove selected class from all clubs
+                document.querySelectorAll('.club-card-1987-interactive').forEach(c => c.classList.remove('selected'));
+                // Add selected class to clicked club
+                card.classList.add('selected');
+                gameState.selectedClub = card.dataset.club;
+                
+                // Update available clubs based on lie (authentic 1987 restrictions)
+                updateClubAvailability();
+                
+                console.log(`Selected: ${gameState.selectedClub}`);
+            });
+        });
+
+        // Take Shot Function - Enhanced 1987 Authentic
+        document.getElementById('takeShotBtn').addEventListener('click', takeShot);
+
+        function takeShot() {
+            const shotBtn = document.getElementById('takeShotBtn');
+            shotBtn.disabled = true;
+            shotBtn.classList.add('disabled-1987');
+            
+            // Authentic 1987 dice roll with chunky animation
+            const distanceRoll = Math.floor(Math.random() * 6) + 1;
+            const directionRoll = Math.floor(Math.random() * 12) + 1;
+            let problemRoll = null;
+            
+            // Problem die only for rough/sand (authentic rules)
+            if (gameState.lie === 'rough' || gameState.lie === 'sand') {
+                problemRoll = Math.floor(Math.random() * 6) + 1;
+                document.getElementById('problemDiceContainer').style.display = 'block';
+                const problemDie = document.getElementById('problemDie');
+                problemDie.classList.add('rolling');
+                setTimeout(() => {
+                    problemDie.textContent = problemRoll;
+                    problemDie.classList.remove('rolling');
+                }, 1000);
+            } else {
+                document.getElementById('problemDiceContainer').style.display = 'none';
+            }
+
+            // Animate dice with 1987 chunky style
+            const distanceDie = document.getElementById('distanceDie');
+            const directionDieEl = document.getElementById('directionDie');
+            
+            distanceDie.classList.add('rolling');
+            directionDieEl.classList.add('rolling');
+            
+            // Show results after animation
+            setTimeout(() => {
+                distanceDie.textContent = distanceRoll;
+                directionDieEl.textContent = directionRoll;
+                distanceDie.classList.remove('rolling');
+                directionDieEl.classList.remove('rolling');
+                
+                // Calculate shot using authentic 1987 mechanics
+                const shotDistance = calculateShotDistance(gameState.selectedClub, distanceRoll, problemRoll);
+                const direction = calculateDirection(directionRoll);
+                
+                // Update game state
+                gameState.strokes++;
+                gameState.distanceToPin = Math.max(0, gameState.distanceToPin - shotDistance);
+                
+                // Update ball position with 1987 authentic movement
+                updateBallPosition(direction, shotDistance);
+                determineLie();
+                
+                // Display results with 1987 style popup
+                displayShotResult(shotDistance, direction, problemRoll);
+                updateDisplay();
+                
+                // Re-enable button
+                setTimeout(() => {
+                    shotBtn.disabled = false;
+                    shotBtn.classList.remove('disabled-1987');
+                }, 2000);
+                
+                // Check for hole completion
+                if (gameState.distanceToPin <= 3 && (gameState.lie === 'green' || gameState.distanceToPin === 0)) {
+                    setTimeout(completeHole, 2500);
+                }
+            }, 1200);
+        }
+
+        function calculateShotDistance(club, diceRoll, problemRoll) {
+            let baseDistance = 0;
+            const rollIndex = diceRoll - 1;
+            
+            // Get base distance from authentic 1987 schedules
+            if (shotSchedules.woods[club]) {
+                baseDistance = shotSchedules.woods[club][rollIndex];
+            } else if (shotSchedules.irons[club]) {
+                baseDistance = shotSchedules.irons[club][rollIndex];
+            } else if (shotSchedules.wedges[club]) {
+                baseDistance = shotSchedules.wedges[club][rollIndex];
+            } else if (shotSchedules.putts[club]) {
+                baseDistance = shotSchedules.putts[club][rollIndex];
+            } else {
+                // Fallback for unlisted clubs
+                baseDistance = 100 + (diceRoll * 15);
+            }
+            
+            // Apply authentic problem die penalties
+            if (problemRoll) {
+                if (gameState.lie === 'rough') {
+                    baseDistance *= 0.8; // 20% reduction in rough
+                } else if (gameState.lie === 'sand') {
+                    baseDistance *= 0.6; // 40% reduction in sand
+                }
+            }
+            
+            return Math.round(baseDistance);
+        }
+
+        function calculateDirection(directionRoll) {
+            // Authentic 12-sided direction die (1987 original rules)
+            if (directionRoll <= 4) return 'left';
+            if (directionRoll >= 9) return 'right';
+            return 'straight';
+        }
+
+        function updateBallPosition(direction, distance) {
+            const ball = document.getElementById('golfBall');
+            ball.classList.add('moving');
+            
+            const progress = 1 - (gameState.distanceToPin / holes[gameState.currentHole - 1].yardage);
+            
+            // Calculate new position with 1987 authentic movement
+            let newX = gameState.ballPosition.x;
+            if (direction === 'left') {
+                newX = Math.max(20, newX - (Math.random() * 25));
+            } else if (direction === 'right') {
+                newX = Math.min(80, newX + (Math.random() * 25));
+            }
+            
+            const newY = 8 + (progress * 75); // Scale to course height
+            
+            gameState.ballPosition = { x: newX, y: newY };
+            
+            // Move ball with chunky 1987 animation
+            setTimeout(() => {
+                ball.style.left = newX + '%';
+                ball.style.bottom = newY + '%';
+                ball.classList.remove('moving');
+            }, 500);
+        }
+
+        function determineLie() {
+            const { x, y } = gameState.ballPosition;
+            
+            if (gameState.distanceToPin === 0) {
+                gameState.lie = 'holed';
+            } else if (gameState.distanceToPin <= 25) {
+                gameState.lie = 'green';
+            } else if (y > 35 && y < 65 && Math.abs(x - 50) < 25) {
+                // Check for water hazard
+                if (Math.random() < 0.25) {
+                    gameState.lie = 'water';
+                } else {
+                    gameState.lie = 'fairway';
+                }
+            } else if ((Math.abs(x - 25) < 15 || Math.abs(x - 75) < 15) && Math.random() < 0.2) {
+                gameState.lie = 'sand';
+            } else if (Math.abs(x - 50) > 25) {
+                gameState.lie = 'rough';
+            } else {
+                gameState.lie = 'fairway';
+            }
+            
+            updateLieIndicator();
+            updateClubAvailability();
+        }
+
+        function updateLieIndicator() {
+            const indicator = document.getElementById('lieIndicator');
+            const lieClasses = {
+                'tee': 'tee',
+                'fairway': 'fairway',
+                'rough': 'rough',
+                'green': 'green',
+                'sand': 'sand',
+                'water': 'water',
+                'holed': 'green'
+            };
+            
+            const lieTexts = {
+                'tee': 'TEE BOX',
+                'fairway': 'FAIRWAY',
+                'rough': 'ROUGH',
+                'green': 'GREEN',
+                'sand': 'SAND TRAP',
+                'water': 'WATER HAZARD',
+                'holed': 'HOLED OUT!'
+            };
+            
+            indicator.className = `lie-indicator-1987 ${lieClasses[gameState.lie]}`;
+            indicator.textContent = lieTexts[gameState.lie];
+        }
+
+        function updateClubAvailability() {
+            // Authentic 1987 club restrictions based on lie
+            const clubs = document.querySelectorAll('.club-card-1987-interactive');
+            
+            clubs.forEach(club => {
+                const clubType = club.dataset.club;
+                let available = true;
+                
+                // Apply authentic 1987 restrictions
+                switch(gameState.lie) {
+                    case 'tee':
+                        available = true; // All clubs available from tee
+                        break;
+                    case 'fairway':
+                        available = clubType !== 'driver'; // No driver from fairway
+                        break;
+                    case 'rough':
+                        available = ['5iron', '7iron', '9iron', 'wedge', 'putter'].includes(clubType);
+                        break;
+                    case 'sand':
+                        available = ['sand', 'wedge', 'putter'].includes(clubType);
+                        break;
+                    case 'green':
+                        available = clubType === 'putter'; // Only putter on green
+                        break;
+                    case 'water':
+                        available = false; // Must take penalty and drop
+                        break;
+                }
+                
+                if (!available) {
+                    club.classList.add('disabled-1987');
+                    club.style.pointerEvents = 'none';
+                } else {
+                    club.classList.remove('disabled-1987');
+                    club.style.pointerEvents = 'auto';
+                }
+            });
+        }
+
+        function displayShotResult(distance, direction, problemRoll) {
+            const resultDiv = document.getElementById('shotResult');
+            const titleDiv = document.getElementById('resultTitle');
+            const detailsDiv = document.getElementById('resultDetails');
+            
+            let directionText = direction.toUpperCase();
+            if (direction === 'left') directionText += ' HOOK';
+            if (direction === 'right') directionText += ' SLICE';
+            
+            let problemText = problemRoll ? ` (Problem: ${problemRoll})` : '';
+            
+            titleDiv.textContent = 'SHOT RESULT';
+            detailsDiv.innerHTML = `
+                <strong>Club:</strong> ${gameState.selectedClub.toUpperCase()}<br>
+                <strong>Distance:</strong> <span class="result-distance">${distance} yards</span><br>
+                <strong>Direction:</strong> ${directionText}${problemText}<br>
+                <strong>Distance to Pin:</strong> ${gameState.distanceToPin} yards<br>
+                <strong>Ball Lie:</strong> ${gameState.lie.toUpperCase()}
+            `;
+            
+            resultDiv.classList.add('show');
+            
+            // Hide after 3 seconds
+            setTimeout(() => {
+                resultDiv.classList.remove('show');
+            }, 3000);
+        }
+
+        function updateDisplay() {
+            document.getElementById('strokeCount').textContent = gameState.strokes;
+            document.getElementById('distanceToPin').textContent = gameState.distanceToPin + 'y';
+            document.getElementById('currentLie').textContent = gameState.lie.charAt(0).toUpperCase() + gameState.lie.slice(1);
+            
+            const hole = holes[gameState.currentHole - 1];
+            const scoreToPar = gameState.strokes - hole.par;
+            let scoreText = 'E';
+            if (scoreToPar > 0) scoreText = '+' + scoreToPar;
+            else if (scoreToPar < 0) scoreText = scoreToPar;
+            document.getElementById('scoreDisplay').textContent = scoreText;
+        }
+
+        function completeHole() {
+            const hole = holes[gameState.currentHole - 1];
+            const scoreToPar = gameState.strokes - hole.par;
+            
+            let scoreText = 'Par';
+            if (scoreToPar === -2) scoreText = 'Eagle';
+            else if (scoreToPar === -1) scoreText = 'Birdie';
+            else if (scoreToPar === 1) scoreText = 'Bogey';
+            else if (scoreToPar >= 2) scoreText = 'Double Bogey+';
+            
+            alert(`🏌️ ${scoreText}!\n\nHole ${gameState.currentHole} completed in ${gameState.strokes} strokes\n(Par ${hole.par})\n\n⛳ Authentic 1987 Board Game Mechanics`);
+            
+            // Advance to next hole or finish round
+            if (gameState.currentHole < 18) {
+                nextHole();
+            } else {
+                alert('🏆 Round Complete!\n\nCongratulations on finishing your round of authentic 1987 golf!');
+                location.reload();
+            }
+        }
+
+        function nextHole() {
+            gameState.currentHole++;
+            gameState.strokes = 0;
+            gameState.distanceToPin = holes[gameState.currentHole - 1].yardage;
+            gameState.lie = 'tee';
+            gameState.ballPosition = { x: 50, y: 8 };
+            
+            // Reset ball position
+            const ball = document.getElementById('golfBall');
+            ball.style.left = '50%';
+            ball.style.bottom = '8%';
+            
+            // Update displays
+            document.getElementById('holeNumber').textContent = gameState.currentHole;
+            document.getElementById('holePar').textContent = holes[gameState.currentHole - 1].par;
+            document.getElementById('holeYardage').textContent = holes[gameState.currentHole - 1].yardage;
+            
+            // Reset dice
+            document.getElementById('distanceDie').textContent = '?';
+            document.getElementById('directionDie').textContent = '?';
+            document.getElementById('problemDiceContainer').style.display = 'none';
+            
+            updateLieIndicator();
+            updateClubAvailability();
+            updateDisplay();
+        }
+
+        // Initialize game with 1987 authentic setup
+        updateLieIndicator();
+        updateClubAvailability();
+        updateDisplay();
+        
+        console.log('🎲 Enhanced 1987 "In Pursuit of Par" loaded successfully!');
+        console.log('🏌️ Authentic board game mechanics active');
+        console.log('📋 All original shot schedules and dice mechanics restored');
+    </script>
+</body>
+</html>

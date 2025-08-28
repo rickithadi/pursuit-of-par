@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>In Pursuit of Par - Direct Start</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="tpc-hole-styles.css">
+</head>
+<body>
+    <div class="enhanced-game-container">
+        <div class="enhanced-header">
+            <h1 class="enhanced-title">🏌️ In Pursuit of Par</h1>
+            <p class="enhanced-subtitle">1987 Board Game Recreation - TPC Sawgrass Stadium Course</p>
+            <div id="gameStatus" style="margin-top: 1rem; padding: 1rem; background: rgba(255,255,255,0.1); border-radius: 8px;">
+                <div>🎯 <strong>Direct Start Mode</strong> - Bypassing complex loading</div>
+                <div id="initStatus">Initializing...</div>
+            </div>
+        </div>
+
+        <div class="enhanced-layout">
+            <div class="main-area">
+                <div class="viewport-3d">
+                    <canvas id="course3DViewport" style="width: 100%; height: 600px; background: linear-gradient(135deg, #87ceeb 0%, #98fb98 100%); border-radius: 8px; display: flex; align-items: center; justify-content: center; color: #1a5f3f; font-size: 1.2rem; font-weight: 600;">
+                        🏌️ TPC Sawgrass Course Visualization
+                    </canvas>
+                </div>
+            </div>
+
+            <div class="enhanced-panel">
+                <!-- TPC Hole Display will be inserted here -->
+                <div id="hole-display-target"></div>
+                
+                <div class="control-group">
+                    <h3>⛳ Game Status</h3>
+                    <div class="status-grid">
+                        <div class="status-item">
+                            <span class="status-label">Hole:</span>
+                            <span id="currentHole">1</span>
+                        </div>
+                        <div class="status-item">
+                            <span class="status-label">Par:</span>
+                            <span id="holePar">4</span>
+                        </div>
+                        <div class="status-item">
+                            <span class="status-label">Strokes:</span>
+                            <span id="currentStrokes">0</span>
+                        </div>
+                        <div class="status-item">
+                            <span class="status-label">Distance:</span>
+                            <span id="distanceToPin3D">394y</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="control-group">
+                    <h3>🏌️ Club Selection</h3>
+                    <div class="club-selection" id="clubSelection">
+                        <div class="club-option selected" data-club="driver">
+                            <div class="club-icon">🏌️</div>
+                            <div class="club-name">Driver</div>
+                            <div class="club-range">200-290y</div>
+                        </div>
+                        <div class="club-option" data-club="iron7">
+                            <div class="club-icon">⚡</div>
+                            <div class="club-name">7 Iron</div>
+                            <div class="club-range">130-160y</div>
+                        </div>
+                        <div class="club-option" data-club="wedge">
+                            <div class="club-icon">🎯</div>
+                            <div class="club-name">Wedge</div>
+                            <div class="club-range">60-100y</div>
+                        </div>
+                        <div class="club-option" data-club="putter">
+                            <div class="club-icon">⛳</div>
+                            <div class="club-name">Putter</div>
+                            <div class="club-range">2-20y</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="control-group">
+                    <div class="shot-controls">
+                        <button id="takeShot3D" class="primary-button">
+                            🎯 Take Shot
+                        </button>
+                    </div>
+                </div>
+
+                <div class="control-group">
+                    <h3>📊 Shot Result</h3>
+                    <div id="shotResult" style="padding: 1rem; background: #f8f9fa; border-radius: 8px; min-height: 60px;">
+                        Select a club and take your first shot!
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Load scripts directly without complex dependency system -->
+    <script src="https://cdn.jsdelivr.net/npm/phaser@3.80.1/dist/phaser.min.js"></script>
+    <script src="authentic-mechanics.js"></script>
+    <script src="board-game-bridge.js"></script>
+    <script src="tpc-hole-data.js"></script>
+    <script src="hole-display-system.js"></script>
+    <script src="phaser-engine.js"></script>
+    
+    <script>
+        // Simple direct initialization
+        document.getElementById('initStatus').textContent = 'Loading scripts...';
+        
+        // Wait a moment for scripts to load, then initialize
+        setTimeout(() => {
+            document.getElementById('initStatus').textContent = 'Initializing game engine...';
+            
+            try {
+                // Check if classes are available
+                if (typeof PhaserBoardGameEngine === 'undefined') {
+                    throw new Error('PhaserBoardGameEngine not loaded');
+                }
+                
+                // Initialize game engine
+                window.phaserEngine = new PhaserBoardGameEngine();
+                document.getElementById('initStatus').textContent = 'Game engine created ✓';
+                
+                // Initialize systems
+                if (window.phaserEngine.initializeGameSystems) {
+                    window.phaserEngine.initializeGameSystems();
+                    document.getElementById('initStatus').textContent = 'Game systems initialized ✓';
+                }
+                
+                // Initialize TPC hole display
+                if (typeof TPCHoleData !== 'undefined' && typeof TPCHoleDisplaySystem !== 'undefined') {
+                    const holeData = new TPCHoleData();
+                    const holeDisplay = new TPCHoleDisplaySystem(window.phaserEngine, holeData);
+                    window.tpcHoleDisplay = holeDisplay;
+                    document.getElementById('initStatus').textContent = 'TPC hole system ready ✓';
+                }
+                
+                // Setup basic UI
+                setupBasicUI();
+                
+                document.getElementById('initStatus').innerHTML = '<span style="color: #10b981; font-weight: bold;">🎉 Ready to play!</span>';
+                
+            } catch (error) {
+                console.error('Direct initialization failed:', error);
+                document.getElementById('initStatus').innerHTML = `<span style="color: #dc2626;">❌ Error: ${error.message}</span>`;
+                
+                // Setup minimal fallback
+                setupMinimalGame();
+            }
+        }, 2000);
+        
+        function setupBasicUI() {
+            // Club selection
+            const clubOptions = document.querySelectorAll('.club-option');
+            clubOptions.forEach(club => {
+                club.addEventListener('click', () => {
+                    clubOptions.forEach(c => c.classList.remove('selected'));
+                    club.classList.add('selected');
+                    console.log(`Selected: ${club.dataset.club}`);
+                });
+            });
+            
+            // Shot button
+            document.getElementById('takeShot3D').addEventListener('click', () => {
+                const selectedClub = document.querySelector('.club-option.selected');
+                if (selectedClub && window.phaserEngine && window.phaserEngine.takeShot) {
+                    window.phaserEngine.takeShot();
+                } else {
+                    // Fallback shot simulation
+                    simulateShot(selectedClub?.dataset.club || 'driver');
+                }
+            });
+        }
+        
+        function setupMinimalGame() {
+            document.getElementById('initStatus').innerHTML = '<span style="color: #f59e0b;">⚠️ Minimal mode - Basic shot simulation</span>';
+            
+            // Setup minimal UI even if full engine failed
+            setupBasicUI();
+            
+            window.gameState = {
+                hole: 1,
+                strokes: 0,
+                distanceToPin: 394,
+                lie: 'tee'
+            };
+        }
+        
+        function simulateShot(club) {
+            const shotResult = document.getElementById('shotResult');
+            const distance = Math.floor(Math.random() * 200) + 50;
+            const direction = ['straight', 'left', 'right'][Math.floor(Math.random() * 3)];
+            
+            window.gameState.strokes++;
+            window.gameState.distanceToPin = Math.max(0, window.gameState.distanceToPin - distance);
+            
+            shotResult.innerHTML = `
+                <div><strong>Shot Result:</strong></div>
+                <div>Club: ${club} | Distance: ${distance}y | Direction: ${direction}</div>
+                <div>Distance to pin: ${window.gameState.distanceToPin}y</div>
+                <div>Strokes: ${window.gameState.strokes}</div>
+            `;
+            
+            // Update display
+            document.getElementById('currentStrokes').textContent = window.gameState.strokes;
+            document.getElementById('distanceToPin3D').textContent = window.gameState.distanceToPin + 'y';
+            
+            if (window.gameState.distanceToPin <= 3) {
+                shotResult.innerHTML += '<div style="color: #10b981; font-weight: bold; margin-top: 0.5rem;">🎉 HOLED OUT!</div>';
+                setTimeout(() => {
+                    alert(`Hole ${window.gameState.hole} completed in ${window.gameState.strokes} strokes!`);
+                    // Reset for next hole
+                    window.gameState.hole++;
+                    window.gameState.strokes = 0;
+                    window.gameState.distanceToPin = 400;
+                    document.getElementById('currentHole').textContent = window.gameState.hole;
+                    document.getElementById('currentStrokes').textContent = '0';
+                    document.getElementById('distanceToPin3D').textContent = '400y';
+                }, 1000);
+            }
+        }
+    </script>
+</body>
+</html>

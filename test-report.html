@@ -1,0 +1,296 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Golf Game Test Report</title>
+    <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif; margin: 0; background: #f5f7fa; }
+        .container { max-width: 1200px; margin: 0 auto; padding: 20px; }
+        .header { background: linear-gradient(135deg, #4CAF50, #2E7D32); color: white; padding: 30px; border-radius: 12px; margin-bottom: 30px; }
+        .summary { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin-bottom: 30px; }
+        .metric { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        .metric-value { font-size: 2rem; font-weight: 700; color: #4CAF50; }
+        .metric-label { color: #666; font-size: 0.9rem; text-transform: uppercase; }
+        .test-results { background: white; padding: 30px; border-radius: 12px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); margin-bottom: 30px; }
+        .test-item { display: flex; align-items: center; padding: 10px; border-bottom: 1px solid #eee; }
+        .test-status { width: 60px; text-align: center; font-weight: 600; }
+        .pass { color: #4CAF50; }
+        .fail { color: #F44336; }
+        .error { color: #FF9800; }
+        .screenshots { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 20px; }
+        .screenshot { background: white; padding: 15px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        .screenshot img { width: 100%; border-radius: 4px; }
+        .performance { background: white; padding: 30px; border-radius: 12px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); margin-bottom: 30px; }
+        .perf-metric { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #eee; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🎲 Golf Game Test Report</h1>
+            <p>Phaser.js Engine with Colonist.io-inspired Aesthetics</p>
+            <p>Generated: 26/08/2025, 3:50:26 pm</p>
+        </div>
+        
+        <div class="summary">
+            <div class="metric">
+                <div class="metric-value">15</div>
+                <div class="metric-label">Total Tests</div>
+            </div>
+            <div class="metric">
+                <div class="metric-value">66.7%</div>
+                <div class="metric-label">Pass Rate</div>
+            </div>
+            <div class="metric">
+                <div class="metric-value">10</div>
+                <div class="metric-label">Passed</div>
+            </div>
+            <div class="metric">
+                <div class="metric-value">5</div>
+                <div class="metric-label">Failed</div>
+            </div>
+            <div class="metric">
+                <div class="metric-value">8</div>
+                <div class="metric-label">Screenshots</div>
+            </div>
+        </div>
+        
+        <div class="test-results">
+            <h2>Test Results</h2>
+            
+                <div class="test-item">
+                    <div class="test-status pass">PASS</div>
+                    <div style="flex: 1;">
+                        <div style="font-weight: 600;">Header exists</div>
+                        <div style="color: #666; font-size: 0.9rem;">Element found</div>
+                    </div>
+                </div>
+            
+                <div class="test-item">
+                    <div class="test-status pass">PASS</div>
+                    <div style="flex: 1;">
+                        <div style="font-weight: 600;">Game title present</div>
+                        <div style="color: #666; font-size: 0.9rem;">Element found</div>
+                    </div>
+                </div>
+            
+                <div class="test-item">
+                    <div class="test-status pass">PASS</div>
+                    <div style="flex: 1;">
+                        <div style="font-weight: 600;">3D viewport container exists</div>
+                        <div style="color: #666; font-size: 0.9rem;">Element found</div>
+                    </div>
+                </div>
+            
+                <div class="test-item">
+                    <div class="test-status pass">PASS</div>
+                    <div style="flex: 1;">
+                        <div style="font-weight: 600;">Control panel exists</div>
+                        <div style="color: #666; font-size: 0.9rem;">Element found</div>
+                    </div>
+                </div>
+            
+                <div class="test-item">
+                    <div class="test-status pass">PASS</div>
+                    <div style="flex: 1;">
+                        <div style="font-weight: 600;">Club selector present</div>
+                        <div style="color: #666; font-size: 0.9rem;">Element found</div>
+                    </div>
+                </div>
+            
+                <div class="test-item">
+                    <div class="test-status pass">PASS</div>
+                    <div style="flex: 1;">
+                        <div style="font-weight: 600;">Dice display present</div>
+                        <div style="color: #666; font-size: 0.9rem;">Element found</div>
+                    </div>
+                </div>
+            
+                <div class="test-item">
+                    <div class="test-status pass">PASS</div>
+                    <div style="flex: 1;">
+                        <div style="font-weight: 600;">Shot button exists</div>
+                        <div style="color: #666; font-size: 0.9rem;">Element found</div>
+                    </div>
+                </div>
+            
+                <div class="test-item">
+                    <div class="test-status pass">PASS</div>
+                    <div style="flex: 1;">
+                        <div style="font-weight: 600;">Phaser library loaded</div>
+                        <div style="color: #666; font-size: 0.9rem;">Test passed</div>
+                    </div>
+                </div>
+            
+                <div class="test-item">
+                    <div class="test-status fail">FAIL</div>
+                    <div style="flex: 1;">
+                        <div style="font-weight: 600;">PhaserBoardGameEngine class exists</div>
+                        <div style="color: #666; font-size: 0.9rem;">Test failed</div>
+                    </div>
+                </div>
+            
+                <div class="test-item">
+                    <div class="test-status fail">FAIL</div>
+                    <div style="flex: 1;">
+                        <div style="font-weight: 600;">Engine instance created</div>
+                        <div style="color: #666; font-size: 0.9rem;">Test failed</div>
+                    </div>
+                </div>
+            
+                <div class="test-item">
+                    <div class="test-status pass">PASS</div>
+                    <div style="flex: 1;">
+                        <div style="font-weight: 600;">Loading overlay hidden</div>
+                        <div style="color: #666; font-size: 0.9rem;">Test passed</div>
+                    </div>
+                </div>
+            
+                <div class="test-item">
+                    <div class="test-status fail">FAIL</div>
+                    <div style="flex: 1;">
+                        <div style="font-weight: 600;">Club selection: driver</div>
+                        <div style="color: #666; font-size: 0.9rem;">Club selection failed</div>
+                    </div>
+                </div>
+            
+                <div class="test-item">
+                    <div class="test-status fail">FAIL</div>
+                    <div style="flex: 1;">
+                        <div style="font-weight: 600;">Club selection: 3wood</div>
+                        <div style="color: #666; font-size: 0.9rem;">Club selection failed</div>
+                    </div>
+                </div>
+            
+                <div class="test-item">
+                    <div class="test-status fail">FAIL</div>
+                    <div style="flex: 1;">
+                        <div style="font-weight: 600;">Club selection: 5wood</div>
+                        <div style="color: #666; font-size: 0.9rem;">Club selection failed</div>
+                    </div>
+                </div>
+            
+                <div class="test-item">
+                    <div class="test-status pass">PASS</div>
+                    <div style="flex: 1;">
+                        <div style="font-weight: 600;">Dice system functionality</div>
+                        <div style="color: #666; font-size: 0.9rem;">Dice rolled: Green=?
+                                Distance, Direction=?
+                                Direction</div>
+                    </div>
+                </div>
+            
+        </div>
+        
+        
+        <div class="performance">
+            <h2>Performance Metrics</h2>
+            <div class="perf-metric">
+                <span>Page Load Time</span>
+                <span>1312ms</span>
+            </div>
+            <div class="perf-metric">
+                <span>DOM Content Loaded</span>
+                <span>510ms</span>
+            </div>
+            <div class="perf-metric">
+                <span>Load Complete</span>
+                <span>805ms</span>
+            </div>
+            <div class="perf-metric">
+                <span>First Paint</span>
+                <span>576ms</span>
+            </div>
+        </div>
+        
+        
+        <div class="test-results">
+            <h2>Screenshots</h2>
+            <div class="screenshots">
+                
+                    <div class="screenshot">
+                        <h4>01-initial-load</h4>
+                        <p style="font-size: 0.8rem; color: #666;">1756187430182-01-initial-load.png</p>
+                        <p style="font-size: 0.8rem; color: #666;">Taken: 26/08/2025, 3:50:30 pm</p>
+                    </div>
+                
+                    <div class="screenshot">
+                        <h4>02-phaser-engine-loaded</h4>
+                        <p style="font-size: 0.8rem; color: #666;">1756187433768-02-phaser-engine-loaded.png</p>
+                        <p style="font-size: 0.8rem; color: #666;">Taken: 26/08/2025, 3:50:34 pm</p>
+                    </div>
+                
+                    <div class="screenshot">
+                        <h4>03-club-selected-driver</h4>
+                        <p style="font-size: 0.8rem; color: #666;">1756187435221-03-club-selected-driver.png</p>
+                        <p style="font-size: 0.8rem; color: #666;">Taken: 26/08/2025, 3:50:35 pm</p>
+                    </div>
+                
+                    <div class="screenshot">
+                        <h4>05-dice-rolled</h4>
+                        <p style="font-size: 0.8rem; color: #666;">1756187528562-05-dice-rolled.png</p>
+                        <p style="font-size: 0.8rem; color: #666;">Taken: 26/08/2025, 3:52:09 pm</p>
+                    </div>
+                
+                    <div class="screenshot">
+                        <h4>06-responsive-mobile</h4>
+                        <p style="font-size: 0.8rem; color: #666;">1756187530197-06-responsive-mobile.png</p>
+                        <p style="font-size: 0.8rem; color: #666;">Taken: 26/08/2025, 3:52:10 pm</p>
+                    </div>
+                
+                    <div class="screenshot">
+                        <h4>06-responsive-tablet</h4>
+                        <p style="font-size: 0.8rem; color: #666;">1756187531397-06-responsive-tablet.png</p>
+                        <p style="font-size: 0.8rem; color: #666;">Taken: 26/08/2025, 3:52:11 pm</p>
+                    </div>
+                
+                    <div class="screenshot">
+                        <h4>06-responsive-desktop-small</h4>
+                        <p style="font-size: 0.8rem; color: #666;">1756187532785-06-responsive-desktop-small.png</p>
+                        <p style="font-size: 0.8rem; color: #666;">Taken: 26/08/2025, 3:52:13 pm</p>
+                    </div>
+                
+                    <div class="screenshot">
+                        <h4>06-responsive-desktop-large</h4>
+                        <p style="font-size: 0.8rem; color: #666;">1756187534361-06-responsive-desktop-large.png</p>
+                        <p style="font-size: 0.8rem; color: #666;">Taken: 26/08/2025, 3:52:14 pm</p>
+                    </div>
+                
+            </div>
+        </div>
+        
+        
+        <div class="test-results">
+            <h2>JavaScript Errors (3)</h2>
+            
+                <div class="test-item">
+                    <div class="test-status error">WARNING</div>
+                    <div style="flex: 1;">
+                        <div style="font-weight: 600;">[.WebGL-0x11c001c7e00]GL Driver Message (OpenGL, Performance, GL_CLOSE_PATH_NV, High): GPU stall due to ReadPixels</div>
+                        <div style="color: #666; font-size: 0.8rem;">26/08/2025, 3:50:29 pm</div>
+                    </div>
+                </div>
+            
+                <div class="test-item">
+                    <div class="test-status error">PAGEERROR</div>
+                    <div style="flex: 1;">
+                        <div style="font-weight: 600;">Identifier 'AuthenticDiceSystem' has already been declared</div>
+                        <div style="color: #666; font-size: 0.8rem;">26/08/2025, 3:50:29 pm</div>
+                    </div>
+                </div>
+            
+                <div class="test-item">
+                    <div class="test-status error">PAGEERROR</div>
+                    <div style="flex: 1;">
+                        <div style="font-weight: 600;">PhaserBoardGameEngine is not defined</div>
+                        <div style="color: #666; font-size: 0.8rem;">26/08/2025, 3:50:29 pm</div>
+                    </div>
+                </div>
+            
+        </div>
+        
+    </div>
+</body>
+</html>

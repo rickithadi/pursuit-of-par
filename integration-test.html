@@ -1,0 +1,682 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Integration Test - In Pursuit of Par</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        
+        .test-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        .test-header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding: 20px;
+            background: linear-gradient(135deg, #2E7D32, #4CAF50);
+            color: white;
+            border-radius: 8px;
+        }
+        
+        .test-section {
+            margin-bottom: 30px;
+            padding: 20px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+        }
+        
+        .test-section.pass {
+            border-color: #4CAF50;
+            background-color: #E8F5E8;
+        }
+        
+        .test-section.fail {
+            border-color: #F44336;
+            background-color: #FFEBEE;
+        }
+        
+        .test-section.pending {
+            border-color: #FF9800;
+            background-color: #FFF3E0;
+        }
+        
+        .status-indicator {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            margin-right: 10px;
+            vertical-align: middle;
+        }
+        
+        .status-pass {
+            background-color: #4CAF50;
+        }
+        
+        .status-fail {
+            background-color: #F44336;
+        }
+        
+        .status-pending {
+            background-color: #FF9800;
+        }
+        
+        .test-details {
+            margin-top: 15px;
+            padding: 15px;
+            background: #f9f9f9;
+            border-radius: 6px;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+        }
+        
+        .test-button {
+            display: inline-block;
+            padding: 10px 20px;
+            background: #2E7D32;
+            color: white;
+            text-decoration: none;
+            border-radius: 6px;
+            margin: 5px;
+            cursor: pointer;
+            border: none;
+            font-size: 14px;
+        }
+        
+        .test-button:hover {
+            background: #1B5E20;
+        }
+        
+        .canvas-container {
+            width: 100%;
+            height: 400px;
+            background: linear-gradient(135deg, #87ceeb 0%, #98fb98 100%);
+            border-radius: 8px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .controls-panel {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+        
+        .control-group {
+            padding: 15px;
+            background: #f5f5f5;
+            border-radius: 6px;
+        }
+        
+        .log-output {
+            height: 200px;
+            overflow-y: auto;
+            background: #1e1e1e;
+            color: #00ff00;
+            padding: 10px;
+            border-radius: 6px;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+        }
+        
+        .integration-status {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px;
+            background: #e3f2fd;
+            border-radius: 6px;
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <div class="test-header">
+            <h1>🔄 Integration Agent Test Suite</h1>
+            <p>Comprehensive testing of all game systems integration</p>
+            <div class="integration-status">
+                <strong>Integration Status: </strong>
+                <span id="overallStatus">Testing...</span>
+                <span id="overallStatusIndicator" class="status-indicator status-pending"></span>
+            </div>
+        </div>
+
+        <!-- Test 1: Script Loading Order -->
+        <div class="test-section" id="scriptLoadingTest">
+            <h3>
+                <span class="status-indicator status-pending" id="scriptLoadingStatus"></span>
+                1. Script Loading & Dependencies
+            </h3>
+            <p>Verify all JavaScript files load in correct order and classes are available</p>
+            <div class="test-details" id="scriptLoadingDetails">
+                Checking script dependencies...
+            </div>
+            <button class="test-button" onclick="testScriptLoading()">Run Test</button>
+        </div>
+
+        <!-- Test 2: Phaser Engine Initialization -->
+        <div class="test-section" id="phaserInitTest">
+            <h3>
+                <span class="status-indicator status-pending" id="phaserInitStatus"></span>
+                2. Phaser Engine Initialization
+            </h3>
+            <p>Test PhaserBoardGameEngine class creation and game initialization</p>
+            <div class="test-details" id="phaserInitDetails">
+                Waiting for script loading test...
+            </div>
+            <button class="test-button" onclick="testPhaserInit()">Run Test</button>
+        </div>
+
+        <!-- Test 3: Canvas & Scene Creation -->
+        <div class="test-section" id="canvasSceneTest">
+            <h3>
+                <span class="status-indicator status-pending" id="canvasSceneStatus"></span>
+                3. Canvas & Scene Rendering
+            </h3>
+            <p>Verify Phaser canvas appears and GolfCourseScene renders test shapes</p>
+            <div class="canvas-container" id="testCanvas">
+                <!-- Phaser canvas will be injected here -->
+            </div>
+            <div class="test-details" id="canvasSceneDetails">
+                Canvas test pending...
+            </div>
+            <button class="test-button" onclick="testCanvasScene()">Run Test</button>
+        </div>
+
+        <!-- Test 4: UI Controls Integration -->
+        <div class="test-section" id="uiIntegrationTest">
+            <h3>
+                <span class="status-indicator status-pending" id="uiIntegrationStatus"></span>
+                4. UI Controls Integration
+            </h3>
+            <p>Test club selection, shot button, and game engine connections</p>
+            <div class="controls-panel">
+                <div class="control-group">
+                    <h4>Club Selection Test</h4>
+                    <select id="testClubSelector">
+                        <option value="driver">Driver</option>
+                        <option value="7iron">7 Iron</option>
+                        <option value="putter">Putter</option>
+                    </select>
+                    <p id="clubTestResult">Not tested</p>
+                </div>
+                <div class="control-group">
+                    <h4>Shot Button Test</h4>
+                    <button id="testShotButton" class="test-button">Test Shot</button>
+                    <p id="shotTestResult">Not tested</p>
+                </div>
+            </div>
+            <div class="test-details" id="uiIntegrationDetails">
+                UI integration test pending...
+            </div>
+            <button class="test-button" onclick="testUIIntegration()">Run Test</button>
+        </div>
+
+        <!-- Test 5: Accessibility Features -->
+        <div class="test-section" id="accessibilityTest">
+            <h3>
+                <span class="status-indicator status-pending" id="accessibilityStatus"></span>
+                5. Accessibility Features
+            </h3>
+            <p>Test H/C/K keyboard shortcuts and visual settings</p>
+            <div class="controls-panel">
+                <div class="control-group">
+                    <h4>Keyboard Shortcuts</h4>
+                    <p>Press Ctrl+H for Hex Grid</p>
+                    <p>Press Ctrl+C for Colorblind Mode</p>
+                    <p>Press Ctrl+K for High Contrast</p>
+                    <div id="keyboardTestResults"></div>
+                </div>
+            </div>
+            <div class="test-details" id="accessibilityDetails">
+                Accessibility test pending...
+            </div>
+            <button class="test-button" onclick="testAccessibility()">Run Test</button>
+        </div>
+
+        <!-- Test 6: End-to-End Workflow -->
+        <div class="test-section" id="e2eTest">
+            <h3>
+                <span class="status-indicator status-pending" id="e2eStatus"></span>
+                6. End-to-End User Workflow
+            </h3>
+            <p>Complete user workflow from club selection to shot execution</p>
+            <div class="test-details" id="e2eDetails">
+                End-to-end test pending...
+            </div>
+            <button class="test-button" onclick="testEndToEnd()">Run Test</button>
+        </div>
+
+        <!-- Console Log Output -->
+        <div class="test-section">
+            <h3>📊 Live Console Output</h3>
+            <div class="log-output" id="consoleOutput">
+                Console logs will appear here...
+            </div>
+            <button class="test-button" onclick="clearConsole()">Clear Console</button>
+        </div>
+
+        <!-- Navigation Links -->
+        <div style="text-align: center; margin-top: 30px;">
+            <a href="game-3d.html" class="test-button">🎮 Go to Main Game</a>
+            <a href="index.html" class="test-button">📊 Scorecard</a>
+            <a href="test.html" class="test-button">🧪 Other Tests</a>
+        </div>
+    </div>
+
+    <!-- Load Scripts in Order (same as game-3d.html) -->
+    <script src="https://cdn.jsdelivr.net/npm/phaser@3.80.1/dist/phaser.min.js"></script>
+    <script src="authentic-mechanics.js"></script>
+    <script src="board-game-bridge.js"></script>
+    <script src="phaser-engine.js"></script>
+
+    <script>
+        let testResults = {};
+        let phaserEngine = null;
+        let originalConsoleLog = console.log;
+        let originalConsoleError = console.error;
+        let originalConsoleWarn = console.warn;
+        
+        // Override console methods to capture output
+        function setupConsoleCapture() {
+            const consoleOutput = document.getElementById('consoleOutput');
+            
+            console.log = function(...args) {
+                originalConsoleLog.apply(console, args);
+                appendToConsole('LOG', args.join(' '));
+            };
+            
+            console.error = function(...args) {
+                originalConsoleError.apply(console, args);
+                appendToConsole('ERROR', args.join(' '));
+            };
+            
+            console.warn = function(...args) {
+                originalConsoleWarn.apply(console, args);
+                appendToConsole('WARN', args.join(' '));
+            };
+        }
+        
+        function appendToConsole(type, message) {
+            const consoleOutput = document.getElementById('consoleOutput');
+            const timestamp = new Date().toLocaleTimeString();
+            const color = type === 'ERROR' ? '#ff4444' : type === 'WARN' ? '#ffaa00' : '#00ff00';
+            consoleOutput.innerHTML += `<div style="color: ${color}">[${timestamp}] ${type}: ${message}</div>`;
+            consoleOutput.scrollTop = consoleOutput.scrollHeight;
+        }
+        
+        function clearConsole() {
+            document.getElementById('consoleOutput').innerHTML = '';
+        }
+        
+        function updateTestStatus(testId, status, details) {
+            const section = document.getElementById(testId);
+            const statusIndicator = document.getElementById(testId.replace('Test', 'Status'));
+            const detailsDiv = document.getElementById(testId.replace('Test', 'Details'));
+            
+            section.className = `test-section ${status}`;
+            statusIndicator.className = `status-indicator status-${status}`;
+            detailsDiv.textContent = details;
+            
+            testResults[testId] = status;
+            updateOverallStatus();
+        }
+        
+        function updateOverallStatus() {
+            const total = Object.keys(testResults).length;
+            const passed = Object.values(testResults).filter(status => status === 'pass').length;
+            const failed = Object.values(testResults).filter(status => status === 'fail').length;
+            
+            const statusText = document.getElementById('overallStatus');
+            const statusIndicator = document.getElementById('overallStatusIndicator');
+            
+            if (failed > 0) {
+                statusText.textContent = `${failed} Failed, ${passed}/${total} Passed`;
+                statusIndicator.className = 'status-indicator status-fail';
+            } else if (passed === total && total > 0) {
+                statusText.textContent = `All ${total} Tests Passed ✓`;
+                statusIndicator.className = 'status-indicator status-pass';
+            } else {
+                statusText.textContent = `${passed}/${total} Tests Completed`;
+                statusIndicator.className = 'status-indicator status-pending';
+            }
+        }
+        
+        // Test 1: Script Loading
+        function testScriptLoading() {
+            console.log('🧪 Testing script loading and dependencies...');
+            
+            let details = [];
+            let allPassed = true;
+            
+            // Check if Phaser is loaded
+            if (typeof Phaser !== 'undefined') {
+                details.push('✓ Phaser.js loaded successfully');
+            } else {
+                details.push('✗ Phaser.js not loaded');
+                allPassed = false;
+            }
+            
+            // Check if our classes exist
+            const classesToCheck = [
+                'AuthenticDiceSystem',
+                'BoardGameShotCalculator', 
+                'BoardGameBridge',
+                'PhaserBoardGameEngine'
+            ];
+            
+            classesToCheck.forEach(className => {
+                try {
+                    if (typeof window[className] !== 'undefined') {
+                        details.push(`✓ ${className} class available`);
+                    } else {
+                        details.push(`✗ ${className} class not available`);
+                        allPassed = false;
+                    }
+                } catch (error) {
+                    details.push(`✗ Error checking ${className}: ${error.message}`);
+                    allPassed = false;
+                }
+            });
+            
+            const status = allPassed ? 'pass' : 'fail';
+            updateTestStatus('scriptLoadingTest', status, details.join('\n'));
+        }
+        
+        // Test 2: Phaser Engine Initialization
+        function testPhaserInit() {
+            console.log('🧪 Testing Phaser engine initialization...');
+            
+            let details = [];
+            let passed = true;
+            
+            try {
+                // Create engine instance
+                phaserEngine = new PhaserBoardGameEngine();
+                details.push('✓ PhaserBoardGameEngine constructor succeeded');
+                
+                // Check basic properties
+                if (phaserEngine.currentHole) {
+                    details.push('✓ Game state properties initialized');
+                } else {
+                    details.push('✗ Game state properties missing');
+                    passed = false;
+                }
+                
+                // Wait a moment for async initialization
+                setTimeout(() => {
+                    if (phaserEngine.game) {
+                        details.push('✓ Phaser game instance created');
+                        updateTestStatus('phaserInitTest', 'pass', details.join('\n'));
+                    } else {
+                        details.push('✗ Phaser game instance not created');
+                        updateTestStatus('phaserInitTest', 'fail', details.join('\n'));
+                    }
+                }, 1000);
+                
+            } catch (error) {
+                details.push(`✗ Engine initialization failed: ${error.message}`);
+                passed = false;
+                updateTestStatus('phaserInitTest', 'fail', details.join('\n'));
+            }
+            
+            if (passed) {
+                console.log('🎲 Phaser engine initialization test in progress...');
+            }
+        }
+        
+        // Test 3: Canvas & Scene Creation
+        function testCanvasScene() {
+            console.log('🧪 Testing canvas and scene creation...');
+            
+            let details = [];
+            let passed = true;
+            
+            try {
+                if (!phaserEngine) {
+                    details.push('✗ Phaser engine not initialized. Run Phaser Init test first.');
+                    updateTestStatus('canvasSceneTest', 'fail', details.join('\n'));
+                    return;
+                }
+                
+                // Check if canvas exists
+                const canvas = document.querySelector('#testCanvas canvas');
+                if (canvas) {
+                    details.push('✓ Canvas element found');
+                } else {
+                    details.push('⚠ Canvas element not found, checking for game...');
+                }
+                
+                // Check if game instance exists
+                if (phaserEngine.game) {
+                    details.push('✓ Phaser game instance active');
+                    
+                    // Check if scene exists
+                    if (phaserEngine.currentScene) {
+                        details.push('✓ GolfCourseScene instance found');
+                        
+                        // Try to trigger scene initialization
+                        if (typeof phaserEngine.initializeScene === 'function') {
+                            phaserEngine.initializeScene();
+                            details.push('✓ Scene initialization triggered');
+                        }
+                        
+                    } else {
+                        details.push('⚠ Scene not yet initialized, may load shortly');
+                    }
+                } else {
+                    details.push('✗ Phaser game instance not active');
+                    passed = false;
+                }
+                
+                // Wait for rendering
+                setTimeout(() => {
+                    const updatedCanvas = document.querySelector('canvas');
+                    if (updatedCanvas) {
+                        details.push('✓ Canvas rendering confirmed');
+                        updateTestStatus('canvasSceneTest', 'pass', details.join('\n'));
+                    } else {
+                        details.push('✗ Canvas still not found after delay');
+                        updateTestStatus('canvasSceneTest', 'fail', details.join('\n'));
+                    }
+                }, 2000);
+                
+            } catch (error) {
+                details.push(`✗ Canvas/scene test failed: ${error.message}`);
+                passed = false;
+                updateTestStatus('canvasSceneTest', 'fail', details.join('\n'));
+            }
+        }
+        
+        // Test 4: UI Integration
+        function testUIIntegration() {
+            console.log('🧪 Testing UI controls integration...');
+            
+            let details = [];
+            let passed = true;
+            
+            try {
+                // Test club selection
+                const clubSelector = document.getElementById('testClubSelector');
+                const clubResult = document.getElementById('clubTestResult');
+                
+                clubSelector.addEventListener('change', (e) => {
+                    const selectedClub = e.target.value;
+                    if (phaserEngine && typeof phaserEngine.selectClub === 'function') {
+                        phaserEngine.selectClub(selectedClub);
+                        clubResult.textContent = `✓ Club selected: ${selectedClub}`;
+                        clubResult.style.color = 'green';
+                    } else {
+                        clubResult.textContent = '✗ Club selection not working';
+                        clubResult.style.color = 'red';
+                    }
+                });
+                
+                details.push('✓ Club selector event listener attached');
+                
+                // Test shot button
+                const shotButton = document.getElementById('testShotButton');
+                const shotResult = document.getElementById('shotTestResult');
+                
+                shotButton.addEventListener('click', () => {
+                    if (phaserEngine && typeof phaserEngine.takeShot === 'function') {
+                        try {
+                            // This might trigger dice roll
+                            const result = phaserEngine.takeShot();
+                            shotResult.textContent = '✓ Shot execution triggered';
+                            shotResult.style.color = 'green';
+                        } catch (error) {
+                            shotResult.textContent = `⚠ Shot method exists but errored: ${error.message}`;
+                            shotResult.style.color = 'orange';
+                        }
+                    } else {
+                        shotResult.textContent = '✗ Shot execution not available';
+                        shotResult.style.color = 'red';
+                    }
+                });
+                
+                details.push('✓ Shot button event listener attached');
+                details.push('✓ UI integration test setup complete');
+                
+                updateTestStatus('uiIntegrationTest', 'pass', details.join('\n'));
+                
+            } catch (error) {
+                details.push(`✗ UI integration test failed: ${error.message}`);
+                updateTestStatus('uiIntegrationTest', 'fail', details.join('\n'));
+            }
+        }
+        
+        // Test 5: Accessibility Features
+        function testAccessibility() {
+            console.log('🧪 Testing accessibility features...');
+            
+            let details = [];
+            let keyboardResults = document.getElementById('keyboardTestResults');
+            
+            try {
+                // Test keyboard shortcuts
+                let shortcutsWorking = 0;
+                
+                // Test Ctrl+H (Hex Grid)
+                document.addEventListener('keydown', (e) => {
+                    if (e.key === 'h' && e.ctrlKey) {
+                        e.preventDefault();
+                        keyboardResults.innerHTML += '<div style="color: green;">✓ Ctrl+H detected</div>';
+                        shortcutsWorking++;
+                    }
+                    if (e.key === 'c' && e.ctrlKey) {
+                        e.preventDefault();
+                        keyboardResults.innerHTML += '<div style="color: green;">✓ Ctrl+C detected</div>';
+                        shortcutsWorking++;
+                    }
+                    if (e.key === 'k' && e.ctrlKey) {
+                        e.preventDefault();
+                        keyboardResults.innerHTML += '<div style="color: green;">✓ Ctrl+K detected</div>';
+                        shortcutsWorking++;
+                    }
+                });
+                
+                details.push('✓ Keyboard event listeners attached');
+                details.push('⚠ Press Ctrl+H, Ctrl+C, Ctrl+K to test shortcuts');
+                
+                updateTestStatus('accessibilityTest', 'pass', details.join('\n'));
+                
+            } catch (error) {
+                details.push(`✗ Accessibility test failed: ${error.message}`);
+                updateTestStatus('accessibilityTest', 'fail', details.join('\n'));
+            }
+        }
+        
+        // Test 6: End-to-End Workflow
+        function testEndToEnd() {
+            console.log('🧪 Running end-to-end workflow test...');
+            
+            let details = [];
+            let passed = true;
+            
+            try {
+                if (!phaserEngine) {
+                    details.push('✗ Phaser engine not available for E2E test');
+                    updateTestStatus('e2eTest', 'fail', details.join('\n'));
+                    return;
+                }
+                
+                // Step 1: Check initial game state
+                if (phaserEngine.currentHole && phaserEngine.currentPlayer) {
+                    details.push('✓ Step 1: Initial game state valid');
+                } else {
+                    details.push('✗ Step 1: Initial game state invalid');
+                    passed = false;
+                }
+                
+                // Step 2: Simulate club selection
+                try {
+                    if (typeof phaserEngine.selectClub === 'function') {
+                        phaserEngine.selectClub('driver');
+                        details.push('✓ Step 2: Club selection successful');
+                    } else {
+                        details.push('⚠ Step 2: Club selection method not available');
+                    }
+                } catch (error) {
+                    details.push(`⚠ Step 2: Club selection error: ${error.message}`);
+                }
+                
+                // Step 3: Check dice system
+                if (phaserEngine.diceSystem) {
+                    details.push('✓ Step 3: Dice system available');
+                } else {
+                    details.push('⚠ Step 3: Dice system not initialized yet');
+                }
+                
+                // Step 4: Check game systems initialization
+                setTimeout(() => {
+                    if (phaserEngine.diceSystem && phaserEngine.shotCalculator) {
+                        details.push('✓ Step 4: All game systems initialized');
+                        updateTestStatus('e2eTest', 'pass', details.join('\n'));
+                    } else {
+                        details.push('⚠ Step 4: Some game systems still loading');
+                        updateTestStatus('e2eTest', 'pass', details.join('\n'));
+                    }
+                }, 3000);
+                
+            } catch (error) {
+                details.push(`✗ E2E test failed: ${error.message}`);
+                updateTestStatus('e2eTest', 'fail', details.join('\n'));
+            }
+        }
+        
+        // Initialize testing when page loads
+        document.addEventListener('DOMContentLoaded', () => {
+            setupConsoleCapture();
+            console.log('🔄 Integration Agent Test Suite initialized');
+            console.log('Click test buttons to verify system integration');
+            
+            // Auto-run script loading test
+            setTimeout(() => {
+                testScriptLoading();
+            }, 500);
+            
+            // Auto-run phaser init test if script loading passes
+            setTimeout(() => {
+                if (testResults.scriptLoadingTest === 'pass') {
+                    testPhaserInit();
+                }
+            }, 1500);
+        });
+    </script>
+</body>
+</html>

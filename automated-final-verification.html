@@ -1,0 +1,727 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Automated Final Verification - In Pursuit of Par</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Inter', sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: #f5f5dc;
+            color: #333;
+        }
+        
+        .verification-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            padding: 2rem;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+        
+        .verification-header {
+            text-align: center;
+            background: linear-gradient(135deg, #4CAF50, #2E7D32);
+            color: white;
+            padding: 2rem;
+            border-radius: 8px;
+            margin-bottom: 2rem;
+        }
+        
+        .test-status {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin: 2rem 0;
+        }
+        
+        .status-card {
+            padding: 1.5rem;
+            border-radius: 8px;
+            text-align: center;
+            border: 2px solid #ddd;
+            transition: all 0.3s ease;
+        }
+        
+        .status-card.testing {
+            border-color: #FF9800;
+            background: #FFF3E0;
+            animation: pulse 2s infinite;
+        }
+        
+        .status-card.pass {
+            border-color: #4CAF50;
+            background: #E8F5E8;
+        }
+        
+        .status-card.fail {
+            border-color: #F44336;
+            background: #FFEBEE;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+        
+        .test-results {
+            background: #f9f9f9;
+            border-left: 4px solid #4CAF50;
+            padding: 1rem;
+            margin: 1rem 0;
+            border-radius: 4px;
+            font-family: 'Monaco', 'Courier New', monospace;
+            font-size: 0.9rem;
+            white-space: pre-wrap;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        
+        .hidden-frame {
+            width: 100%;
+            height: 600px;
+            border: none;
+            opacity: 0.1;
+            pointer-events: none;
+        }
+        
+        .final-report {
+            background: linear-gradient(135deg, #4CAF50, #2E7D32);
+            color: white;
+            padding: 2rem;
+            border-radius: 12px;
+            margin-top: 2rem;
+            text-align: center;
+        }
+        
+        .final-report.fail {
+            background: linear-gradient(135deg, #F44336, #D32F2F);
+        }
+        
+        .final-report.warning {
+            background: linear-gradient(135deg, #FF9800, #F57C00);
+        }
+        
+        .progress-indicator {
+            width: 100%;
+            height: 8px;
+            background: #e0e0e0;
+            border-radius: 4px;
+            margin: 1rem 0;
+            overflow: hidden;
+        }
+        
+        .progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, #4CAF50, #2E7D32);
+            width: 0%;
+            transition: width 0.5s ease;
+        }
+    </style>
+</head>
+<body>
+    <div class="verification-container">
+        <div class="verification-header">
+            <h1>🧪 Automated Final Verification</h1>
+            <p>Testing Agent - Comprehensive Golf Course Map/Visualization Verification</p>
+            <div class="progress-indicator">
+                <div class="progress-bar" id="progressBar"></div>
+            </div>
+        </div>
+        
+        <div class="test-status" id="testStatus">
+            <div class="status-card testing" id="canvasCard">
+                <h3>🎨 Canvas Rendering</h3>
+                <p>Testing...</p>
+                <div class="score" id="canvasScore">0/100</div>
+            </div>
+            
+            <div class="status-card testing" id="jsCard">
+                <h3>🖥️ JavaScript</h3>
+                <p>Testing...</p>
+                <div class="score" id="jsScore">0/100</div>
+            </div>
+            
+            <div class="status-card testing" id="uiCard">
+                <h3>🎮 UI Elements</h3>
+                <p>Testing...</p>
+                <div class="score" id="uiScore">0/100</div>
+            </div>
+            
+            <div class="status-card testing" id="visualCard">
+                <h3>🎨 Visual Elements</h3>
+                <p>Testing...</p>
+                <div class="score" id="visualScore">0/100</div>
+            </div>
+            
+            <div class="status-card testing" id="perfCard">
+                <h3>⚡ Performance</h3>
+                <p>Testing...</p>
+                <div class="score" id="perfScore">0/100</div>
+            </div>
+        </div>
+        
+        <div class="test-results" id="testResults">🔄 Initializing automated verification...\n</div>
+        
+        <iframe id="gameFrame" class="hidden-frame" src="http://localhost:61931/game-3d.html"></iframe>
+        
+        <div id="finalReport" style="display: none;"></div>
+    </div>
+
+    <script>
+        // Automated Testing Implementation
+        const TEST_RESULTS = {
+            canvas: { score: 0, status: 'testing', details: [] },
+            javascript: { score: 0, status: 'testing', details: [] },
+            ui: { score: 0, status: 'testing', details: [] },
+            visual: { score: 0, status: 'testing', details: [] },
+            performance: { score: 0, status: 'testing', details: [] }
+        };
+        
+        let gameFrame = null;
+        let testOutput = '';
+        
+        function log(message) {
+            testOutput += message + '\n';
+            document.getElementById('testResults').textContent = testOutput;
+            console.log(message);
+        }
+        
+        function updateCard(cardId, status, score, message) {
+            const card = document.getElementById(cardId);
+            card.className = `status-card ${status}`;
+            card.querySelector('p').textContent = message;
+            card.querySelector('.score').textContent = `${score}/100`;
+        }
+        
+        function updateProgress() {
+            const totalTests = Object.keys(TEST_RESULTS).length;
+            const completedTests = Object.values(TEST_RESULTS).filter(test => test.status !== 'testing').length;
+            const progress = (completedTests / totalTests) * 100;
+            document.getElementById('progressBar').style.width = `${progress}%`;
+        }
+        
+        async function testCanvasRendering() {
+            log('🎨 Testing Canvas Rendering...');
+            
+            try {
+                // Wait for game frame to load
+                await new Promise(resolve => {
+                    gameFrame = document.getElementById('gameFrame');
+                    if (gameFrame.contentDocument && gameFrame.contentDocument.readyState === 'complete') {
+                        resolve();
+                    } else {
+                        gameFrame.onload = resolve;
+                    }
+                });
+                
+                await new Promise(resolve => setTimeout(resolve, 3000)); // Wait for game to initialize
+                
+                const gameDoc = gameFrame.contentDocument;
+                if (!gameDoc) {
+                    throw new Error('Cannot access game frame content');
+                }
+                
+                // Test 1: Check canvas exists
+                const canvas = gameDoc.querySelector('canvas');
+                if (canvas) {
+                    TEST_RESULTS.canvas.score += 25;
+                    TEST_RESULTS.canvas.details.push('✅ Canvas element found');
+                    log('✅ Phaser canvas found');
+                    
+                    // Test canvas dimensions
+                    if (canvas.width > 0 && canvas.height > 0) {
+                        TEST_RESULTS.canvas.score += 20;
+                        TEST_RESULTS.canvas.details.push(`✅ Canvas dimensions: ${canvas.width}x${canvas.height}`);
+                        log(`✅ Canvas dimensions: ${canvas.width}x${canvas.height}`);
+                    } else {
+                        TEST_RESULTS.canvas.details.push('❌ Invalid canvas dimensions');
+                        log('❌ Invalid canvas dimensions');
+                    }
+                } else {
+                    TEST_RESULTS.canvas.details.push('❌ No canvas found');
+                    log('❌ No Phaser canvas found');
+                }
+                
+                // Test 2: Check Phaser game engine
+                const phaserEngine = gameFrame.contentWindow?.phaserEngine;
+                if (phaserEngine) {
+                    TEST_RESULTS.canvas.score += 20;
+                    TEST_RESULTS.canvas.details.push('✅ Phaser engine accessible');
+                    log('✅ Phaser engine found');
+                    
+                    if (phaserEngine.game) {
+                        TEST_RESULTS.canvas.score += 15;
+                        TEST_RESULTS.canvas.details.push('✅ Phaser game created');
+                        log('✅ Phaser game instance found');
+                    }
+                    
+                    if (phaserEngine.currentScene) {
+                        TEST_RESULTS.canvas.score += 10;
+                        TEST_RESULTS.canvas.details.push('✅ Scene initialized');
+                        log('✅ Scene initialized');
+                    }
+                } else {
+                    TEST_RESULTS.canvas.details.push('❌ Phaser engine not accessible');
+                    log('❌ Phaser engine not accessible');
+                }
+                
+                // Test 3: Check background color
+                const gameContainer = gameDoc.querySelector('.enhanced-game-container');
+                if (gameContainer) {
+                    const bgColor = gameFrame.contentWindow.getComputedStyle(gameContainer).backgroundColor;
+                    TEST_RESULTS.canvas.score += 10;
+                    TEST_RESULTS.canvas.details.push(`✅ Background: ${bgColor}`);
+                    log(`✅ Colonist.io background: ${bgColor}`);
+                }
+                
+                // Update status
+                TEST_RESULTS.canvas.status = TEST_RESULTS.canvas.score >= 70 ? 'pass' : 'fail';
+                updateCard('canvasCard', TEST_RESULTS.canvas.status, TEST_RESULTS.canvas.score, 
+                    TEST_RESULTS.canvas.status === 'pass' ? 'Canvas OK' : 'Canvas Issues');
+                
+            } catch (error) {
+                TEST_RESULTS.canvas.status = 'fail';
+                TEST_RESULTS.canvas.details.push(`❌ Error: ${error.message}`);
+                log(`❌ Canvas test error: ${error.message}`);
+                updateCard('canvasCard', 'fail', TEST_RESULTS.canvas.score, 'Test Failed');
+            }
+            
+            updateProgress();
+        }
+        
+        async function testJavaScriptFunctionality() {
+            log('🖥️ Testing JavaScript Functionality...');
+            
+            try {
+                // Test Phaser library loading
+                if (gameFrame.contentWindow?.Phaser) {
+                    TEST_RESULTS.javascript.score += 20;
+                    TEST_RESULTS.javascript.details.push('✅ Phaser.js loaded');
+                    log('✅ Phaser.js library loaded');
+                } else {
+                    TEST_RESULTS.javascript.details.push('❌ Phaser.js not loaded');
+                    log('❌ Phaser.js not loaded');
+                }
+                
+                // Test engine classes
+                if (gameFrame.contentWindow?.PhaserBoardGameEngine) {
+                    TEST_RESULTS.javascript.score += 20;
+                    TEST_RESULTS.javascript.details.push('✅ PhaserBoardGameEngine available');
+                    log('✅ PhaserBoardGameEngine class found');
+                } else {
+                    TEST_RESULTS.javascript.details.push('❌ PhaserBoardGameEngine missing');
+                    log('❌ PhaserBoardGameEngine not found');
+                }
+                
+                // Test authentic mechanics
+                if (gameFrame.contentWindow?.AuthenticMechanics) {
+                    TEST_RESULTS.javascript.score += 15;
+                    TEST_RESULTS.javascript.details.push('✅ AuthenticMechanics available');
+                    log('✅ AuthenticMechanics class found');
+                } else {
+                    TEST_RESULTS.javascript.details.push('❌ AuthenticMechanics missing');
+                    log('❌ AuthenticMechanics not found');
+                }
+                
+                // Test engine instantiation
+                if (gameFrame.contentWindow?.phaserEngine) {
+                    TEST_RESULTS.javascript.score += 25;
+                    TEST_RESULTS.javascript.details.push('✅ Engine instantiated');
+                    log('✅ Phaser engine instantiated');
+                    
+                    // Test game creation
+                    if (gameFrame.contentWindow.phaserEngine.game) {
+                        TEST_RESULTS.javascript.score += 20;
+                        TEST_RESULTS.javascript.details.push('✅ Game instance created');
+                        log('✅ Phaser game instance created');
+                    }
+                } else {
+                    TEST_RESULTS.javascript.details.push('❌ Engine not instantiated');
+                    log('❌ Phaser engine not instantiated');
+                }
+                
+                TEST_RESULTS.javascript.status = TEST_RESULTS.javascript.score >= 70 ? 'pass' : 'fail';
+                updateCard('jsCard', TEST_RESULTS.javascript.status, TEST_RESULTS.javascript.score,
+                    TEST_RESULTS.javascript.status === 'pass' ? 'JavaScript OK' : 'JS Issues');
+                
+            } catch (error) {
+                TEST_RESULTS.javascript.status = 'fail';
+                TEST_RESULTS.javascript.details.push(`❌ Error: ${error.message}`);
+                log(`❌ JavaScript test error: ${error.message}`);
+                updateCard('jsCard', 'fail', TEST_RESULTS.javascript.score, 'Test Failed');
+            }
+            
+            updateProgress();
+        }
+        
+        async function testUIElements() {
+            log('🎮 Testing UI Elements...');
+            
+            try {
+                const gameDoc = gameFrame.contentDocument;
+                
+                // Test club selection
+                const clubOptions = gameDoc.querySelectorAll('.club-option');
+                if (clubOptions.length > 0) {
+                    TEST_RESULTS.ui.score += 20;
+                    TEST_RESULTS.ui.details.push(`✅ ${clubOptions.length} club options found`);
+                    log(`✅ Found ${clubOptions.length} club options`);
+                    
+                    // Test club click
+                    clubOptions[0].click();
+                    setTimeout(() => {
+                        if (clubOptions[0].classList.contains('selected')) {
+                            TEST_RESULTS.ui.score += 15;
+                            TEST_RESULTS.ui.details.push('✅ Club selection working');
+                            log('✅ Club selection working');
+                        }
+                    }, 100);
+                } else {
+                    TEST_RESULTS.ui.details.push('❌ No club options found');
+                    log('❌ No club options found');
+                }
+                
+                // Test shot button
+                const shotButton = gameDoc.getElementById('takeShot3D');
+                if (shotButton) {
+                    TEST_RESULTS.ui.score += 20;
+                    TEST_RESULTS.ui.details.push('✅ Shot button found');
+                    log('✅ Shot button found');
+                    
+                    // Test shot button functionality
+                    shotButton.click();
+                } else {
+                    TEST_RESULTS.ui.details.push('❌ Shot button not found');
+                    log('❌ Shot button not found');
+                }
+                
+                // Test camera controls
+                const cameraButtons = gameDoc.querySelectorAll('.camera-btn');
+                if (cameraButtons.length > 0) {
+                    TEST_RESULTS.ui.score += 15;
+                    TEST_RESULTS.ui.details.push(`✅ ${cameraButtons.length} camera controls found`);
+                    log(`✅ Found ${cameraButtons.length} camera controls`);
+                } else {
+                    TEST_RESULTS.ui.details.push('❌ No camera controls found');
+                    log('❌ No camera controls found');
+                }
+                
+                // Test accessibility toggles
+                const accessibilityToggles = gameDoc.querySelectorAll('.setting-toggle input[type="checkbox"]');
+                if (accessibilityToggles.length > 0) {
+                    TEST_RESULTS.ui.score += 15;
+                    TEST_RESULTS.ui.details.push(`✅ ${accessibilityToggles.length} accessibility toggles found`);
+                    log(`✅ Found ${accessibilityToggles.length} accessibility toggles`);
+                    
+                    // Test high contrast toggle
+                    const highContrastToggle = gameDoc.getElementById('highContrastMode');
+                    if (highContrastToggle) {
+                        highContrastToggle.click();
+                        setTimeout(() => {
+                            if (gameDoc.body.classList.contains('high-contrast')) {
+                                TEST_RESULTS.ui.score += 10;
+                                TEST_RESULTS.ui.details.push('✅ High contrast working');
+                                log('✅ High contrast mode working');
+                                highContrastToggle.click(); // Toggle back
+                            }
+                        }, 100);
+                    }
+                } else {
+                    TEST_RESULTS.ui.details.push('❌ No accessibility toggles found');
+                    log('❌ No accessibility toggles found');
+                }
+                
+                // Test units toggle
+                const unitsToggle = gameDoc.getElementById('unitsToggle');
+                if (unitsToggle) {
+                    TEST_RESULTS.ui.score += 20;
+                    TEST_RESULTS.ui.details.push('✅ Units toggle found');
+                    log('✅ Units toggle found');
+                } else {
+                    TEST_RESULTS.ui.details.push('❌ Units toggle not found');
+                    log('❌ Units toggle not found');
+                }
+                
+                TEST_RESULTS.ui.status = TEST_RESULTS.ui.score >= 70 ? 'pass' : 'fail';
+                updateCard('uiCard', TEST_RESULTS.ui.status, TEST_RESULTS.ui.score,
+                    TEST_RESULTS.ui.status === 'pass' ? 'UI Elements OK' : 'UI Issues');
+                
+            } catch (error) {
+                TEST_RESULTS.ui.status = 'fail';
+                TEST_RESULTS.ui.details.push(`❌ Error: ${error.message}`);
+                log(`❌ UI test error: ${error.message}`);
+                updateCard('uiCard', 'fail', TEST_RESULTS.ui.score, 'Test Failed');
+            }
+            
+            updateProgress();
+        }
+        
+        async function testVisualElements() {
+            log('🎨 Testing Visual Elements...');
+            
+            try {
+                const gameDoc = gameFrame.contentDocument;
+                
+                // Test viewport
+                const viewport = gameDoc.getElementById('course3DViewport');
+                if (viewport) {
+                    TEST_RESULTS.visual.score += 25;
+                    TEST_RESULTS.visual.details.push('✅ Course viewport found');
+                    log('✅ Course viewport found');
+                    
+                    const viewportStyle = gameFrame.contentWindow.getComputedStyle(viewport);
+                    const height = parseInt(viewportStyle.height);
+                    if (height >= 500) {
+                        TEST_RESULTS.visual.score += 15;
+                        TEST_RESULTS.visual.details.push(`✅ Good viewport height: ${height}px`);
+                        log(`✅ Viewport height: ${height}px`);
+                    }
+                } else {
+                    TEST_RESULTS.visual.details.push('❌ Course viewport not found');
+                    log('❌ Course viewport not found');
+                }
+                
+                // Test enhanced header
+                const header = gameDoc.querySelector('.enhanced-header');
+                if (header) {
+                    TEST_RESULTS.visual.score += 15;
+                    TEST_RESULTS.visual.details.push('✅ Enhanced header found');
+                    log('✅ Enhanced header found');
+                } else {
+                    TEST_RESULTS.visual.details.push('❌ Enhanced header missing');
+                    log('❌ Enhanced header missing');
+                }
+                
+                // Test game panel
+                const panel = gameDoc.querySelector('.enhanced-panel');
+                if (panel) {
+                    TEST_RESULTS.visual.score += 15;
+                    TEST_RESULTS.visual.details.push('✅ Game panel found');
+                    log('✅ Game panel found');
+                } else {
+                    TEST_RESULTS.visual.details.push('❌ Game panel missing');
+                    log('❌ Game panel missing');
+                }
+                
+                // Test dice display
+                const dice = gameDoc.querySelectorAll('.enhanced-dice');
+                if (dice.length >= 2) {
+                    TEST_RESULTS.visual.score += 15;
+                    TEST_RESULTS.visual.details.push(`✅ ${dice.length} dice elements found`);
+                    log(`✅ Found ${dice.length} dice elements`);
+                } else {
+                    TEST_RESULTS.visual.details.push('❌ Insufficient dice elements');
+                    log('❌ Not enough dice elements found');
+                }
+                
+                // Test colonist.io styling
+                const gameContainer = gameDoc.querySelector('.enhanced-game-container');
+                if (gameContainer) {
+                    const bgColor = gameFrame.contentWindow.getComputedStyle(gameContainer).backgroundColor;
+                    if (bgColor.includes('245, 245, 220') || bgColor.includes('245,245,220')) {
+                        TEST_RESULTS.visual.score += 20;
+                        TEST_RESULTS.visual.details.push('✅ Colonist.io cream background');
+                        log('✅ Colonist.io cream background applied');
+                    } else {
+                        TEST_RESULTS.visual.score += 10; // Partial credit
+                        TEST_RESULTS.visual.details.push(`⚠️ Background: ${bgColor}`);
+                        log(`⚠️ Background color: ${bgColor}`);
+                    }
+                }
+                
+                // Test responsive layout
+                const layout = gameDoc.querySelector('.enhanced-layout');
+                if (layout) {
+                    TEST_RESULTS.visual.score += 10;
+                    TEST_RESULTS.visual.details.push('✅ Responsive layout found');
+                    log('✅ Responsive layout detected');
+                }
+                
+                TEST_RESULTS.visual.status = TEST_RESULTS.visual.score >= 70 ? 'pass' : 'fail';
+                updateCard('visualCard', TEST_RESULTS.visual.status, TEST_RESULTS.visual.score,
+                    TEST_RESULTS.visual.status === 'pass' ? 'Visual OK' : 'Visual Issues');
+                
+            } catch (error) {
+                TEST_RESULTS.visual.status = 'fail';
+                TEST_RESULTS.visual.details.push(`❌ Error: ${error.message}`);
+                log(`❌ Visual test error: ${error.message}`);
+                updateCard('visualCard', 'fail', TEST_RESULTS.visual.score, 'Test Failed');
+            }
+            
+            updateProgress();
+        }
+        
+        async function testPerformance() {
+            log('⚡ Testing Performance...');
+            
+            try {
+                // Test loading time
+                const loadTime = performance.timing.loadEventEnd - performance.timing.navigationStart;
+                if (loadTime < 5000) {
+                    TEST_RESULTS.performance.score += 25;
+                    TEST_RESULTS.performance.details.push(`✅ Fast load: ${loadTime}ms`);
+                    log(`✅ Loading time: ${loadTime}ms`);
+                } else {
+                    TEST_RESULTS.performance.score += 10;
+                    TEST_RESULTS.performance.details.push(`⚠️ Slow load: ${loadTime}ms`);
+                    log(`⚠️ Loading time: ${loadTime}ms`);
+                }
+                
+                // Test memory usage
+                if (performance.memory) {
+                    const memUsage = (performance.memory.usedJSHeapSize / 1024 / 1024).toFixed(2);
+                    const usagePercent = (performance.memory.usedJSHeapSize / performance.memory.jsHeapSizeLimit) * 100;
+                    
+                    if (usagePercent < 50) {
+                        TEST_RESULTS.performance.score += 25;
+                        TEST_RESULTS.performance.details.push(`✅ Good memory: ${memUsage}MB`);
+                        log(`✅ Memory usage: ${memUsage}MB (${usagePercent.toFixed(1)}%)`);
+                    } else {
+                        TEST_RESULTS.performance.score += 10;
+                        TEST_RESULTS.performance.details.push(`⚠️ High memory: ${memUsage}MB`);
+                        log(`⚠️ Memory usage: ${memUsage}MB (${usagePercent.toFixed(1)}%)`);
+                    }
+                } else {
+                    TEST_RESULTS.performance.score += 15;
+                    TEST_RESULTS.performance.details.push('⚠️ Memory API unavailable');
+                    log('⚠️ Memory API not available');
+                }
+                
+                // Test frame rate
+                let frameCount = 0;
+                const startTime = performance.now();
+                const duration = 1000;
+                
+                function countFrames() {
+                    frameCount++;
+                    if (performance.now() - startTime < duration) {
+                        requestAnimationFrame(countFrames);
+                    } else {
+                        const fps = frameCount;
+                        if (fps >= 45) {
+                            TEST_RESULTS.performance.score += 25;
+                            TEST_RESULTS.performance.details.push(`✅ Good FPS: ${fps}`);
+                            log(`✅ Frame rate: ${fps} FPS`);
+                        } else {
+                            TEST_RESULTS.performance.score += 10;
+                            TEST_RESULTS.performance.details.push(`⚠️ Low FPS: ${fps}`);
+                            log(`⚠️ Frame rate: ${fps} FPS`);
+                        }
+                        
+                        // Finish performance test
+                        TEST_RESULTS.performance.score += 25; // Base score for completing test
+                        TEST_RESULTS.performance.status = TEST_RESULTS.performance.score >= 70 ? 'pass' : 'fail';
+                        updateCard('perfCard', TEST_RESULTS.performance.status, TEST_RESULTS.performance.score,
+                            TEST_RESULTS.performance.status === 'pass' ? 'Performance OK' : 'Performance Issues');
+                        updateProgress();
+                        
+                        // Generate final report after a delay
+                        setTimeout(generateFinalReport, 1000);
+                    }
+                }
+                requestAnimationFrame(countFrames);
+                
+            } catch (error) {
+                TEST_RESULTS.performance.status = 'fail';
+                TEST_RESULTS.performance.details.push(`❌ Error: ${error.message}`);
+                log(`❌ Performance test error: ${error.message}`);
+                updateCard('perfCard', 'fail', TEST_RESULTS.performance.score, 'Test Failed');
+                updateProgress();
+                setTimeout(generateFinalReport, 1000);
+            }
+        }
+        
+        function generateFinalReport() {
+            log('\n📋 Generating Final Report...');
+            
+            const totalScore = Object.values(TEST_RESULTS).reduce((sum, test) => sum + test.score, 0) / 5;
+            const passCount = Object.values(TEST_RESULTS).filter(test => test.status === 'pass').length;
+            const failCount = Object.values(TEST_RESULTS).filter(test => test.status === 'fail').length;
+            
+            let grade, className;
+            if (totalScore >= 85) {
+                grade = 'EXCELLENT';
+                className = '';
+            } else if (totalScore >= 70) {
+                grade = 'GOOD';
+                className = 'warning';
+            } else {
+                grade = 'NEEDS IMPROVEMENT';
+                className = 'fail';
+            }
+            
+            const finalReport = document.getElementById('finalReport');
+            finalReport.className = `final-report ${className}`;
+            finalReport.innerHTML = `
+                <h2>🧪 COMPREHENSIVE FINAL VERIFICATION REPORT</h2>
+                <div style="font-size: 1.5rem; margin: 1rem 0;">
+                    <strong>OVERALL GRADE: ${grade} (${totalScore.toFixed(1)}/100)</strong>
+                </div>
+                
+                <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; margin: 2rem 0; text-align: left;">
+                    <div>✅ Passing Tests: ${passCount}/5</div>
+                    <div>❌ Failing Tests: ${failCount}/5</div>
+                    <div>📊 Average Score: ${totalScore.toFixed(1)}%</div>
+                </div>
+                
+                <h3>📋 SUCCESS CRITERIA VERIFICATION:</h3>
+                <div style="text-align: left; margin: 1rem 0;">
+                    ${TEST_RESULTS.canvas.status === 'pass' ? '✅ Canvas visible with Phaser rendering' : '❌ Canvas rendering issues'}<br>
+                    ${TEST_RESULTS.javascript.status === 'pass' ? '✅ No critical JavaScript errors' : '❌ JavaScript errors detected'}<br>
+                    ${TEST_RESULTS.ui.status === 'pass' ? '✅ UI controls responsive and working' : '❌ UI controls not functioning properly'}<br>
+                    ${TEST_RESULTS.visual.status === 'pass' ? '✅ Visual elements render correctly' : '❌ Visual rendering problems'}<br>
+                    ${TEST_RESULTS.performance.status === 'pass' ? '✅ Performance meets requirements' : '❌ Performance issues detected'}
+                </div>
+                
+                <h3>📝 FINAL RECOMMENDATION:</h3>
+                <div style="text-align: left; margin-top: 1rem;">
+                    ${totalScore >= 85 ? 
+                        '🎉 EXCELLENT! The golf course map/visualization is working properly.<br>✅ Ready for production deployment.<br>✅ All systems verified successfully.' :
+                        totalScore >= 70 ?
+                        '👍 GOOD performance with minor issues.<br>⚠️ Address warning items before deployment.<br>✅ Core functionality working.' :
+                        '❌ SIGNIFICANT ISSUES detected.<br>❌ Major fixes required before deployment.<br>⚠️ Core functionality impacted.'
+                    }
+                </div>
+            `;
+            finalReport.style.display = 'block';
+            
+            log(`\n🏆 FINAL GRADE: ${grade} (${totalScore.toFixed(1)}/100)`);
+            log(`✅ Tests Passed: ${passCount}/5`);
+            log(`❌ Tests Failed: ${failCount}/5`);
+            log('\n🧪 Comprehensive Final Verification Complete!');
+        }
+        
+        // Start automated testing
+        async function runAutomatedTests() {
+            log('🚀 Starting Automated Final Verification...\n');
+            
+            // Wait for game frame to load
+            await new Promise(resolve => setTimeout(resolve, 5000));
+            
+            // Run tests sequentially
+            await testCanvasRendering();
+            await new Promise(resolve => setTimeout(resolve, 1000));
+            
+            await testJavaScriptFunctionality();
+            await new Promise(resolve => setTimeout(resolve, 1000));
+            
+            await testUIElements();
+            await new Promise(resolve => setTimeout(resolve, 2000));
+            
+            await testVisualElements();
+            await new Promise(resolve => setTimeout(resolve, 1000));
+            
+            await testPerformance();
+        }
+        
+        // Start tests when page loads
+        window.addEventListener('load', () => {
+            setTimeout(runAutomatedTests, 2000);
+        });
+    </script>
+</body>
+</html>

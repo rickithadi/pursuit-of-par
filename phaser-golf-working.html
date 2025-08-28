@@ -1,0 +1,498 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>In Pursuit of Par - Enhanced Phaser UI</title>
+    <script src="https://cdn.jsdelivr.net/npm/phaser@3.70.0/dist/phaser.min.js"></script>
+    <style>
+        :root {
+            --orange-gauge: #D2691E;
+            --brown-box: #8B4513;
+            --cream-paper: #F5DEB3;
+            --muted-green: #228B22;
+            --fairway-green: #32CD32;
+            --vintage-black: #2F2F2F;
+            --vintage-white: #FAFAFA;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Times New Roman', serif;
+            background: linear-gradient(135deg, var(--cream-paper) 0%, #E6D3A3 100%);
+            display: flex;
+            height: 100vh;
+        }
+
+        .game-container {
+            display: flex;
+            width: 100%;
+            height: 100vh;
+        }
+
+        .left-panel {
+            width: 300px;
+            background: var(--cream-paper);
+            border-right: 3px solid var(--brown-box);
+            padding: 20px;
+            overflow-y: auto;
+        }
+
+        .right-panel {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .phaser-container {
+            flex: 1;
+            position: relative;
+            background: #87CEEB; /* Sky blue instead of green */
+        }
+
+        .section-title {
+            font-size: 1.3em;
+            font-weight: bold;
+            color: var(--brown-box);
+            margin-bottom: 12px;
+            text-align: center;
+            letter-spacing: 1px;
+        }
+
+        .control-section {
+            margin-bottom: 20px;
+            padding: 15px;
+            background: var(--vintage-white);
+            border: 2px solid var(--brown-box);
+            border-radius: 6px;
+        }
+
+        .club-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+        }
+
+        .club-button {
+            padding: 10px 8px;
+            background: var(--orange-gauge);
+            color: white;
+            border: 3px solid #B8860B;
+            border-radius: 6px;
+            font-family: 'Times New Roman', serif;
+            font-size: 0.85em;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-align: center;
+        }
+
+        .club-button:hover {
+            background: #CD853F;
+            transform: translateY(-2px);
+        }
+
+        .club-button.selected {
+            background: var(--brown-box);
+            transform: translateY(-3px);
+            box-shadow: 0 6px 12px rgba(0,0,0,0.3);
+        }
+
+        .club-button:disabled {
+            background: #999;
+            color: #666;
+            cursor: not-allowed;
+            opacity: 0.5;
+        }
+
+        .dice-container {
+            display: flex;
+            justify-content: space-between;
+            margin: 15px 0;
+        }
+
+        .dice {
+            width: 45px;
+            height: 45px;
+            background: white;
+            border: 3px solid var(--vintage-black);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.6em;
+            font-weight: bold;
+        }
+
+        .dice.green { background: #90EE90; border-color: var(--muted-green); }
+        .dice.red { background: #FFB6C1; border-color: #DC143C; }
+        
+        .dice.rolling {
+            animation: diceRoll 0.6s ease-in-out;
+            transform-origin: center;
+        }
+        
+        @keyframes diceRoll {
+            0% { transform: rotate(0deg) scale(1); }
+            25% { transform: rotate(90deg) scale(1.2); }
+            50% { transform: rotate(180deg) scale(1.1); }
+            75% { transform: rotate(270deg) scale(1.2); }
+            100% { transform: rotate(360deg) scale(1); }
+        }
+
+        .take-shot-btn {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(135deg, var(--orange-gauge) 0%, #B8860B 100%);
+            color: white;
+            border: 4px solid #8B4513;
+            border-radius: 12px;
+            font-family: 'Times New Roman', serif;
+            font-size: 1.2em;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .take-shot-btn:hover {
+            background: linear-gradient(135deg, #CD853F 0%, #D2691E 100%);
+            transform: translateY(-2px);
+        }
+
+        .take-shot-btn:disabled {
+            background: #999;
+            cursor: not-allowed;
+            opacity: 0.6;
+        }
+
+        .status-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid #ccc;
+        }
+
+        .status-item:last-child { border-bottom: none; }
+        .status-label { font-weight: bold; color: var(--brown-box); }
+        .status-value { font-weight: bold; color: var(--vintage-black); }
+
+        .game-controls {
+            background: var(--brown-box);
+            color: var(--vintage-white);
+            padding: 15px;
+            display: flex;
+            gap: 15px;
+            align-items: center;
+            border-top: 2px solid #654321;
+        }
+    </style>
+</head>
+<body>
+    <div class="game-container">
+        <!-- Left Control Panel -->
+        <div class="left-panel">
+            <div class="control-section">
+                <h3 class="section-title">Club Selection</h3>
+                <div class="club-grid" id="clubGrid">
+                    <button class="club-button" data-club="driver">Driver</button>
+                    <button class="club-button" data-club="3wood">3-Wood</button>
+                    <button class="club-button" data-club="5wood">5-Wood</button>
+                    <button class="club-button" data-club="2iron">2-Iron</button>
+                    <button class="club-button" data-club="5iron">5-Iron</button>
+                    <button class="club-button" data-club="7iron">7-Iron</button>
+                    <button class="club-button" data-club="9iron">9-Iron</button>
+                    <button class="club-button" data-club="wedge">Wedge</button>
+                    <button class="club-button" data-club="putter">Putter</button>
+                </div>
+            </div>
+
+            <div class="control-section">
+                <h3 class="section-title">Dice Results</h3>
+                <div class="dice-container">
+                    <div class="dice green" id="distanceDice">?</div>
+                    <div class="dice green" id="directionDice">?</div>
+                    <div class="dice red" id="problemDice">-</div>
+                </div>
+            </div>
+
+            <button class="take-shot-btn" id="takeShot" disabled>
+                Select Club to Take Shot
+            </button>
+
+            <div class="control-section">
+                <h3 class="section-title">Game Status</h3>
+                <div class="status-item">
+                    <span class="status-label">Hole:</span>
+                    <span class="status-value" id="currentHole">1</span>
+                </div>
+                <div class="status-item">
+                    <span class="status-label">Par:</span>
+                    <span class="status-value" id="holePar">4</span>
+                </div>
+                <div class="status-item">
+                    <span class="status-label">Strokes:</span>
+                    <span class="status-value" id="strokeCount">0</span>
+                </div>
+                <div class="status-item">
+                    <span class="status-label">Distance:</span>
+                    <span class="status-value" id="distanceToPin">394 yds</span>
+                </div>
+                <div class="status-item">
+                    <span class="status-label">Lie:</span>
+                    <span class="status-value" id="currentLie">Tee</span>
+                </div>
+                <div class="status-item">
+                    <span class="status-label">Score:</span>
+                    <span class="status-value" id="totalScore">E</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right Phaser Game Panel -->
+        <div class="right-panel">
+            <div class="phaser-container" id="phaserContainer">
+                <!-- Phaser canvas will be inserted here -->
+            </div>
+            
+            <div class="game-controls">
+                <button onclick="toggleView()">Toggle View</button>
+                <button onclick="showAerial()">Show Real Course</button>
+                <span style="margin-left: auto;">TPC Sawgrass - Authentic 1987 Golf Board Game</span>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Simple working Phaser scene
+        class GolfScene extends Phaser.Scene {
+            constructor() {
+                super({ key: 'GolfScene' });
+            }
+
+            preload() {
+                console.log('🎮 Phaser scene preloading...');
+            }
+
+            create() {
+                console.log('🎮 Phaser scene creating...');
+                
+                // Create course background
+                this.add.rectangle(400, 300, 800, 600, 0x87CEEB); // Sky blue background
+                
+                // Create course elements
+                this.createCourse();
+                this.createBall();
+                
+                // Connect to board game
+                window.phaserScene = this;
+                console.log('✅ Phaser scene created successfully');
+            }
+            
+            createCourse() {
+                // Simple course layout
+                const graphics = this.add.graphics();
+                
+                // Rough background
+                graphics.fillStyle(0x556B2F);
+                graphics.fillRect(0, 100, 800, 500);
+                
+                // Fairway
+                graphics.fillStyle(0x32CD32);
+                graphics.fillEllipse(400, 350, 350, 400);
+                
+                // Tee box
+                graphics.fillStyle(0x8B4513);
+                graphics.fillRect(350, 550, 100, 30);
+                
+                // Green
+                graphics.fillStyle(0x228B22);
+                graphics.fillCircle(400, 100, 60);
+                
+                // Pin
+                graphics.fillStyle(0x654321);
+                graphics.fillRect(396, 70, 8, 40);
+                graphics.fillStyle(0xFF0000);
+                graphics.fillTriangle(404, 75, 404, 90, 425, 82);
+                
+                console.log('✅ Course created');
+            }
+            
+            createBall() {
+                // Create ball (NO setStroke - this was the bug!)
+                this.ball = this.add.circle(400, 565, 6, 0xFFFFFF);
+                
+                // Create separate outline using graphics
+                this.ballOutline = this.add.graphics();
+                this.ballOutline.lineStyle(2, 0x000000);
+                this.ballOutline.strokeCircle(400, 565, 6);
+                
+                console.log('✅ Ball created with graphics outline at:', this.ball.x, this.ball.y);
+            }
+            
+            updateBallPosition(gameState) {
+                if (!this.ball || !gameState) return;
+                
+                // Convert game position to Phaser coordinates
+                const x = (gameState.ballPosition.x / 100) * 800;
+                const y = 580 - ((gameState.ballPosition.y / 100) * 480); // Flip Y axis
+                
+                console.log('Moving ball to:', x, y, 'from game state:', gameState.ballPosition);
+                
+                // Animate ball movement
+                this.tweens.add({
+                    targets: this.ball,
+                    x: x,
+                    y: y,
+                    duration: 1000,
+                    ease: 'Power2',
+                    onUpdate: () => {
+                        // Update outline position to match ball
+                        if (this.ballOutline) {
+                            this.ballOutline.clear();
+                            this.ballOutline.lineStyle(2, 0x000000);
+                            this.ballOutline.strokeCircle(this.ball.x, this.ball.y, 6);
+                        }
+                    }
+                });
+            }
+        }
+
+        // Working board game engine (simplified from main game)
+        class WorkingBoardGameEngine {
+            constructor() {
+                console.log('🎯 Initializing working board game engine...');
+                
+                this.courseData = {
+                    1: { par: 4, name: "Opening Statement", yardages: { blue: 394 } }
+                };
+                
+                this.gameState = {
+                    currentHole: 1,
+                    strokeCount: 0,
+                    totalScore: 0,
+                    distanceToPin: 394,
+                    ballPosition: { x: 50, y: 5 },
+                    currentLie: 'tee',
+                    selectedClub: null
+                };
+                
+                this.initializeUI();
+                console.log('✅ Board game engine initialized');
+            }
+            
+            initializeUI() {
+                this.setupClubSelection();
+                this.setupShotButton();
+                this.updateGameStatus();
+            }
+            
+            setupClubSelection() {
+                const clubButtons = document.querySelectorAll('.club-button');
+                clubButtons.forEach(button => {
+                    button.addEventListener('click', () => {
+                        clubButtons.forEach(b => b.classList.remove('selected'));
+                        button.classList.add('selected');
+                        this.gameState.selectedClub = button.dataset.club;
+                        this.updateShotButton();
+                    });
+                });
+            }
+            
+            setupShotButton() {
+                const shotButton = document.getElementById('takeShot');
+                shotButton.addEventListener('click', () => {
+                    if (!shotButton.disabled) {
+                        this.takeShot();
+                    }
+                });
+            }
+            
+            updateShotButton() {
+                const shotButton = document.getElementById('takeShot');
+                if (this.gameState.selectedClub) {
+                    shotButton.disabled = false;
+                    shotButton.textContent = `Take Shot with ${this.gameState.selectedClub.toUpperCase()}`;
+                } else {
+                    shotButton.disabled = true;
+                    shotButton.textContent = 'Select Club to Take Shot';
+                }
+            }
+            
+            async takeShot() {
+                console.log('🏌️ Taking shot with:', this.gameState.selectedClub);
+                
+                // Simple shot calculation
+                const distance = 100 + Math.random() * 150;
+                const direction = (Math.random() - 0.5) * 40;
+                
+                // Update game state
+                this.gameState.strokeCount++;
+                this.gameState.distanceToPin = Math.max(0, this.gameState.distanceToPin - distance);
+                
+                // Calculate new ball position
+                const progress = 1 - (this.gameState.distanceToPin / 394);
+                this.gameState.ballPosition.y = Math.max(5, Math.min(95, progress * 90 + 5));
+                this.gameState.ballPosition.x = 50 + (direction / 40) * 30;
+                this.gameState.ballPosition.x = Math.max(10, Math.min(90, this.gameState.ballPosition.x));
+                
+                console.log('📍 New ball position:', this.gameState.ballPosition);
+                
+                // Update Phaser scene
+                if (window.phaserScene) {
+                    window.phaserScene.updateBallPosition(this.gameState);
+                }
+                
+                // Update UI
+                this.updateGameStatus();
+                
+                // Clear selection
+                document.querySelectorAll('.club-button').forEach(b => b.classList.remove('selected'));
+                this.gameState.selectedClub = null;
+                this.updateShotButton();
+            }
+            
+            updateGameStatus() {
+                document.getElementById('currentHole').textContent = this.gameState.currentHole;
+                document.getElementById('holePar').textContent = this.courseData[this.gameState.currentHole].par;
+                document.getElementById('strokeCount').textContent = this.gameState.strokeCount;
+                document.getElementById('distanceToPin').textContent = `${this.gameState.distanceToPin.toFixed(0)} yds`;
+                document.getElementById('currentLie').textContent = this.gameState.currentLie;
+            }
+        }
+
+        // Global functions
+        function toggleView() {
+            console.log('Toggle view clicked');
+        }
+        
+        function showAerial() {
+            window.open('./assets/tpc-aerials/hole1_aerial.jpg', '_blank');
+        }
+
+        // Initialize everything
+        window.addEventListener('load', () => {
+            console.log('🚀 Starting Phaser Golf Game...');
+            
+            // Configure Phaser
+            const config = {
+                type: Phaser.AUTO,
+                width: 800,
+                height: 600,
+                parent: 'phaserContainer',
+                scene: GolfScene,
+                backgroundColor: 0x87CEEB // Sky blue
+            };
+
+            // Create Phaser game
+            const game = new Phaser.Game(config);
+            
+            // Create board game engine
+            setTimeout(() => {
+                window.boardGame = new WorkingBoardGameEngine();
+                console.log('🎮 All systems initialized');
+            }, 1000);
+        });
+    </script>
+</body>
+</html>

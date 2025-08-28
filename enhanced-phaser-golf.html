@@ -1,0 +1,1149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>In Pursuit of Par - Enhanced Phaser UI</title>
+    <script src="https://cdn.jsdelivr.net/npm/phaser@3.70.0/dist/phaser.min.js"></script>
+    <style>
+        :root {
+            --orange-gauge: #D2691E;
+            --brown-box: #8B4513;
+            --cream-paper: #F5DEB3;
+            --muted-green: #228B22;
+            --fairway-green: #32CD32;
+            --vintage-black: #2F2F2F;
+            --vintage-white: #FAFAFA;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Times New Roman', serif;
+            background: linear-gradient(135deg, var(--cream-paper) 0%, #E6D3A3 100%);
+            display: flex;
+            height: 100vh;
+        }
+
+        .game-container {
+            display: flex;
+            width: 100%;
+            height: 100vh;
+        }
+
+        .left-panel {
+            width: 300px;
+            background: var(--cream-paper);
+            border-right: 3px solid var(--brown-box);
+            padding: 20px;
+            overflow-y: auto;
+        }
+
+        .right-panel {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .phaser-container {
+            flex: 1;
+            position: relative;
+        }
+
+        .game-controls {
+            background: var(--brown-box);
+            color: var(--vintage-white);
+            padding: 15px;
+            display: flex;
+            gap: 15px;
+            align-items: center;
+            border-top: 2px solid #654321;
+        }
+
+        .section-title {
+            font-size: 1.3em;
+            font-weight: bold;
+            color: var(--brown-box);
+            margin-bottom: 12px;
+            text-align: center;
+            letter-spacing: 1px;
+        }
+
+        .control-section {
+            margin-bottom: 20px;
+            padding: 15px;
+            background: var(--vintage-white);
+            border: 2px solid var(--brown-box);
+            border-radius: 6px;
+        }
+
+        .club-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+        }
+
+        .club-button {
+            padding: 10px 8px;
+            background: var(--orange-gauge);
+            color: white;
+            border: 3px solid #B8860B;
+            border-radius: 6px;
+            font-family: 'Times New Roman', serif;
+            font-size: 0.85em;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-align: center;
+        }
+
+        .club-button:hover {
+            background: #CD853F;
+            transform: translateY(-2px);
+        }
+
+        .club-button.selected {
+            background: var(--brown-box);
+            transform: translateY(-3px);
+            box-shadow: 0 6px 12px rgba(0,0,0,0.3);
+        }
+
+        .club-button:disabled {
+            background: #999;
+            color: #666;
+            cursor: not-allowed;
+            opacity: 0.5;
+        }
+
+        .dice-container {
+            display: flex;
+            justify-content: space-between;
+            margin: 15px 0;
+        }
+
+        .dice {
+            width: 45px;
+            height: 45px;
+            background: white;
+            border: 3px solid var(--vintage-black);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.6em;
+            font-weight: bold;
+        }
+
+        .dice.green { background: #90EE90; border-color: var(--muted-green); }
+        .dice.red { background: #FFB6C1; border-color: #DC143C; }
+        
+        .dice.rolling {
+            animation: diceRoll 0.6s ease-in-out;
+            transform-origin: center;
+        }
+        
+        @keyframes diceRoll {
+            0% { transform: rotate(0deg) scale(1); }
+            25% { transform: rotate(90deg) scale(1.2); }
+            50% { transform: rotate(180deg) scale(1.1); }
+            75% { transform: rotate(270deg) scale(1.2); }
+            100% { transform: rotate(360deg) scale(1); }
+        }
+
+        .take-shot-btn {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(135deg, var(--orange-gauge) 0%, #B8860B 100%);
+            color: white;
+            border: 4px solid #8B4513;
+            border-radius: 12px;
+            font-family: 'Times New Roman', serif;
+            font-size: 1.2em;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .take-shot-btn:hover {
+            background: linear-gradient(135deg, #CD853F 0%, #D2691E 100%);
+            transform: translateY(-2px);
+        }
+
+        .take-shot-btn:disabled {
+            background: #999;
+            cursor: not-allowed;
+            opacity: 0.6;
+        }
+
+        .status-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid #ccc;
+        }
+
+        .status-item:last-child { border-bottom: none; }
+        .status-label { font-weight: bold; color: var(--brown-box); }
+        .status-value { font-weight: bold; color: var(--vintage-black); }
+
+        .phaser-overlay {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            background: rgba(139, 69, 19, 0.9);
+            color: white;
+            padding: 10px 15px;
+            border-radius: 8px;
+            font-weight: bold;
+            z-index: 1000;
+        }
+
+        @media (max-width: 1024px) {
+            .game-container { flex-direction: column; }
+            .left-panel { width: 100%; height: auto; max-height: 40vh; }
+            .club-grid { grid-template-columns: 1fr 1fr 1fr 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <div class="game-container">
+        <!-- Left Control Panel -->
+        <div class="left-panel">
+            <div class="control-section">
+                <h3 class="section-title">Club Selection</h3>
+                <div class="club-grid" id="clubGrid">
+                    <button class="club-button" data-club="driver">Driver</button>
+                    <button class="club-button" data-club="3wood">3-Wood</button>
+                    <button class="club-button" data-club="5wood">5-Wood</button>
+                    <button class="club-button" data-club="2iron">2-Iron</button>
+                    <button class="club-button" data-club="5iron">5-Iron</button>
+                    <button class="club-button" data-club="7iron">7-Iron</button>
+                    <button class="club-button" data-club="9iron">9-Iron</button>
+                    <button class="club-button" data-club="wedge">Wedge</button>
+                    <button class="club-button" data-club="putter">Putter</button>
+                </div>
+            </div>
+
+            <div class="control-section">
+                <h3 class="section-title">Dice Results</h3>
+                <div class="dice-container">
+                    <div class="dice green" id="distanceDice">?</div>
+                    <div class="dice green" id="directionDice">?</div>
+                    <div class="dice red" id="problemDice">-</div>
+                </div>
+            </div>
+
+            <button class="take-shot-btn" id="takeShot" disabled>
+                Select Club to Take Shot
+            </button>
+
+            <div class="control-section">
+                <h3 class="section-title">Game Status</h3>
+                <div class="status-item">
+                    <span class="status-label">Hole:</span>
+                    <span class="status-value" id="currentHole">1</span>
+                </div>
+                <div class="status-item">
+                    <span class="status-label">Par:</span>
+                    <span class="status-value" id="holePar">4</span>
+                </div>
+                <div class="status-item">
+                    <span class="status-label">Strokes:</span>
+                    <span class="status-value" id="strokeCount">0</span>
+                </div>
+                <div class="status-item">
+                    <span class="status-label">Distance:</span>
+                    <span class="status-value" id="distanceToPin">394 yds</span>
+                </div>
+                <div class="status-item">
+                    <span class="status-label">Lie:</span>
+                    <span class="status-value" id="currentLie">Tee</span>
+                </div>
+                <div class="status-item">
+                    <span class="status-label">Score:</span>
+                    <span class="status-value" id="totalScore">E</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right Phaser Game Panel -->
+        <div class="right-panel">
+            <div class="phaser-container" id="phaserContainer">
+                <div class="phaser-overlay" id="holeInfo">
+                    Hole 1 - Par 4 - "Opening Statement"
+                </div>
+            </div>
+            
+            <div class="game-controls">
+                <button onclick="game.changeView('overhead')">Overhead View</button>
+                <button onclick="game.changeView('side')">Side View</button>
+                <button onclick="game.toggleGrid()">Toggle Grid</button>
+                <button onclick="game.showAerial()">Show Real Course</button>
+                <span style="margin-left: auto;">TPC Sawgrass - Authentic 1987 Golf Board Game</span>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Enhanced Phaser Golf Game Scene
+        class GolfGameScene extends Phaser.Scene {
+            constructor() {
+                super({ key: 'GolfGameScene' });
+                this.ball = null;
+                this.courseElements = [];
+                this.gridEnabled = true;
+                this.currentView = 'overhead';
+            }
+
+            preload() {
+                // Create simple colored rectangles for game elements
+                this.load.image('tee', 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==');
+            }
+
+            create() {
+                console.log('🎮 Phaser Golf Scene Created');
+                
+                // Set up camera and world bounds
+                this.cameras.main.setBounds(0, 0, 800, 600);
+                this.physics.world.setBounds(0, 0, 800, 600);
+                
+                this.createCourse();
+                this.createBall();
+                this.createGrid();
+                
+                // Connect to the board game engine
+                this.connectToBoardGame();
+            }
+
+            createCourse() {
+                // Create detailed golf course elements
+                const graphics = this.add.graphics();
+                
+                // Course background (rough)
+                graphics.fillStyle(0x556B2F);
+                graphics.fillRect(0, 0, 800, 600);
+                
+                // Fairway (curved path)
+                graphics.fillStyle(0x32CD32);
+                graphics.fillEllipse(400, 300, 380, 480);
+                
+                // Tee box (bottom)
+                graphics.fillStyle(0x8B4513);
+                graphics.fillRoundedRect(350, 550, 100, 30, 5);
+                
+                // Green (top with realistic shape)
+                graphics.fillStyle(0x228B22);
+                graphics.fillCircle(400, 90, 70);
+                graphics.fillStyle(0x32CD32);
+                graphics.fillCircle(400, 90, 55);
+                
+                // Sand bunkers (hazards)
+                graphics.fillStyle(0xF4A460);
+                // Left bunker
+                graphics.fillEllipse(250, 200, 60, 40);
+                // Right bunker
+                graphics.fillEllipse(550, 250, 80, 50);
+                // Greenside bunker
+                graphics.fillEllipse(480, 140, 50, 30);
+                
+                // Water hazard (small pond)
+                graphics.fillStyle(0x4682B4);
+                graphics.fillEllipse(150, 350, 80, 60);
+                
+                // Pin and flag
+                graphics.fillStyle(0x654321);
+                graphics.fillRect(396, 60, 8, 50);
+                graphics.fillStyle(0xFF0000);
+                graphics.fillTriangle(404, 65, 404, 85, 430, 75);
+                
+                // Add yardage markers
+                const yardages = [100, 150, 200, 250, 300];
+                yardages.forEach(yard => {
+                    const progress = yard / 400;
+                    const y = 550 - (progress * 450);
+                    
+                    graphics.fillStyle(0xFFFFFF);
+                    graphics.fillCircle(400, y, 8);
+                    
+                    const text = this.add.text(410, y - 8, `${yard}`, {
+                        fontSize: '12px',
+                        fill: '#000000',
+                        fontWeight: 'bold'
+                    });
+                });
+                
+                this.courseGraphics = graphics;
+            }
+
+            createBall() {
+                // Create ball sprite
+                this.ball = this.add.circle(400, 550, 8, 0xFFD700);
+                this.ball.setStroke(0x000000, 2);
+                
+                // Add physics
+                this.physics.add.existing(this.ball);
+                this.ball.body.setCollideWorldBounds(true);
+                this.ball.body.setBounce(0.3);
+                
+                // Create lie indicator circle around ball
+                this.lieIndicator = this.add.circle(400, 550, 15, 0x8B4513, 0.3);
+                this.lieIndicator.setStroke(0x8B4513, 2);
+                
+                // Add ball trail effect
+                this.ballTrail = [];
+            }
+
+            createGrid() {
+                this.gridGraphics = this.add.graphics();
+                this.updateGrid();
+            }
+
+            updateGrid() {
+                this.gridGraphics.clear();
+                
+                if (this.gridEnabled) {
+                    this.gridGraphics.lineStyle(1, 0x666666, 0.3);
+                    
+                    // Draw grid lines
+                    for (let x = 0; x <= 800; x += 40) {
+                        this.gridGraphics.moveTo(x, 0);
+                        this.gridGraphics.lineTo(x, 600);
+                    }
+                    
+                    for (let y = 0; y <= 600; y += 40) {
+                        this.gridGraphics.moveTo(0, y);
+                        this.gridGraphics.lineTo(800, y);
+                    }
+                    
+                    this.gridGraphics.strokePath();
+                }
+            }
+
+            connectToBoardGame() {
+                // Connect to the board game engine
+                window.phaserScene = this;
+                
+                // Listen for ball position updates
+                this.ballUpdateInterval = setInterval(() => {
+                    if (window.boardGame && window.boardGame.gameState) {
+                        this.updateBallFromBoardGame(window.boardGame.gameState);
+                    }
+                }, 100);
+            }
+
+            updateBallFromBoardGame(gameState) {
+                if (!this.ball || !this.lieIndicator) return;
+                
+                // Convert percentage position to Phaser coordinates
+                const x = (gameState.ballPosition.x / 100) * 800;
+                const y = 600 - ((gameState.ballPosition.y / 100) * 600);
+                
+                // Update lie indicator color based on current lie
+                const lieColors = {
+                    tee: 0x8B4513,      // Brown
+                    fairway: 0x32CD32,  // Green
+                    rough: 0x556B2F,    // Dark green
+                    sand: 0xF4A460,     // Sandy brown
+                    green: 0x00FF00     // Bright green
+                };
+                
+                const lieColor = lieColors[gameState.currentLie] || 0x8B4513;
+                
+                // Animate ball and lie indicator movement
+                this.tweens.add({
+                    targets: [this.ball, this.lieIndicator],
+                    x: x,
+                    y: y,
+                    duration: 1000,
+                    ease: 'Power2',
+                    onStart: () => {
+                        // Update lie indicator appearance
+                        this.lieIndicator.setFillStyle(lieColor, 0.3);
+                        this.lieIndicator.setStrokeStyle(2, lieColor);
+                    },
+                    onComplete: () => {
+                        // Add bounce effect
+                        this.tweens.add({
+                            targets: this.ball,
+                            scaleX: 1.2,
+                            scaleY: 1.2,
+                            duration: 200,
+                            yoyo: true
+                        });
+                        
+                        // Pulse lie indicator
+                        this.tweens.add({
+                            targets: this.lieIndicator,
+                            scaleX: 1.3,
+                            scaleY: 1.3,
+                            alpha: 0.6,
+                            duration: 300,
+                            yoyo: true
+                        });
+                    }
+                });
+                
+                // Add to trail
+                this.addBallTrail(x, y);
+            }
+
+            addBallTrail(x, y) {
+                // Add trail point
+                const trailPoint = this.add.circle(x, y, 3, 0xFFD700, 0.5);
+                this.ballTrail.push(trailPoint);
+                
+                // Fade out trail point
+                this.tweens.add({
+                    targets: trailPoint,
+                    alpha: 0,
+                    duration: 2000,
+                    onComplete: () => {
+                        trailPoint.destroy();
+                        this.ballTrail = this.ballTrail.filter(p => p !== trailPoint);
+                    }
+                });
+                
+                // Limit trail length
+                if (this.ballTrail.length > 10) {
+                    const oldPoint = this.ballTrail.shift();
+                    if (oldPoint && oldPoint.destroy) {
+                        oldPoint.destroy();
+                    }
+                }
+            }
+
+            changeView(view) {
+                this.currentView = view;
+                
+                if (view === 'side') {
+                    this.cameras.main.setZoom(1.5);
+                    this.cameras.main.centerOn(400, this.ball.y);
+                } else {
+                    this.cameras.main.setZoom(1);
+                    this.cameras.main.centerOn(400, 300);
+                }
+            }
+
+            toggleGrid() {
+                this.gridEnabled = !this.gridEnabled;
+                this.updateGrid();
+            }
+
+            update() {
+                // Update camera to follow ball if in side view
+                if (this.currentView === 'side' && this.ball) {
+                    this.cameras.main.centerOn(400, this.ball.y);
+                }
+            }
+            
+            displayShotResult(resultText, distanceToPin) {
+                // Remove existing result text
+                if (this.shotResultText) {
+                    this.shotResultText.destroy();
+                }
+                
+                // Create new result text
+                this.shotResultText = this.add.text(400, 500, resultText + `\nRemaining: ${distanceToPin} yds`, {
+                    fontSize: '14px',
+                    fill: '#FFFFFF',
+                    backgroundColor: 'rgba(139, 69, 19, 0.8)',
+                    padding: { x: 10, y: 5 },
+                    align: 'center'
+                });
+                this.shotResultText.setOrigin(0.5);
+                
+                // Fade out after 3 seconds
+                this.tweens.add({
+                    targets: this.shotResultText,
+                    alpha: 0,
+                    duration: 3000,
+                    delay: 2000,
+                    onComplete: () => {
+                        if (this.shotResultText) {
+                            this.shotResultText.destroy();
+                            this.shotResultText = null;
+                        }
+                    }
+                });
+            }
+        }
+
+        // Enhanced Board Game Engine (complete authentic 1987 mechanics)
+        class EnhancedBoardGameEngine {
+            constructor() {
+                // Complete working logic from main game
+                this.courseData = this.initializeCourseData();
+                this.shotSchedules = this.initializeShotSchedules();
+                this.clubRestrictions = this.initializeClubRestrictions();
+                this.problemEffects = this.initializeProblemEffects();
+                
+                const firstHole = this.courseData[1];
+                this.gameState = {
+                    currentHole: 1,
+                    strokeCount: 0,
+                    totalScore: 0,
+                    distanceToPin: firstHole.yardages.blue,
+                    ballPosition: { x: 50, y: 5 },
+                    currentLie: 'tee',
+                    selectedClub: null,
+                    holesCompleted: 0
+                };
+                
+                this.initializeUI();
+            }
+
+            // Copy all the working methods from ultimate-pursuit-of-par.html
+            initializeCourseData() {
+                return {
+                    1: { par: 4, name: "Opening Statement", yardages: { blue: 394 } },
+                    2: { par: 5, name: "The Long Drive", yardages: { blue: 507 } },
+                    3: { par: 3, name: "Water Carry", yardages: { blue: 160 } },
+                    4: { par: 4, name: "Dogleg Left", yardages: { blue: 384 } },
+                    5: { par: 4, name: "Risk/Reward", yardages: { blue: 466 } },
+                    6: { par: 4, name: "Bunker Challenge", yardages: { blue: 393 } },
+                    7: { par: 4, name: "Strategic Placement", yardages: { blue: 442 } },
+                    8: { par: 5, name: "Reachable Par 5", yardages: { blue: 537 } },
+                    9: { par: 4, name: "Front Nine Finish", yardages: { blue: 424 } },
+                    10: { par: 4, name: "Back Nine Start", yardages: { blue: 424 } },
+                    11: { par: 5, name: "Water All Around", yardages: { blue: 535 } },
+                    12: { par: 4, name: "Pete's Corner", yardages: { blue: 358 } },
+                    13: { par: 3, name: "Demanding Par 3", yardages: { blue: 181 } },
+                    14: { par: 4, name: "The Bear Trap Start", yardages: { blue: 467 } },
+                    15: { par: 4, name: "Bear Trap Middle", yardages: { blue: 449 } },
+                    16: { par: 5, name: "Bear Trap Finish", yardages: { blue: 507 } },
+                    17: { par: 3, name: "Island Green", yardages: { blue: 137 } },
+                    18: { par: 4, name: "Home Hole", yardages: { blue: 447 } }
+                };
+            }
+
+            initializeShotSchedules() {
+                return {
+                    woods: {
+                        driver: {
+                            1: { min: 200, max: 240, accuracy: 0.7 },
+                            2: { min: 210, max: 250, accuracy: 0.75 },
+                            3: { min: 220, max: 260, accuracy: 0.8 },
+                            4: { min: 230, max: 270, accuracy: 0.85 },
+                            5: { min: 240, max: 280, accuracy: 0.8 },
+                            6: { min: 250, max: 290, accuracy: 0.75 }
+                        },
+                        '3wood': {
+                            1: { min: 180, max: 210, accuracy: 0.75 },
+                            2: { min: 190, max: 220, accuracy: 0.8 },
+                            3: { min: 200, max: 230, accuracy: 0.85 },
+                            4: { min: 210, max: 240, accuracy: 0.9 },
+                            5: { min: 200, max: 230, accuracy: 0.85 },
+                            6: { min: 190, max: 220, accuracy: 0.8 }
+                        },
+                        '5wood': {
+                            1: { min: 160, max: 185, accuracy: 0.8 },
+                            2: { min: 170, max: 195, accuracy: 0.85 },
+                            3: { min: 180, max: 205, accuracy: 0.9 },
+                            4: { min: 185, max: 210, accuracy: 0.95 },
+                            5: { min: 180, max: 205, accuracy: 0.9 },
+                            6: { min: 170, max: 195, accuracy: 0.85 }
+                        }
+                    },
+                    irons: {
+                        '2iron': {
+                            1: { min: 140, max: 165, accuracy: 0.8 },
+                            2: { min: 150, max: 175, accuracy: 0.85 },
+                            3: { min: 160, max: 185, accuracy: 0.9 },
+                            4: { min: 170, max: 195, accuracy: 0.95 },
+                            5: { min: 165, max: 185, accuracy: 0.9 },
+                            6: { min: 155, max: 175, accuracy: 0.85 }
+                        },
+                        '5iron': {
+                            1: { min: 100, max: 125, accuracy: 0.85 },
+                            2: { min: 110, max: 135, accuracy: 0.9 },
+                            3: { min: 120, max: 145, accuracy: 0.95 },
+                            4: { min: 130, max: 155, accuracy: 1.0 },
+                            5: { min: 125, max: 145, accuracy: 0.95 },
+                            6: { min: 115, max: 135, accuracy: 0.9 }
+                        },
+                        '7iron': {
+                            1: { min: 80, max: 105, accuracy: 0.9 },
+                            2: { min: 90, max: 115, accuracy: 0.95 },
+                            3: { min: 100, max: 125, accuracy: 1.0 },
+                            4: { min: 110, max: 135, accuracy: 1.0 },
+                            5: { min: 105, max: 125, accuracy: 1.0 },
+                            6: { min: 95, max: 115, accuracy: 0.95 }
+                        },
+                        '9iron': {
+                            1: { min: 60, max: 85, accuracy: 0.95 },
+                            2: { min: 70, max: 95, accuracy: 1.0 },
+                            3: { min: 80, max: 105, accuracy: 1.0 },
+                            4: { min: 90, max: 115, accuracy: 1.0 },
+                            5: { min: 85, max: 105, accuracy: 1.0 },
+                            6: { min: 75, max: 95, accuracy: 1.0 }
+                        }
+                    },
+                    wedge: {
+                        wedge: {
+                            1: { min: 30, max: 55, accuracy: 1.0 },
+                            2: { min: 40, max: 65, accuracy: 1.0 },
+                            3: { min: 50, max: 75, accuracy: 1.0 },
+                            4: { min: 60, max: 85, accuracy: 1.0 },
+                            5: { min: 55, max: 75, accuracy: 1.0 },
+                            6: { min: 45, max: 65, accuracy: 1.0 }
+                        }
+                    },
+                    putter: {
+                        putter: {
+                            1: { min: 5, max: 15, accuracy: 1.0 },
+                            2: { min: 10, max: 20, accuracy: 1.0 },
+                            3: { min: 15, max: 25, accuracy: 1.0 },
+                            4: { min: 20, max: 30, accuracy: 1.0 },
+                            5: { min: 25, max: 35, accuracy: 1.0 },
+                            6: { min: 30, max: 40, accuracy: 1.0 }
+                        }
+                    }
+                };
+            }
+
+            initializeClubRestrictions() {
+                return {
+                    tee: ['driver', '3wood', '5wood', '2iron', '5iron', '7iron', '9iron', 'wedge'],
+                    fairway: ['driver', '3wood', '5wood', '2iron', '5iron', '7iron', '9iron', 'wedge'],
+                    rough: ['5iron', '7iron', '9iron', 'wedge'],
+                    sand: ['wedge'],
+                    green: ['putter']
+                };
+            }
+
+            initializeUI() {
+                this.setupClubSelection();
+                this.setupShotButton();
+                this.updateGameStatus();
+                this.updateAvailableClubs();
+            }
+
+            setupClubSelection() {
+                const clubButtons = document.querySelectorAll('.club-button');
+                clubButtons.forEach(button => {
+                    button.addEventListener('click', () => {
+                        if (!button.disabled) {
+                            clubButtons.forEach(b => b.classList.remove('selected'));
+                            button.classList.add('selected');
+                            this.gameState.selectedClub = button.dataset.club;
+                            this.updateShotButton();
+                        }
+                    });
+                });
+            }
+
+            setupShotButton() {
+                const shotButton = document.getElementById('takeShot');
+                shotButton.addEventListener('click', () => {
+                    if (!shotButton.disabled) {
+                        this.takeShot();
+                    }
+                });
+            }
+
+            updateShotButton() {
+                const shotButton = document.getElementById('takeShot');
+                if (this.gameState.selectedClub) {
+                    shotButton.disabled = false;
+                    shotButton.textContent = `Take Shot with ${this.gameState.selectedClub.toUpperCase()}`;
+                } else {
+                    shotButton.disabled = true;
+                    shotButton.textContent = 'Select Club to Take Shot';
+                }
+            }
+
+            updateAvailableClubs() {
+                const availableClubs = this.clubRestrictions[this.gameState.currentLie];
+                const clubButtons = document.querySelectorAll('.club-button');
+                
+                clubButtons.forEach(button => {
+                    const club = button.dataset.club;
+                    if (availableClubs.includes(club)) {
+                        button.disabled = false;
+                    } else {
+                        button.disabled = true;
+                        button.classList.remove('selected');
+                        if (this.gameState.selectedClub === club) {
+                            this.gameState.selectedClub = null;
+                        }
+                    }
+                });
+                
+                this.updateShotButton();
+            }
+
+            async takeShot() {
+                const club = this.gameState.selectedClub;
+                if (!club) return;
+
+                // Roll dice with animation
+                const diceResults = await this.rollDice();
+                
+                // Calculate shot result using authentic mechanics
+                const shotResult = this.calculateShotResult(club, diceResults);
+                
+                // Update game state
+                this.gameState.strokeCount++;
+                this.gameState.distanceToPin = Math.max(0, shotResult.newDistance);
+                
+                // Determine new lie and position
+                const newLie = this.determineLie(shotResult);
+                this.gameState.currentLie = newLie;
+                
+                // Update ball position with authentic calculation
+                this.updateBallPositionAfterShot(shotResult, newLie);
+                
+                // Show detailed shot result
+                this.showShotResult(club, diceResults, shotResult);
+                
+                // Update UI
+                this.updateGameStatus();
+                this.updateAvailableClubs();
+                
+                // Clear club selection
+                document.querySelectorAll('.club-button').forEach(b => b.classList.remove('selected'));
+                this.gameState.selectedClub = null;
+                this.updateShotButton();
+                
+                // Check if hole is completed
+                if (shotResult.holeCompleted) {
+                    setTimeout(() => this.completeHole(), 2000);
+                }
+            }
+
+            updateGameStatus() {
+                const currentHole = this.courseData[this.gameState.currentHole];
+                
+                document.getElementById('currentHole').textContent = this.gameState.currentHole;
+                document.getElementById('holePar').textContent = currentHole.par;
+                document.getElementById('strokeCount').textContent = this.gameState.strokeCount;
+                document.getElementById('distanceToPin').textContent = `${this.gameState.distanceToPin} yds`;
+                document.getElementById('currentLie').textContent = this.gameState.currentLie;
+                
+                const holeInfo = document.getElementById('holeInfo');
+                holeInfo.textContent = `Hole ${this.gameState.currentHole} - Par ${currentHole.par} - "${currentHole.name}"`;
+            }
+
+            changeView(view) {
+                if (window.phaserScene) {
+                    window.phaserScene.changeView(view);
+                }
+            }
+
+            toggleGrid() {
+                if (window.phaserScene) {
+                    window.phaserScene.toggleGrid();
+                }
+            }
+
+            showAerial() {
+                const holeNum = this.gameState.currentHole;
+                window.open(`./assets/tpc-aerials/hole${holeNum}_aerial.jpg`, '_blank');
+            }
+            
+            // Add all the authentic mechanics from working game
+            initializeProblemEffects() {
+                return {
+                    rough: {
+                        1: { distanceMultiplier: 0.6, accuracyPenalty: 0.3 },
+                        2: { distanceMultiplier: 0.7, accuracyPenalty: 0.25 },
+                        3: { distanceMultiplier: 0.8, accuracyPenalty: 0.2 },
+                        4: { distanceMultiplier: 0.85, accuracyPenalty: 0.15 },
+                        5: { distanceMultiplier: 0.9, accuracyPenalty: 0.1 },
+                        6: { distanceMultiplier: 1.0, accuracyPenalty: 0 }
+                    },
+                    sand: {
+                        1: { distanceMultiplier: 0.3, accuracyPenalty: 0.3, stayInSand: true },
+                        2: { distanceMultiplier: 0.4, accuracyPenalty: 0.25 },
+                        3: { distanceMultiplier: 0.5, accuracyPenalty: 0.2 },
+                        4: { distanceMultiplier: 0.6, accuracyPenalty: 0.2 },
+                        5: { distanceMultiplier: 0.5, accuracyPenalty: 0.25 },
+                        6: { distanceMultiplier: 0.4, accuracyPenalty: 0.3 }
+                    },
+                    fairway: {
+                        1: { distanceMultiplier: 0.9, accuracyPenalty: 0.1 },
+                        2: { distanceMultiplier: 0.95, accuracyPenalty: 0.05 },
+                        3: { distanceMultiplier: 1.0, accuracyPenalty: 0 },
+                        4: { distanceMultiplier: 1.0, accuracyPenalty: 0 },
+                        5: { distanceMultiplier: 1.0, accuracyPenalty: 0 },
+                        6: { distanceMultiplier: 1.0, accuracyPenalty: 0 }
+                    },
+                    tee: {
+                        1: { distanceMultiplier: 1.0, accuracyPenalty: 0 },
+                        2: { distanceMultiplier: 1.0, accuracyPenalty: 0 },
+                        3: { distanceMultiplier: 1.0, accuracyPenalty: 0 },
+                        4: { distanceMultiplier: 1.0, accuracyPenalty: 0 },
+                        5: { distanceMultiplier: 1.0, accuracyPenalty: 0 },
+                        6: { distanceMultiplier: 1.0, accuracyPenalty: 0 }
+                    }
+                };
+            }
+            
+            async rollDice() {
+                const distanceDie = document.getElementById('distanceDice');
+                const directionDie = document.getElementById('directionDice');
+                const problemDie = document.getElementById('problemDice');
+                
+                // Check if we need to roll problem dice (only for hazards)
+                const needsProblemDice = ['rough', 'sand'].includes(this.gameState.currentLie);
+                
+                // Start rolling animation
+                const dicesToRoll = [distanceDie, directionDie];
+                if (needsProblemDice) dicesToRoll.push(problemDie);
+                
+                dicesToRoll.forEach(die => {
+                    die.classList.add('rolling');
+                    die.textContent = '?';
+                });
+                
+                // Clear problem die if not needed
+                if (!needsProblemDice) {
+                    problemDie.textContent = '-';
+                    problemDie.classList.remove('rolling');
+                }
+                
+                // Wait for animation
+                await new Promise(resolve => setTimeout(resolve, 600));
+                
+                // Generate results
+                const results = {
+                    distance: Math.floor(Math.random() * 6) + 1,
+                    direction: Math.floor(Math.random() * 12) + 1,
+                    problem: needsProblemDice ? Math.floor(Math.random() * 6) + 1 : null
+                };
+                
+                // Display results
+                distanceDie.textContent = results.distance;
+                directionDie.textContent = results.direction;
+                if (needsProblemDice) {
+                    problemDie.textContent = results.problem;
+                } else {
+                    problemDie.textContent = '-';
+                }
+                
+                // Remove animation
+                dicesToRoll.forEach(die => {
+                    die.classList.remove('rolling');
+                });
+                
+                return results;
+            }
+            
+            calculateShotResult(club, diceResults) {
+                // Get club category
+                const clubCategory = this.getClubCategory(club);
+                const shotSchedule = this.shotSchedules[clubCategory][club];
+                const shotData = shotSchedule[diceResults.distance];
+                
+                // Calculate base distance
+                let distance = shotData.min + Math.random() * (shotData.max - shotData.min);
+                
+                // Apply problem dice effects (only if rolled)
+                if (diceResults.problem) {
+                    const problemModifier = this.getProblemDiceModifier(diceResults.problem);
+                    distance += problemModifier;
+                    distance = Math.max(5, distance); // Minimum 5 yards
+                }
+                
+                // Calculate direction
+                const direction = this.calculateDirection(diceResults.direction);
+                
+                // Calculate new distance to pin
+                const newDistance = Math.max(0, this.gameState.distanceToPin - distance);
+                
+                // Check if hole is completed
+                let holeCompleted = false;
+                if (this.gameState.currentLie === 'green' || newDistance <= 2) {
+                    // If putting or very close, check if ball goes in hole
+                    if (club === 'putter' && newDistance <= 5) {
+                        holeCompleted = newDistance <= 2;
+                    } else if (newDistance <= 2) {
+                        holeCompleted = true;
+                    }
+                }
+                
+                // Calculate problem effect info for display
+                let problemEffectInfo = null;
+                if (diceResults.problem) {
+                    const problemModifier = this.getProblemDiceModifier(diceResults.problem);
+                    problemEffectInfo = {
+                        diceRoll: diceResults.problem,
+                        modifier: problemModifier,
+                        applied: true
+                    };
+                }
+
+                return {
+                    club,
+                    distance: Math.round(distance),
+                    direction,
+                    newDistance,
+                    problemEffect: problemEffectInfo,
+                    holeCompleted,
+                    diceResults
+                };
+            }
+            
+            getClubCategory(club) {
+                if (['driver', '3wood', '5wood'].includes(club)) return 'woods';
+                if (['2iron', '5iron', '7iron', '9iron'].includes(club)) return 'irons';
+                if (club === 'wedge') return 'wedge';
+                if (club === 'putter') return 'putter';
+                return 'irons';
+            }
+            
+            getProblemDiceModifier(problemRoll) {
+                const modifiers = {
+                    1: -20, 2: -10, 3: 0, 4: 0, 5: 10, 6: 20
+                };
+                return modifiers[problemRoll] || 0;
+            }
+            
+            calculateDirection(directionRoll) {
+                const directionTable = {
+                    1: { text: 'Hard Left', deviation: -45 },
+                    2: { text: 'Left', deviation: -30 },
+                    3: { text: 'Slight Left', deviation: -15 },
+                    4: { text: 'Straight', deviation: 0 },
+                    5: { text: 'Straight', deviation: 0 },
+                    6: { text: 'Straight', deviation: 0 },
+                    7: { text: 'Straight', deviation: 0 },
+                    8: { text: 'Straight', deviation: 0 },
+                    9: { text: 'Slight Right', deviation: 15 },
+                    10: { text: 'Right', deviation: 30 },
+                    11: { text: 'Hard Right', deviation: 45 },
+                    12: { text: 'Hook/Slice', deviation: Math.random() > 0.5 ? -60 : 60 }
+                };
+                
+                return directionTable[directionRoll];
+            }
+            
+            determineLie(shotResult) {
+                if (shotResult.holeCompleted) return 'green';
+                
+                const distance = shotResult.newDistance;
+                const absDeviation = Math.abs(shotResult.direction.deviation);
+                
+                // Green area - need good accuracy AND close distance
+                if (distance <= 20 && absDeviation <= 15) {
+                    return 'green';
+                }
+                if (distance <= 10 && absDeviation <= 30) {
+                    return 'green';
+                }
+                
+                // Bunkers and hazards - based on direction errors
+                if (absDeviation > 45) {
+                    if (Math.random() > 0.5) return 'sand';
+                    else return 'rough';
+                }
+                if (absDeviation > 30) {
+                    if (Math.random() > 0.7) return 'sand';
+                    else return 'rough';
+                }
+                
+                // Fairway vs rough - depends on accuracy
+                if (absDeviation <= 15) {
+                    return 'fairway';
+                }
+                
+                return Math.random() > 0.6 ? 'rough' : 'fairway';
+            }
+            
+            updateBallPositionAfterShot(shotResult, newLie) {
+                // Calculate position based on remaining distance to pin and direction
+                const totalHoleDistance = this.courseData[this.gameState.currentHole].yardages.blue || 400;
+                const progressAlongHole = 1 - (shotResult.newDistance / totalHoleDistance);
+                
+                // Y position: 5% (bottom/tee) to 95% (top/green) based on progress
+                let newY = Math.max(5, Math.min(95, progressAlongHole * 85 + 5));
+                
+                // X position: 50% (center) +/- direction deviation  
+                const maxDeviation = 35;
+                let newX = 50 + (shotResult.direction.deviation / 45) * maxDeviation;
+                newX = Math.max(10, Math.min(90, newX));
+                
+                // Special positioning for green
+                if (newLie === 'green') {
+                    newY = Math.max(80, newY);
+                    newX = 50 + (shotResult.direction.deviation / 45) * 20;
+                    newX = Math.max(30, Math.min(70, newX));
+                }
+                
+                this.gameState.ballPosition = { x: newX, y: newY };
+                
+                console.log('Ball moved to:', this.gameState.ballPosition, 'Lie:', newLie);
+            }
+            
+            showShotResult(club, diceResults, shotResult) {
+                const resultText = `${club.toUpperCase()}: ${shotResult.distance}yds ${shotResult.direction.text}`;
+                const problemText = shotResult.problemEffect ? 
+                    ` (Problem: ${shotResult.problemEffect.modifier > 0 ? '+' : ''}${shotResult.problemEffect.modifier}yds)` : '';
+                
+                console.log('Shot Result:', resultText + problemText);
+                console.log('Distance to pin:', shotResult.newDistance, 'yds');
+                
+                // Show result in Phaser scene
+                if (window.phaserScene) {
+                    window.phaserScene.displayShotResult(resultText + problemText, shotResult.newDistance);
+                }
+            }
+            
+            completeHole() {
+                console.log(`Hole ${this.gameState.currentHole} completed in ${this.gameState.strokeCount} strokes!`);
+                
+                // Calculate score
+                const par = this.courseData[this.gameState.currentHole].par;
+                const score = this.gameState.strokeCount - par;
+                this.gameState.totalScore += score;
+                
+                // Move to next hole or finish round
+                if (this.gameState.currentHole < 18) {
+                    this.moveToNextHole();
+                } else {
+                    console.log(`Round completed! Total score: ${this.gameState.totalScore > 0 ? '+' : ''}${this.gameState.totalScore}`);
+                }
+            }
+            
+            moveToNextHole() {
+                this.gameState.currentHole++;
+                this.gameState.strokeCount = 0;
+                this.gameState.ballPosition = { x: 50, y: 5 };
+                this.gameState.currentLie = 'tee';
+                this.gameState.distanceToPin = this.courseData[this.gameState.currentHole].yardages.blue;
+                
+                this.updateGameStatus();
+                this.updateAvailableClubs();
+            }
+        }
+
+        // Initialize the game
+        window.addEventListener('load', () => {
+            // Set up Phaser game
+            const config = {
+                type: Phaser.AUTO,
+                width: 800,
+                height: 600,
+                parent: 'phaserContainer',
+                physics: {
+                    default: 'arcade',
+                    arcade: {
+                        gravity: { y: 0 },
+                        debug: false
+                    }
+                },
+                scene: GolfGameScene,
+                backgroundColor: '#32CD32'
+            };
+
+            const phaserGame = new Phaser.Game(config);
+            
+            // Initialize board game engine
+            window.boardGame = new EnhancedBoardGameEngine();
+            window.game = window.boardGame;
+            
+            console.log('🎮 Enhanced Phaser Golf Game Initialized');
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Game 3D - Automated Testing</title>
+</head>
+<body>
+    <div id="test-results"></div>
+    <iframe id="game-frame" src="http://localhost:61931/game-3d" width="1200" height="800" style="border:1px solid #ccc;"></iframe>
+    
+    <script>
+        const results = [];
+        
+        function logResult(test, status, message) {
+            results.push({test, status, message, timestamp: new Date().toISOString()});
+            console.log(`[${status.toUpperCase()}] ${test}: ${message}`);
+            updateDisplay();
+        }
+        
+        function updateDisplay() {
+            const container = document.getElementById('test-results');
+            container.innerHTML = '<h2>Test Results</h2>' + 
+                results.map(r => `<div style="color:${r.status==='PASS'?'green':'red'}"><strong>${r.test}:</strong> ${r.message}</div>`).join('');
+        }
+        
+        function runTests() {
+            setTimeout(() => {
+                const iframe = document.getElementById('game-frame');
+                const gameWindow = iframe.contentWindow;
+                const gameDoc = iframe.contentDocument;
+                
+                try {
+                    // Test 1: Check if Phaser is loaded
+                    if (typeof gameWindow.Phaser !== 'undefined') {
+                        logResult('Phaser.js Loading', 'PASS', 'Phaser.js library loaded successfully');
+                    } else {
+                        logResult('Phaser.js Loading', 'FAIL', 'Phaser.js not found in game window');
+                    }
+                    
+                    // Test 2: Check if PhaserBoardGameEngine exists
+                    if (typeof gameWindow.PhaserBoardGameEngine !== 'undefined') {
+                        logResult('Game Engine Class', 'PASS', 'PhaserBoardGameEngine class exists');
+                    } else {
+                        logResult('Game Engine Class', 'FAIL', 'PhaserBoardGameEngine class not found');
+                    }
+                    
+                    // Test 3: Check if game engine is initialized
+                    if (typeof gameWindow.phaserEngine !== 'undefined' && gameWindow.phaserEngine !== null) {
+                        logResult('Game Engine Initialization', 'PASS', 'Game engine instance created successfully');
+                    } else {
+                        logResult('Game Engine Initialization', 'FAIL', 'Game engine not initialized');
+                    }
+                    
+                    // Test 4: Check for canvas element
+                    const canvas = gameDoc.querySelector('canvas');
+                    if (canvas) {
+                        logResult('Phaser Canvas', 'PASS', `Canvas found with size ${canvas.width}x${canvas.height}`);
+                    } else {
+                        logResult('Phaser Canvas', 'FAIL', 'No canvas element found in game viewport');
+                    }
+                    
+                    // Test 5: Check for course viewport
+                    const viewport = gameDoc.getElementById('course3DViewport');
+                    if (viewport) {
+                        const style = gameWindow.getComputedStyle(viewport);
+                        logResult('Course Viewport', 'PASS', `Viewport exists with dimensions ${style.width}x${style.height}`);
+                    } else {
+                        logResult('Course Viewport', 'FAIL', 'Course viewport element not found');
+                    }
+                    
+                    // Test 6: Check loading overlay removal
+                    const loadingOverlay = gameDoc.getElementById('loadingOverlay');
+                    if (loadingOverlay) {
+                        const isHidden = gameWindow.getComputedStyle(loadingOverlay).display === 'none';
+                        if (isHidden) {
+                            logResult('Loading State', 'PASS', 'Loading overlay properly hidden');
+                        } else {
+                            logResult('Loading State', 'FAIL', 'Loading overlay still visible');
+                        }
+                    }
+                    
+                    // Test 7: Check club selector functionality
+                    const clubSelector = gameDoc.getElementById('clubSelector3D');
+                    if (clubSelector && clubSelector.children.length > 0) {
+                        logResult('Club Selection UI', 'PASS', `${clubSelector.children.length} club options found`);
+                    } else {
+                        logResult('Club Selection UI', 'FAIL', 'Club selector not found or empty');
+                    }
+                    
+                    // Test 8: Check dice elements
+                    const greenDice = gameDoc.getElementById('greenDice3D');
+                    const directionDice = gameDoc.getElementById('directionDice3D');
+                    if (greenDice && directionDice) {
+                        logResult('Dice System', 'PASS', 'Dice elements found and accessible');
+                    } else {
+                        logResult('Dice System', 'FAIL', 'One or more dice elements missing');
+                    }
+                    
+                    // Test 9: Check camera controls
+                    const cameraControls = gameDoc.querySelectorAll('.camera-btn');
+                    if (cameraControls.length >= 4) {
+                        logResult('Camera Controls', 'PASS', `${cameraControls.length} camera control buttons found`);
+                    } else {
+                        logResult('Camera Controls', 'FAIL', `Only ${cameraControls.length} camera controls found, expected 4`);
+                    }
+                    
+                    // Test 10: Check accessibility features
+                    const hexGridToggle = gameDoc.getElementById('enableHexGrid');
+                    const colorBlindToggle = gameDoc.getElementById('colorBlindMode');
+                    const highContrastToggle = gameDoc.getElementById('highContrastMode');
+                    
+                    if (hexGridToggle && colorBlindToggle && highContrastToggle) {
+                        logResult('Accessibility Features', 'PASS', 'All accessibility toggles found');
+                    } else {
+                        logResult('Accessibility Features', 'FAIL', 'Some accessibility toggles missing');
+                    }
+                    
+                    // Test 11: Check units toggle
+                    const unitsToggle = gameDoc.getElementById('unitsToggle');
+                    if (unitsToggle) {
+                        logResult('Units System', 'PASS', 'Units toggle button found');
+                    } else {
+                        logResult('Units System', 'FAIL', 'Units toggle button missing');
+                    }
+                    
+                    // Test 12: Check shot button
+                    const shotButton = gameDoc.getElementById('takeShot3D');
+                    if (shotButton) {
+                        const isEnabled = !shotButton.disabled;
+                        logResult('Shot Button', isEnabled ? 'PASS' : 'WARN', `Shot button found, enabled: ${isEnabled}`);
+                    } else {
+                        logResult('Shot Button', 'FAIL', 'Take shot button not found');
+                    }
+                    
+                    // Test 13: Check game status display
+                    const currentPlayer = gameDoc.getElementById('currentPlayer3D');
+                    const currentStrokes = gameDoc.getElementById('currentStrokes3D');
+                    const distanceToPin = gameDoc.getElementById('distanceToPin3D');
+                    const currentLie = gameDoc.getElementById('currentLie3D');
+                    
+                    if (currentPlayer && currentStrokes && distanceToPin && currentLie) {
+                        logResult('Game Status Display', 'PASS', 'All game status elements found');
+                    } else {
+                        logResult('Game Status Display', 'FAIL', 'Some game status elements missing');
+                    }
+                    
+                    // Test 14: Check console errors
+                    const errors = [];
+                    const originalError = gameWindow.console.error;
+                    gameWindow.console.error = function(...args) {
+                        errors.push(args.join(' '));
+                        originalError.apply(gameWindow.console, args);
+                    };
+                    
+                    setTimeout(() => {
+                        if (errors.length === 0) {
+                            logResult('Console Errors', 'PASS', 'No JavaScript console errors detected');
+                        } else {
+                            logResult('Console Errors', 'FAIL', `${errors.length} console errors: ${errors.join(', ')}`);
+                        }
+                        
+                        // Final summary
+                        const passed = results.filter(r => r.status === 'PASS').length;
+                        const failed = results.filter(r => r.status === 'FAIL').length;
+                        const warnings = results.filter(r => r.status === 'WARN').length;
+                        
+                        console.log(`\n=== TEST SUMMARY ===`);
+                        console.log(`Passed: ${passed}`);
+                        console.log(`Failed: ${failed}`);
+                        console.log(`Warnings: ${warnings}`);
+                        console.log(`Total: ${results.length}`);
+                        
+                        // Export results to parent window
+                        if (window.parent !== window) {
+                            window.parent.postMessage({
+                                type: 'testResults',
+                                results: results,
+                                summary: {passed, failed, warnings, total: results.length}
+                            }, '*');
+                        }
+                    }, 2000);
+                    
+                } catch (error) {
+                    logResult('Test Execution', 'FAIL', `Error running tests: ${error.message}`);
+                }
+            }, 5000);
+        }
+        
+        // Listen for iframe load
+        document.getElementById('game-frame').addEventListener('load', runTests);
+    </script>
+</body>
+</html>

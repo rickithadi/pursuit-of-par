@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Minimal Phaser Test</title>
+    <script src="https://cdn.jsdelivr.net/npm/phaser@3.80.1/dist/phaser.min.js"></script>
+    <style>
+        #game-container { 
+            width: 800px; 
+            height: 600px; 
+            border: 2px solid #333; 
+            margin: 20px auto; 
+            background: #f5f5dc; 
+        }
+    </style>
+</head>
+<body>
+    <h1>Minimal Phaser Canvas Test</h1>
+    <div id="game-container"></div>
+    
+    <script>
+        console.log('🧪 Starting minimal Phaser test...');
+        console.log('Phaser version:', Phaser.VERSION);
+        console.log('Document ready state:', document.readyState);
+        
+        // Wait for DOM to be completely ready
+        function startTest() {
+            console.log('🎮 Creating minimal Phaser game...');
+            
+            const container = document.getElementById('game-container');
+            console.log('Container found:', !!container);
+            console.log('Container type:', container?.constructor.name);
+            console.log('Container dimensions:', container?.offsetWidth, 'x', container?.offsetHeight);
+            
+            const config = {
+                type: Phaser.WEBGL,  // Explicit WEBGL first
+                width: 800,
+                height: 600,
+                parent: 'game-container',  // String ID
+                backgroundColor: '#F5F5DC',
+                scene: {
+                    create: function() {
+                        console.log('✅ Scene created - adding test shapes');
+                        
+                        // Add test shapes
+                        const circle = this.add.circle(200, 150, 50, 0xFF0000);
+                        const rect = this.add.rectangle(400, 150, 100, 80, 0x00FF00);
+                        const text = this.add.text(300, 300, 'Canvas Working!', {
+                            fontSize: '32px',
+                            color: '#000000'
+                        });
+                        
+                        console.log('✅ Test shapes added:', circle, rect, text);
+                    }
+                }
+            };
+            
+            try {
+                console.log('🎮 Attempting WEBGL creation...');
+                const game = new Phaser.Game(config);
+                console.log('✅ WEBGL game created successfully');
+                
+                // Verify canvas was created
+                setTimeout(() => {
+                    const canvas = container.querySelector('canvas');
+                    console.log('Canvas created:', !!canvas);
+                    if (canvas) {
+                        console.log('Canvas dimensions:', canvas.width, 'x', canvas.height);
+                        console.log('Canvas context available:', !!canvas.getContext);
+                    }
+                }, 500);
+                
+            } catch (error) {
+                console.error('❌ WEBGL creation failed:', error.message);
+                console.log('🔄 Trying Canvas fallback...');
+                
+                config.type = Phaser.CANVAS;
+                try {
+                    const game = new Phaser.Game(config);
+                    console.log('✅ Canvas fallback successful');
+                } catch (canvasError) {
+                    console.error('❌ Canvas fallback also failed:', canvasError.message);
+                }
+            }
+        }
+        
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', startTest);
+        } else {
+            setTimeout(startTest, 100);
+        }
+    </script>
+</body>
+</html>

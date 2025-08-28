@@ -1,0 +1,811 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>In Pursuit of Par - Working Version</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #f5f2e8 0%, #e8f4e8 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+            padding: 2rem;
+        }
+        
+        .header {
+            text-align: center;
+            padding: 2rem;
+            background: linear-gradient(135deg, #1a5f3f 0%, #0d3926 100%);
+            color: white;
+            border-radius: 12px;
+            margin-bottom: 2rem;
+        }
+        
+        .header h1 { font-size: 2.5rem; margin-bottom: 0.5rem; }
+        .header p { opacity: 0.9; }
+        
+        .game-layout {
+            display: grid;
+            grid-template-columns: 1fr 350px;
+            gap: 2rem;
+        }
+        
+        .course-view {
+            border-radius: 12px;
+            padding: 0;
+            min-height: 600px;
+            position: relative;
+            overflow: hidden;
+            background: linear-gradient(180deg, #87ceeb 0%, #6ba6cd 20%, #228b22 25%, #32cd32 75%, #228b22 100%);
+        }
+        
+        /* Course areas with distinct visual differentiation */
+        .tee-box {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 80px;
+            height: 40px;
+            background: linear-gradient(135deg, #8B7355 0%, #A0522D 100%);
+            border-radius: 8px;
+            border: 2px solid #654321;
+        }
+        
+        .fairway {
+            position: absolute;
+            bottom: 80px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 120px;
+            height: 300px;
+            background: linear-gradient(180deg, #228b22 0%, #32cd32 50%, #228b22 100%);
+            border-radius: 60px;
+            border: 2px solid #006400;
+        }
+        
+        .rough-left {
+            position: absolute;
+            bottom: 80px;
+            left: 10%;
+            width: 80px;
+            height: 300px;
+            background: linear-gradient(180deg, #556b2f 0%, #6b8e23 50%, #556b2f 100%);
+            border-radius: 40px;
+            border: 2px solid #4a5d1a;
+        }
+        
+        .rough-right {
+            position: absolute;
+            bottom: 80px;
+            right: 10%;
+            width: 80px;
+            height: 300px;
+            background: linear-gradient(180deg, #556b2f 0%, #6b8e23 50%, #556b2f 100%);
+            border-radius: 40px;
+            border: 2px solid #4a5d1a;
+        }
+        
+        .green {
+            position: absolute;
+            top: 40px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100px;
+            height: 100px;
+            background: radial-gradient(circle, #90EE90 0%, #32CD32 70%, #228B22 100%);
+            border-radius: 50px;
+            border: 3px solid #006400;
+        }
+        
+        .hole {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 16px;
+            height: 16px;
+            background: radial-gradient(circle, #000 0%, #333 100%);
+            border-radius: 50%;
+            border: 2px solid #111;
+            z-index: 3;
+        }
+        
+        .flag {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 4;
+        }
+        
+        .flag-pole {
+            width: 2px;
+            height: 40px;
+            background: #8B4513;
+            position: relative;
+        }
+        
+        .flag-cloth {
+            position: absolute;
+            top: 0;
+            left: 2px;
+            width: 20px;
+            height: 12px;
+            background: linear-gradient(45deg, #FF0000 0%, #FF4500 100%);
+            border-radius: 0 3px 3px 0;
+            animation: flutter 2s ease-in-out infinite;
+        }
+        
+        @keyframes flutter {
+            0%, 100% { transform: scaleX(1); }
+            50% { transform: scaleX(0.8); }
+        }
+        
+        .ball {
+            width: 12px;
+            height: 12px;
+            background: radial-gradient(circle at 30% 30%, #ffffff 0%, #f0f0f0 50%, #e0e0e0 100%);
+            border-radius: 50%;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.4), inset 0 1px 2px rgba(255,255,255,0.8);
+            position: absolute;
+            transition: all 1.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            z-index: 5;
+            border: 1px solid #ddd;
+        }
+        
+        .ball::after {
+            content: '';
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            background: radial-gradient(circle at 25% 25%, rgba(255,255,255,0.8) 0%, transparent 50%);
+        }
+        
+        /* Water hazard */
+        .water-hazard {
+            position: absolute;
+            left: 20%;
+            bottom: 200px;
+            width: 60%;
+            height: 80px;
+            background: linear-gradient(135deg, #4682B4 0%, #1E90FF 50%, #0066CC 100%);
+            border-radius: 40px;
+            border: 2px solid #003d7a;
+            animation: ripple 3s ease-in-out infinite;
+        }
+        
+        @keyframes ripple {
+            0%, 100% { box-shadow: 0 0 0 0 rgba(70, 130, 180, 0.4); }
+            50% { box-shadow: 0 0 0 10px rgba(70, 130, 180, 0); }
+        }
+        
+        /* Sand bunkers */
+        .sand-bunker {
+            position: absolute;
+            background: linear-gradient(135deg, #F4A460 0%, #DEB887 50%, #D2B48C 100%);
+            border: 2px solid #CD853F;
+            border-radius: 20px;
+        }
+        
+        .bunker-left {
+            left: 15%;
+            bottom: 150px;
+            width: 40px;
+            height: 60px;
+        }
+        
+        .bunker-right {
+            right: 15%;
+            bottom: 180px;
+            width: 50px;
+            height: 40px;
+        }
+        
+        /* Lie indicator overlay */
+        .lie-indicator {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            padding: 8px 12px;
+            border-radius: 20px;
+            font-weight: bold;
+            font-size: 0.9rem;
+            z-index: 6;
+            animation: fadeIn 0.5s ease;
+        }
+        
+        .lie-tee { background: linear-gradient(135deg, #8B7355, #A0522D); color: white; }
+        .lie-fairway { background: linear-gradient(135deg, #32CD32, #228B22); color: white; }
+        .lie-rough { background: linear-gradient(135deg, #6B8E23, #556B2F); color: white; }
+        .lie-green { background: linear-gradient(135deg, #90EE90, #32CD32); color: #006400; }
+        .lie-sand { background: linear-gradient(135deg, #F4A460, #DEB887); color: #8B4513; }
+        .lie-water { background: linear-gradient(135deg, #4682B4, #1E90FF); color: white; }
+        
+        /* Distance markers */
+        .yardage-marker {
+            position: absolute;
+            background: white;
+            border: 2px solid #333;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.7rem;
+            font-weight: bold;
+            color: #333;
+        }
+        
+        .marker-200 { right: 25%; bottom: 320px; }
+        .marker-150 { left: 30%; bottom: 280px; }
+        .marker-100 { right: 35%; bottom: 200px; }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: scale(0.8); }
+            to { opacity: 1; transform: scale(1); }
+        }
+        
+        .sidebar {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+        
+        .panel {
+            background: #f8f9fa;
+            border-radius: 12px;
+            padding: 1.5rem;
+            border: 2px solid #e9ecef;
+        }
+        
+        .panel h3 {
+            color: #1a5f3f;
+            margin-bottom: 1rem;
+            font-size: 1.2rem;
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+        
+        .stat-item {
+            background: white;
+            padding: 0.75rem;
+            border-radius: 8px;
+        }
+        
+        .stat-label {
+            font-size: 0.8rem;
+            color: #666;
+            text-transform: uppercase;
+        }
+        
+        .stat-value {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #1a5f3f;
+        }
+        
+        .clubs {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 0.5rem;
+        }
+        
+        .club {
+            background: white;
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            padding: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: center;
+        }
+        
+        .club:hover {
+            border-color: #1a5f3f;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(26, 95, 63, 0.2);
+        }
+        
+        .club.selected {
+            background: #1a5f3f;
+            color: white;
+            border-color: #1a5f3f;
+        }
+        
+        .club-name { font-weight: bold; margin-bottom: 0.25rem; }
+        .club-range { font-size: 0.8rem; opacity: 0.8; }
+        
+        .btn-shot {
+            width: 100%;
+            padding: 1rem;
+            background: linear-gradient(135deg, #c9a96e 0%, #e6c896 100%);
+            color: #1a5f3f;
+            border: none;
+            border-radius: 8px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-shot:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(201, 169, 110, 0.3);
+        }
+        
+        .btn-shot:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        
+        .dice-display {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            margin: 1rem 0;
+        }
+        
+        .die {
+            width: 50px;
+            height: 50px;
+            background: white;
+            border: 2px solid #333;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            font-weight: bold;
+            animation: roll 0.5s ease;
+        }
+        
+        @keyframes roll {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .shot-result {
+            padding: 1rem;
+            background: #d1fae5;
+            border-radius: 8px;
+            margin-top: 1rem;
+            display: none;
+        }
+        
+        .shot-result.show { display: block; }
+        
+        .celebration {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: white;
+            padding: 3rem;
+            border-radius: 16px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            text-align: center;
+            display: none;
+            z-index: 1000;
+        }
+        
+        .celebration.show { display: block; }
+        .celebration h2 { color: #1a5f3f; margin-bottom: 1rem; }
+        .celebration .emoji { font-size: 4rem; margin-bottom: 1rem; }
+        
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.5);
+            display: none;
+            z-index: 999;
+        }
+        
+        .overlay.show { display: block; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🏌️ In Pursuit of Par</h1>
+            <p>1987 Board Game Recreation - TPC Sawgrass Stadium Course</p>
+        </div>
+        
+        <div class="game-layout">
+            <div class="course-view">
+                <!-- Course layout elements -->
+                <div class="tee-box"></div>
+                <div class="fairway"></div>
+                <div class="rough-left"></div>
+                <div class="rough-right"></div>
+                <div class="water-hazard"></div>
+                <div class="sand-bunker bunker-left"></div>
+                <div class="sand-bunker bunker-right"></div>
+                <div class="green">
+                    <div class="hole"></div>
+                    <div class="flag">
+                        <div class="flag-pole"></div>
+                        <div class="flag-cloth"></div>
+                    </div>
+                </div>
+                
+                <!-- Distance markers -->
+                <div class="yardage-marker marker-200">200</div>
+                <div class="yardage-marker marker-150">150</div>
+                <div class="yardage-marker marker-100">100</div>
+                
+                <!-- Golf ball -->
+                <div id="ball" class="ball" style="bottom: 50px; left: 50%; transform: translateX(-50%);"></div>
+                
+                <!-- Current lie indicator -->
+                <div id="lieIndicator" class="lie-indicator lie-tee">📍 Tee Box</div>
+                
+                <!-- Hole info overlay -->
+                <div style="position: absolute; bottom: 10px; left: 10px; background: rgba(0,0,0,0.7); color: white; padding: 8px 12px; border-radius: 8px; font-size: 0.9rem;">
+                    <strong>Hole <span id="holeNum">1</span> - Par <span id="holePar">4</span></strong><br>
+                    <span id="courseStatus">394 yards to pin</span>
+                </div>
+            </div>
+            
+            <div class="sidebar">
+                <div class="panel">
+                    <h3>📊 Game Status</h3>
+                    <div class="stats-grid">
+                        <div class="stat-item">
+                            <div class="stat-label">Strokes</div>
+                            <div class="stat-value" id="strokes">0</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-label">Distance</div>
+                            <div class="stat-value" id="distance">394y</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-label">Lie</div>
+                            <div class="stat-value" id="lie">Tee</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-label">Score</div>
+                            <div class="stat-value" id="score">E</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="panel">
+                    <h3>🏌️ Club Selection</h3>
+                    <div class="clubs">
+                        <div class="club selected" data-club="driver" data-min="200" data-max="290">
+                            <div class="club-name">Driver</div>
+                            <div class="club-range">200-290y</div>
+                        </div>
+                        <div class="club" data-club="3wood" data-min="180" data-max="230">
+                            <div class="club-name">3 Wood</div>
+                            <div class="club-range">180-230y</div>
+                        </div>
+                        <div class="club" data-club="5iron" data-min="150" data-max="180">
+                            <div class="club-name">5 Iron</div>
+                            <div class="club-range">150-180y</div>
+                        </div>
+                        <div class="club" data-club="7iron" data-min="130" data-max="160">
+                            <div class="club-name">7 Iron</div>
+                            <div class="club-range">130-160y</div>
+                        </div>
+                        <div class="club" data-club="9iron" data-min="110" data-max="140">
+                            <div class="club-name">9 Iron</div>
+                            <div class="club-range">110-140y</div>
+                        </div>
+                        <div class="club" data-club="wedge" data-min="60" data-max="100">
+                            <div class="club-name">Wedge</div>
+                            <div class="club-range">60-100y</div>
+                        </div>
+                        <div class="club" data-club="sand" data-min="30" data-max="60">
+                            <div class="club-name">Sand W</div>
+                            <div class="club-range">30-60y</div>
+                        </div>
+                        <div class="club" data-club="putter" data-min="2" data-max="30">
+                            <div class="club-name">Putter</div>
+                            <div class="club-range">2-30y</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <button id="shotBtn" class="btn-shot">🎯 TAKE SHOT</button>
+                
+                <div class="dice-display" id="diceDisplay" style="display: none;">
+                    <div class="die" id="die1">?</div>
+                    <div class="die" id="die2">?</div>
+                </div>
+                
+                <div id="shotResult" class="shot-result"></div>
+            </div>
+        </div>
+    </div>
+    
+    <div id="overlay" class="overlay"></div>
+    <div id="celebration" class="celebration">
+        <div class="emoji">🎉</div>
+        <h2 id="celebTitle">HOLE COMPLETE!</h2>
+        <p id="celebText">You finished hole 1 in 4 strokes (Par)</p>
+        <button onclick="nextHole()" style="margin-top: 1rem; padding: 0.5rem 2rem; background: #1a5f3f; color: white; border: none; border-radius: 8px; cursor: pointer;">Next Hole →</button>
+    </div>
+
+    <script>
+        // Game state
+        let gameState = {
+            currentHole: 1,
+            strokes: 0,
+            distanceToPin: 394,
+            lie: 'tee',
+            ballPosition: { x: 50, y: 90 },
+            totalScore: 0,
+            holesCompleted: []
+        };
+
+        // Hole data
+        const holes = [
+            { number: 1, par: 4, yardage: 394 },
+            { number: 2, par: 5, yardage: 532 },
+            { number: 3, par: 3, yardage: 177 },
+            { number: 4, par: 4, yardage: 384 },
+            { number: 5, par: 4, yardage: 466 },
+            { number: 6, par: 4, yardage: 393 },
+            { number: 7, par: 4, yardage: 442 },
+            { number: 8, par: 5, yardage: 537 },
+            { number: 9, par: 4, yardage: 440 },
+            { number: 10, par: 4, yardage: 424 },
+            { number: 11, par: 5, yardage: 535 },
+            { number: 12, par: 4, yardage: 358 },
+            { number: 13, par: 3, yardage: 181 },
+            { number: 14, par: 4, yardage: 467 },
+            { number: 15, par: 4, yardage: 449 },
+            { number: 16, par: 5, yardage: 507 },
+            { number: 17, par: 3, yardage: 137 },
+            { number: 18, par: 4, yardage: 447 }
+        ];
+
+        // Club selection
+        document.querySelectorAll('.club').forEach(club => {
+            club.addEventListener('click', () => {
+                document.querySelectorAll('.club').forEach(c => c.classList.remove('selected'));
+                club.classList.add('selected');
+            });
+        });
+
+        // Take shot
+        document.getElementById('shotBtn').addEventListener('click', takeShot);
+
+        function takeShot() {
+            const selectedClub = document.querySelector('.club.selected');
+            if (!selectedClub) return;
+            
+            const club = selectedClub.dataset.club;
+            const minDist = parseInt(selectedClub.dataset.min);
+            const maxDist = parseInt(selectedClub.dataset.max);
+            
+            // Roll dice
+            const die1 = Math.floor(Math.random() * 6) + 1;
+            const die2 = Math.floor(Math.random() * 12) + 1;
+            
+            // Show dice
+            const diceDisplay = document.getElementById('diceDisplay');
+            diceDisplay.style.display = 'flex';
+            document.getElementById('die1').textContent = die1;
+            document.getElementById('die2').textContent = die2;
+            
+            // Calculate shot
+            const distanceRoll = die1;
+            const directionRoll = die2;
+            
+            // Distance calculation
+            const distancePercent = distanceRoll / 6;
+            const shotDistance = Math.floor(minDist + (maxDist - minDist) * distancePercent);
+            
+            // Direction
+            let direction = 'straight';
+            if (directionRoll <= 3) direction = 'left';
+            else if (directionRoll >= 10) direction = 'right';
+            
+            // Update game state
+            gameState.strokes++;
+            gameState.distanceToPin = Math.max(0, gameState.distanceToPin - shotDistance);
+            
+            // Determine lie with more realistic logic
+            let newLie = 'fairway';
+            if (gameState.distanceToPin === 0) {
+                newLie = 'holed';
+            } else if (gameState.distanceToPin <= 30) {
+                newLie = 'green';
+            } else {
+                // Check if ball landed in specific areas based on direction and distance
+                const accuracy = Math.random();
+                if (direction === 'straight' && accuracy > 0.3) {
+                    newLie = 'fairway';
+                } else if (direction !== 'straight' || accuracy <= 0.3) {
+                    // Check for hazards
+                    if (gameState.distanceToPin > 150 && gameState.distanceToPin < 250 && Math.random() < 0.2) {
+                        newLie = 'water';
+                    } else if (Math.random() < 0.15) {
+                        newLie = 'sand';
+                    } else {
+                        newLie = 'rough';
+                    }
+                }
+            }
+            
+            gameState.lie = newLie;
+            
+            // Move ball with proper positioning
+            const ball = document.getElementById('ball');
+            const progress = 1 - (gameState.distanceToPin / holes[gameState.currentHole - 1].yardage);
+            
+            // Calculate position based on direction and lie
+            let leftPosition = 50; // Default center
+            if (direction === 'left') {
+                leftPosition = Math.max(20, 50 - Math.random() * 25);
+            } else if (direction === 'right') {
+                leftPosition = Math.min(80, 50 + Math.random() * 25);
+            }
+            
+            // Adjust for specific lies
+            if (gameState.lie === 'sand') {
+                leftPosition = Math.random() < 0.5 ? 25 : 75; // In bunkers
+            } else if (gameState.lie === 'water') {
+                leftPosition = 50; // Center for water
+            }
+            
+            const bottomPosition = 50 + progress * 500; // Extended range
+            ball.style.bottom = bottomPosition + 'px';
+            ball.style.left = leftPosition + '%';
+            
+            // Show result
+            const resultDiv = document.getElementById('shotResult');
+            resultDiv.innerHTML = `
+                <strong>Shot Result:</strong><br>
+                Distance: ${shotDistance} yards (${direction})<br>
+                New Position: ${gameState.lie}<br>
+                ${gameState.distanceToPin > 0 ? `${gameState.distanceToPin} yards to pin` : '🎯 HOLED OUT!'}
+            `;
+            resultDiv.classList.add('show');
+            
+            // Update display
+            updateDisplay();
+            
+            // Check for hole completion
+            if (gameState.distanceToPin === 0) {
+                setTimeout(() => completeHole(), 1000);
+            }
+        }
+
+        function updateDisplay() {
+            document.getElementById('strokes').textContent = gameState.strokes;
+            document.getElementById('distance').textContent = gameState.distanceToPin + 'y';
+            document.getElementById('lie').textContent = gameState.lie.charAt(0).toUpperCase() + gameState.lie.slice(1);
+            
+            const hole = holes[gameState.currentHole - 1];
+            const scoreToPar = gameState.strokes - hole.par;
+            let scoreText = 'E';
+            if (scoreToPar > 0) scoreText = '+' + scoreToPar;
+            else if (scoreToPar < 0) scoreText = scoreToPar;
+            document.getElementById('score').textContent = scoreText;
+            
+            // Update lie indicator with proper styling and emoji
+            const lieIndicator = document.getElementById('lieIndicator');
+            const lieInfo = getLieInfo(gameState.lie);
+            lieIndicator.className = `lie-indicator lie-${gameState.lie}`;
+            lieIndicator.textContent = lieInfo.text;
+            
+            document.getElementById('courseStatus').textContent = `${gameState.distanceToPin} yards to pin`;
+        }
+        
+        function getLieInfo(lie) {
+            const lieData = {
+                'tee': { text: '🏌️ Tee Box', penalty: 0 },
+                'fairway': { text: '🌱 Fairway', penalty: 0 },
+                'rough': { text: '🌿 Rough', penalty: 0.8 },
+                'green': { text: '⛳ Green', penalty: 0 },
+                'sand': { text: '🏖️ Sand Bunker', penalty: 0.6 },
+                'water': { text: '🌊 Water Hazard', penalty: 0 },
+                'holed': { text: '🎯 Holed Out!', penalty: 0 }
+            };
+            return lieData[lie] || lieData['fairway'];
+        }
+
+        function completeHole() {
+            const hole = holes[gameState.currentHole - 1];
+            const scoreToPar = gameState.strokes - hole.par;
+            
+            let scoreText = 'Par';
+            let emoji = '⛳';
+            if (scoreToPar === -2) { scoreText = 'Eagle'; emoji = '🦅'; }
+            else if (scoreToPar === -1) { scoreText = 'Birdie'; emoji = '🐦'; }
+            else if (scoreToPar === 1) { scoreText = 'Bogey'; emoji = '📈'; }
+            else if (scoreToPar === 2) { scoreText = 'Double Bogey'; emoji = '📊'; }
+            else if (scoreToPar > 2) { scoreText = `+${scoreToPar}`; emoji = '😅'; }
+            
+            gameState.holesCompleted.push({
+                hole: gameState.currentHole,
+                strokes: gameState.strokes,
+                par: hole.par
+            });
+            
+            gameState.totalScore += gameState.strokes;
+            
+            document.getElementById('celebTitle').textContent = scoreText.toUpperCase() + '!';
+            document.getElementById('celebText').textContent = 
+                `You finished hole ${gameState.currentHole} in ${gameState.strokes} strokes (Par ${hole.par})`;
+            document.querySelector('.celebration .emoji').textContent = emoji;
+            
+            document.getElementById('overlay').classList.add('show');
+            document.getElementById('celebration').classList.add('show');
+        }
+
+        function nextHole() {
+            if (gameState.currentHole >= 18) {
+                finishRound();
+                return;
+            }
+            
+            gameState.currentHole++;
+            const hole = holes[gameState.currentHole - 1];
+            gameState.strokes = 0;
+            gameState.distanceToPin = hole.yardage;
+            gameState.lie = 'tee';
+            
+            // Reset ball position to tee box
+            const ball = document.getElementById('ball');
+            ball.style.bottom = '50px';
+            ball.style.left = '50%';
+            ball.style.transform = 'translateX(-50%)';
+            
+            // Update displays
+            document.getElementById('holeNum').textContent = gameState.currentHole;
+            document.getElementById('holePar').textContent = hole.par;
+            document.getElementById('shotResult').classList.remove('show');
+            document.getElementById('diceDisplay').style.display = 'none';
+            
+            updateDisplay();
+            
+            // Hide celebration
+            document.getElementById('overlay').classList.remove('show');
+            document.getElementById('celebration').classList.remove('show');
+        }
+
+        function finishRound() {
+            const totalPar = holes.reduce((sum, h) => sum + h.par, 0);
+            const finalScore = gameState.totalScore - totalPar;
+            
+            let message = `Final Score: ${gameState.totalScore} strokes\n`;
+            if (finalScore === 0) message += 'Even Par - Great round!';
+            else if (finalScore < 0) message += `${finalScore} Under Par - Excellent!`;
+            else message += `+${finalScore} Over Par - Keep practicing!`;
+            
+            alert(message + '\n\nClick OK to play again!');
+            location.reload();
+        }
+
+        // Initialize
+        updateDisplay();
+        console.log('🎮 Golf game initialized successfully!');
+        console.log('Select a club and click "TAKE SHOT" to play!');
+    </script>
+</body>
+</html>

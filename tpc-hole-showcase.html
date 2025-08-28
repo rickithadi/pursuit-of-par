@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TPC Sawgrass Hole Display System - Showcase</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="tpc-hole-styles.css">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #f5f2e8 0%, #e8f4e8 100%);
+            margin: 0;
+            padding: 2rem;
+            min-height: 100vh;
+            color: #333;
+        }
+        
+        .showcase-header {
+            text-align: center;
+            margin-bottom: 2rem;
+            background: linear-gradient(135deg, #1a5f3f 0%, #0d3926 100%);
+            color: white;
+            padding: 2rem;
+            border-radius: 16px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.2);
+        }
+        
+        .showcase-title {
+            font-size: 2.5rem;
+            font-weight: 800;
+            margin-bottom: 0.5rem;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+        
+        .showcase-subtitle {
+            font-size: 1.2rem;
+            color: #c9a96e;
+            font-weight: 500;
+        }
+        
+        .showcase-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 350px 1fr;
+            gap: 2rem;
+            align-items: start;
+        }
+        
+        .mock-viewport {
+            background: linear-gradient(135deg, #87ceeb 0%, #98fb98 100%);
+            border-radius: 12px;
+            height: 600px;
+            position: relative;
+            overflow: hidden;
+            border: 3px solid #1a5f3f;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: #1a5f3f;
+            text-shadow: 1px 1px 2px rgba(255,255,255,0.5);
+        }
+        
+        .demo-instructions {
+            background: rgba(255,255,255,0.9);
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin-top: 1rem;
+            border-left: 4px solid #2196F3;
+        }
+        
+        .demo-instructions h3 {
+            margin-top: 0;
+            color: #1a5f3f;
+            font-size: 1.1rem;
+        }
+        
+        .demo-instructions ul {
+            margin: 0.5rem 0;
+            padding-left: 1.5rem;
+        }
+        
+        .demo-instructions li {
+            margin-bottom: 0.5rem;
+            line-height: 1.4;
+        }
+        
+        .feature-badges {
+            display: flex;
+            gap: 0.5rem;
+            margin-top: 1rem;
+            flex-wrap: wrap;
+        }
+        
+        .badge {
+            background: #2196F3;
+            color: white;
+            padding: 0.25rem 0.75rem;
+            border-radius: 12px;
+            font-size: 0.8rem;
+            font-weight: 500;
+        }
+        
+        .badge.authentic {
+            background: #4CAF50;
+        }
+        
+        .badge.visual {
+            background: #FF9800;
+        }
+        
+        .badge.interactive {
+            background: #9C27B0;
+        }
+        
+        @media (max-width: 768px) {
+            .showcase-container {
+                grid-template-columns: 1fr;
+                gap: 1rem;
+            }
+            
+            body {
+                padding: 1rem;
+            }
+            
+            .showcase-title {
+                font-size: 2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="showcase-header">
+        <h1 class="showcase-title">🏌️ TPC Sawgrass Stadium Course</h1>
+        <p class="showcase-subtitle">Professional Hole Display System - Live Demo</p>
+        <div class="feature-badges">
+            <span class="badge authentic">1987 Board Game Authentic</span>
+            <span class="badge visual">Professional Tournament Style</span>
+            <span class="badge interactive">Interactive Hole Selection</span>
+            <span class="badge">Real TPC Data</span>
+        </div>
+    </div>
+
+    <div class="showcase-container">
+        <div class="sidebar-area">
+            <!-- TPC Hole Selector will be inserted here -->
+            <div id="hole-display-target"></div>
+            
+            <div class="demo-instructions">
+                <h3>🎯 Interactive Features</h3>
+                <ul>
+                    <li><strong>Click any hole</strong> to view detailed information</li>
+                    <li><strong>Change tees</strong> to see different yardages</li>
+                    <li><strong>View strategy</strong> for professional insights</li>
+                    <li><strong>Authentic data</strong> from TPC Sawgrass</li>
+                    <li><strong>Aerial photos</strong> from tournament coverage</li>
+                </ul>
+                
+                <h3>🏆 Tournament Data</h3>
+                <p>Featuring authentic yardages, difficulty ratings, and professional statistics from The Players Championship venue.</p>
+                
+                <h3>🎲 Board Game Integration</h3>
+                <p>Seamlessly integrates with the 1987 "In Pursuit of Par" board game mechanics while providing modern tournament-style presentation.</p>
+            </div>
+        </div>
+        
+        <div class="main-area">
+            <div class="mock-viewport" id="mock-viewport">
+                <div>
+                    🏌️ Golf Course Visualization Area
+                    <br>
+                    <small style="font-size: 1rem; opacity: 0.8;">
+                        Select a hole to see detailed information
+                    </small>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Load TPC Hole Display System -->
+    <script src="tpc-hole-data.js"></script>
+    <script src="hole-display-system.js"></script>
+    
+    <script>
+        // Initialize the TPC hole display system
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('🏌️ Initializing TPC Sawgrass showcase...');
+            
+            // Mock game engine for demonstration
+            const mockGameEngine = {
+                updateHoleData: function(holeData) {
+                    console.log('Mock game engine received hole data:', holeData);
+                    
+                    // Update mock viewport
+                    const viewport = document.getElementById('mock-viewport');
+                    if (viewport && holeData) {
+                        viewport.innerHTML = `
+                            <div style="text-align: center;">
+                                <div style="font-size: 3rem; margin-bottom: 1rem;">⛳</div>
+                                <div style="font-size: 1.8rem; font-weight: 800; margin-bottom: 0.5rem;">
+                                    HOLE ${holeData.number}
+                                </div>
+                                <div style="font-size: 1.2rem; color: #c9a96e; margin-bottom: 0.5rem;">
+                                    ${holeData.name}
+                                </div>
+                                <div style="font-size: 1rem; opacity: 0.8;">
+                                    Par ${holeData.par} • ${holeData.yardages.blue} Yards
+                                </div>
+                                <div style="margin-top: 1rem; font-size: 0.9rem; max-width: 300px; line-height: 1.4;">
+                                    ${holeData.description}
+                                </div>
+                            </div>
+                        `;
+                    }
+                }
+            };
+            
+            try {
+                // Initialize TPC hole data and display system
+                const holeData = new TPCHoleData();
+                const holeDisplay = new TPCHoleDisplaySystem(mockGameEngine, holeData);
+                
+                // Store globally for debugging
+                window.tpcHoleData = holeData;
+                window.tpcHoleDisplay = holeDisplay;
+                
+                console.log('✓ TPC Sawgrass showcase initialized successfully');
+                
+                // Test with first hole
+                setTimeout(() => {
+                    holeDisplay.displayHole(1);
+                    console.log('✓ Displayed hole 1 as demo');
+                }, 500);
+                
+            } catch (error) {
+                console.error('✗ Failed to initialize TPC showcase:', error);
+                
+                // Show error in viewport
+                const viewport = document.getElementById('mock-viewport');
+                if (viewport) {
+                    viewport.innerHTML = `
+                        <div style="color: #dc2626; text-align: center;">
+                            <div style="font-size: 2rem; margin-bottom: 1rem;">⚠️</div>
+                            <div>Failed to load TPC hole display system</div>
+                            <div style="font-size: 0.9rem; margin-top: 0.5rem;">
+                                Check browser console for details
+                            </div>
+                        </div>
+                    `;
+                }
+            }
+        });
+        
+        // Add some demo functionality
+        document.addEventListener('click', function(event) {
+            // Handle hole card clicks with visual feedback
+            if (event.target.closest('.hole-card:not(.placeholder)')) {
+                const holeCard = event.target.closest('.hole-card');
+                const holeNumber = holeCard.dataset.hole;
+                
+                // Add visual feedback
+                holeCard.style.transform = 'scale(0.95)';
+                setTimeout(() => {
+                    holeCard.style.transform = '';
+                }, 150);
+                
+                console.log(`🎯 Selected hole ${holeNumber}`);
+            }
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Simple Debug Test</title>
+</head>
+<body>
+    <h1>Simple Debug Test</h1>
+    <div id="results"></div>
+    
+    <!-- Load scripts in exact same order as game-3d.html -->
+    <script src="https://cdn.jsdelivr.net/npm/phaser@3.80.1/dist/phaser.min.js"></script>
+    <script src="authentic-mechanics.js"></script>
+    <script src="board-game-bridge.js"></script>
+    <script src="phaser-engine.js"></script>
+    
+    <script>
+        setTimeout(function() {
+            let results = [];
+            
+            // Check each class
+            results.push('Phaser: ' + (typeof Phaser !== 'undefined' ? '✓' : '✗'));
+            results.push('AuthenticDiceSystem: ' + (typeof window.AuthenticDiceSystem !== 'undefined' ? '✓' : '✗'));
+            results.push('BoardGameShotCalculator: ' + (typeof window.BoardGameShotCalculator !== 'undefined' ? '✓' : '✗'));
+            results.push('BoardGameBridge: ' + (typeof window.BoardGameBridge !== 'undefined' ? '✓' : '✗'));
+            results.push('PhaserBoardGameEngine: ' + (typeof window.PhaserBoardGameEngine !== 'undefined' ? '✓' : '✗'));
+            results.push('GolfCourseScene: ' + (typeof window.GolfCourseScene !== 'undefined' ? '✓' : '✗'));
+            results.push('ShotAnalysisSystem: ' + (typeof window.ShotAnalysisSystem !== 'undefined' ? '✓' : '✗'));
+            
+            // Try to create instance
+            try {
+                const engine = new PhaserBoardGameEngine();
+                results.push('PhaserBoardGameEngine instance: ✓');
+                window.testEngine = engine;
+            } catch (error) {
+                results.push('PhaserBoardGameEngine instance: ✗ ' + error.message);
+            }
+            
+            document.getElementById('results').innerHTML = results.join('<br>');
+            console.log('Results:', results);
+        }, 1000);
+    </script>
+</body>
+</html>

@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Debug - Class Loading Test</title>
+</head>
+<body>
+    <div id="test-results"></div>
+    <script src="https://cdn.jsdelivr.net/npm/phaser@3.80.1/dist/phaser.min.js"></script>
+    <script src="authentic-mechanics.js"></script>
+    <script src="board-game-bridge.js"></script>
+    <script src="phaser-engine.js"></script>
+    
+    <script>
+        console.log('=== Debug Class Loading Test ===');
+        
+        // Test 1: Check if Phaser loads
+        console.log('1. Phaser loaded:', typeof Phaser !== 'undefined');
+        
+        // Test 2: Check if classes from authentic-mechanics.js load
+        console.log('2. AuthenticDiceSystem:', typeof AuthenticDiceSystem !== 'undefined');
+        console.log('2. BoardGameShotCalculator:', typeof BoardGameShotCalculator !== 'undefined');
+        
+        // Test 3: Check if classes from phaser-engine.js load
+        console.log('3. PhaserBoardGameEngine:', typeof PhaserBoardGameEngine !== 'undefined');
+        console.log('3. GolfCourseScene:', typeof GolfCourseScene !== 'undefined');
+        console.log('3. ShotAnalysisSystem:', typeof ShotAnalysisSystem !== 'undefined');
+        
+        // Test 4: Try to create instance
+        try {
+            const engine = new PhaserBoardGameEngine();
+            console.log('4. ✓ PhaserBoardGameEngine instance created successfully');
+            
+            // Test 5: Check if game systems can be initialized
+            if (engine.initializeGameSystems) {
+                engine.initializeGameSystems();
+                console.log('5. ✓ Game systems initialized successfully');
+                console.log('   - diceSystem:', typeof engine.diceSystem);
+                console.log('   - shotCalculator:', typeof engine.shotCalculator);
+                console.log('   - analysisSystem:', typeof engine.analysisSystem);
+            } else {
+                console.log('5. ✗ initializeGameSystems method not found');
+            }
+            
+            // Test 6: Check global window assignment
+            window.testEngine = engine;
+            console.log('6. ✓ Engine assigned to window.testEngine');
+            
+        } catch (error) {
+            console.error('4. ✗ Failed to create PhaserBoardGameEngine:', error.message);
+            console.error('Stack trace:', error.stack);
+        }
+        
+        // Update display
+        document.getElementById('test-results').innerHTML = `
+            <h2>Debug Results</h2>
+            <p>Check browser console for detailed test results.</p>
+            <p>Open Developer Tools (F12) and look at the Console tab.</p>
+        `;
+    </script>
+</body>
+</html>

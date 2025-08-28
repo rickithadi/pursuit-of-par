@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Test Original Minimal - Copy of Working Version</title>
+    <style>
+        body { 
+            margin: 0; 
+            padding: 20px; 
+            background: #f0f0f0; 
+            font-family: Arial, sans-serif; 
+        }
+        #gameContainer { 
+            width: 800px; 
+            height: 600px; 
+            border: 2px solid #333; 
+            margin: 20px auto; 
+            background: white;
+        }
+        .info {
+            text-align: center;
+            margin: 10px;
+        }
+        button {
+            padding: 10px 15px;
+            margin: 5px;
+            background: #007acc;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        button:hover {
+            background: #005999;
+        }
+        #log {
+            max-height: 200px;
+            overflow-y: auto;
+            background: #f9f9f9;
+            border: 1px solid #ccc;
+            padding: 10px;
+            margin: 10px auto;
+            width: 800px;
+            font-family: monospace;
+            font-size: 12px;
+        }
+    </style>
+</head>
+<body>
+    <div class="info">
+        <h1>Test Original Minimal - Should Work</h1>
+        <p>Exact copy of the version that worked before</p>
+        <button onclick="runDiagnostics()">Run Diagnostics</button>
+        <button onclick="clearLog()">Clear Log</button>
+    </div>
+    
+    <div id="gameContainer"></div>
+    
+    <div id="log"></div>
+
+    <script src="https://cdn.jsdelivr.net/npm/phaser@3.70.0/dist/phaser.min.js"></script>
+    
+    <script>
+        let game = null;
+        let scene = null;
+        
+        function log(message) {
+            const logDiv = document.getElementById('log');
+            logDiv.innerHTML += '<div>' + new Date().toLocaleTimeString() + ': ' + message + '</div>';
+            logDiv.scrollTop = logDiv.scrollHeight;
+            console.log(message);
+        }
+        
+        class TestScene extends Phaser.Scene {
+            constructor() {
+                super({ key: 'TestScene' });
+                log('🎮 TestScene constructor called');
+            }
+            
+            preload() {
+                log('🔄 TestScene preload called');
+            }
+            
+            create() {
+                log('🎨 TestScene create called - STARTING GRAPHICS');
+                
+                scene = this;
+                window.testScene = this;
+                
+                // Test 1: Background rectangle
+                log('Drawing background...');
+                const bg = this.add.rectangle(400, 300, 800, 600, 0x87CEEB);
+                log('Background created: ' + (bg ? '✅' : '❌'));
+                
+                // Test 2: Visible shapes
+                log('Drawing test shapes...');
+                
+                // Red rectangle
+                const redRect = this.add.rectangle(200, 150, 100, 100, 0xFF0000);
+                log('Red rectangle: ' + (redRect ? '✅' : '❌'));
+                
+                // Green circle  
+                const greenCircle = this.add.circle(400, 300, 50, 0x00FF00);
+                log('Green circle: ' + (greenCircle ? '✅' : '❌'));
+                
+                // Blue triangle
+                const graphics = this.add.graphics();
+                graphics.fillStyle(0x0000FF);
+                graphics.fillTriangle(550, 100, 600, 200, 650, 100);
+                log('Graphics triangle: ' + (graphics ? '✅' : '❌'));
+                
+                // Test 3: Text
+                const text = this.add.text(400, 500, 'PHASER IS WORKING!', {
+                    fontSize: '32px',
+                    fill: '#FFFFFF',
+                    backgroundColor: '#000000',
+                    padding: { x: 10, y: 5 }
+                });
+                text.setOrigin(0.5);
+                log('Text object: ' + (text ? '✅' : '❌'));
+                
+                log('✅ TestScene create completed - Should see sky blue with shapes and text');
+                log('Scene children count: ' + this.children.list.length);
+            }
+        }
+        
+        // Initialize exactly like the working version
+        window.addEventListener('load', () => {
+            log('🚀 Page loaded, starting Phaser...');
+            log('Phaser available: ' + (typeof Phaser !== 'undefined' ? '✅ v' + Phaser.VERSION : '❌'));
+            
+            if (typeof Phaser === 'undefined') {
+                log('❌ CRITICAL: Phaser not loaded from CDN');
+                return;
+            }
+            
+            const config = {
+                type: Phaser.AUTO,
+                width: 800,
+                height: 600,
+                parent: 'gameContainer',
+                backgroundColor: 0x333333, // Dark gray as fallback
+                scene: TestScene
+            };
+            
+            try {
+                game = new Phaser.Game(config);
+                log('✅ Phaser Game created successfully');
+                window.testGame = game;
+                
+                // Check canvas creation after delay
+                setTimeout(() => {
+                    const canvas = document.querySelector('#gameContainer canvas');
+                    log('Canvas element created: ' + (canvas ? '✅' : '❌'));
+                    if (canvas) {
+                        log('Canvas dimensions: ' + canvas.width + 'x' + canvas.height);
+                        log('Canvas parent: ' + canvas.parentElement.id);
+                    }
+                    runDiagnostics();
+                }, 2000);
+                
+            } catch (error) {
+                log('❌ Failed to create Phaser Game: ' + error.message);
+                log('Error stack: ' + error.stack);
+            }
+        });
+        
+        function runDiagnostics() {
+            log('🔍 Running diagnostics...');
+            
+            // Check Phaser
+            log('Phaser loaded: ' + (typeof Phaser !== 'undefined' ? '✅' : '❌'));
+            if (typeof Phaser !== 'undefined') {
+                log('Phaser version: ' + Phaser.VERSION);
+            }
+            
+            // Check game
+            log('Game created: ' + (game ? '✅' : '❌'));
+            log('Scene created: ' + (scene ? '✅' : '❌'));
+            
+            // Check canvas
+            const canvas = document.querySelector('#gameContainer canvas');
+            log('Canvas element: ' + (canvas ? '✅' : '❌'));
+            if (canvas) {
+                log('Canvas size: ' + canvas.width + 'x' + canvas.height);
+                log('Canvas visible: ' + (canvas.style.display !== 'none' ? '✅' : '❌'));
+                log('Canvas position: ' + canvas.style.position);
+                
+                // Test canvas rendering
+                try {
+                    const ctx = canvas.getContext('2d');
+                    if (ctx) {
+                        const imageData = ctx.getImageData(100, 100, 1, 1);
+                        const pixel = imageData.data;
+                        const hasColor = pixel[0] + pixel[1] + pixel[2] > 0;
+                        log('Canvas has rendered content: ' + (hasColor ? '✅' : '❌'));
+                        log('Pixel at (100,100): R' + pixel[0] + ' G' + pixel[1] + ' B' + pixel[2]);
+                    }
+                } catch (e) {
+                    log('Canvas context error: ' + e.message);
+                }
+            }
+            
+            // Check scene children
+            if (scene && scene.children) {
+                log('Scene objects: ' + scene.children.list.length);
+                scene.children.list.forEach((child, i) => {
+                    log(`Object ${i}: ${child.type || child.constructor.name} at (${child.x}, ${child.y})`);
+                });
+            }
+            
+            log('🔍 Diagnostics complete');
+        }
+        
+        function clearLog() {
+            document.getElementById('log').innerHTML = '';
+        }
+    </script>
+</body>
+</html>

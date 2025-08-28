@@ -1,0 +1,296 @@
+/* 1987 "In Pursuit of Par" Authentic Color Palette */
+:root {
+    /* Primary 1987 Board Game Colors - Based on authentic materials */
+    --vintage-orange: #D2691E;      /* Authentic orange from distance gauges */
+    --vintage-orange-light: #F4A460; 
+    --vintage-orange-dark: #B8860B;
+    
+    --vintage-brown: #8B4513;       /* Box/card backing brown */
+    --vintage-brown-light: #A0522D;
+    --vintage-brown-dark: #654321;
+    
+    --vintage-green: #556B2F;       /* Muted 1980s golf green */
+    --vintage-green-light: #6B8E23;
+    --vintage-green-dark: #2E4A1A;
+    
+    --vintage-cream: #F5DEB3;       /* Aged paper/card color */
+    --vintage-cream-dark: #DDD3B8;
+    --vintage-off-white: #FAEBD7;
+    
+    --vintage-blue: #4682B4;        /* Water hazard blue */
+    --vintage-red: #B22222;         /* Problem die red */
+    
+    /* Typography colors for 1987 feel */
+    --vintage-text-dark: #2F1B14;   /* Dark brown text */
+    --vintage-text-medium: #654321;
+    --vintage-text-light: #8B7355;
+    
+    /* Board game shadows and borders */
+    --vintage-shadow: 0 3px 6px rgba(139, 69, 19, 0.3);
+    --vintage-inset-shadow: inset 0 1px 3px rgba(139, 69, 19, 0.2);
+    --vintage-border: 2px solid var(--vintage-brown);
+    --vintage-border-light: 1px solid var(--vintage-brown-light);
+}
+
+/* 1987 Board Game Component Styles */
+.authentic-1987-panel {
+    background: linear-gradient(135deg, var(--vintage-cream) 0%, var(--vintage-off-white) 100%);
+    border: var(--vintage-border);
+    border-radius: 8px;
+    padding: 1rem;
+    box-shadow: var(--vintage-shadow);
+    position: relative;
+}
+
+.authentic-1987-panel::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: 
+        /* Paper texture simulation */
+        radial-gradient(circle at 25% 25%, rgba(210, 105, 30, 0.03) 0%, transparent 50%),
+        radial-gradient(circle at 75% 75%, rgba(139, 69, 19, 0.02) 0%, transparent 50%);
+    pointer-events: none;
+    border-radius: 6px;
+}
+
+/* Authentic 1987 Dice - Orange Distance Gauges */
+.dice-1987-authentic {
+    width: 50px;
+    height: 50px;
+    background: linear-gradient(135deg, var(--vintage-orange) 0%, var(--vintage-orange-dark) 100%);
+    color: var(--vintage-off-white);
+    border: 2px solid var(--vintage-brown-dark);
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    font-weight: bold;
+    box-shadow: var(--vintage-shadow), var(--vintage-inset-shadow);
+    font-family: 'Times New Roman', serif; /* Period-appropriate font */
+}
+
+.dice-1987-authentic.problem {
+    background: linear-gradient(135deg, var(--vintage-red) 0%, #8B0000 100%);
+}
+
+.dice-1987-authentic.rolling {
+    animation: vintage-roll 1.2s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+@keyframes vintage-roll {
+    0%, 100% { transform: rotate(0deg); }
+    25% { transform: rotate(90deg) scale(1.1); }
+    50% { transform: rotate(180deg) scale(1.2); }
+    75% { transform: rotate(270deg) scale(1.1); }
+}
+
+/* 1987 Club Selection Cards */
+.club-card-1987 {
+    background: var(--vintage-cream);
+    border: var(--vintage-border-light);
+    border-radius: 4px;
+    padding: 0.75rem;
+    margin: 0.25rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    color: var(--vintage-text-dark);
+    font-family: 'Times New Roman', serif;
+    font-weight: bold;
+}
+
+.club-card-1987:hover {
+    background: var(--vintage-orange-light);
+    border-color: var(--vintage-orange-dark);
+    color: var(--vintage-text-dark);
+    box-shadow: var(--vintage-shadow);
+}
+
+.club-card-1987.selected {
+    background: linear-gradient(135deg, var(--vintage-orange) 0%, var(--vintage-orange-light) 100%);
+    border-color: var(--vintage-brown-dark);
+    color: var(--vintage-off-white);
+    box-shadow: var(--vintage-shadow), inset 0 1px 0 rgba(255,255,255,0.2);
+}
+
+/* Authentic Shot Schedule Table */
+.shot-schedule-1987 {
+    background: var(--vintage-off-white);
+    border: var(--vintage-border);
+    border-collapse: separate;
+    border-spacing: 0;
+    border-radius: 6px;
+    overflow: hidden;
+    font-family: 'Times New Roman', serif;
+    font-size: 0.85rem;
+}
+
+.shot-schedule-1987 th {
+    background: linear-gradient(135deg, var(--vintage-brown) 0%, var(--vintage-brown-light) 100%);
+    color: var(--vintage-off-white);
+    padding: 0.5rem;
+    text-align: center;
+    font-weight: bold;
+    text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
+}
+
+.shot-schedule-1987 td {
+    background: var(--vintage-cream);
+    border: 1px solid var(--vintage-brown-light);
+    padding: 0.4rem;
+    text-align: center;
+    color: var(--vintage-text-dark);
+    font-weight: bold;
+}
+
+.shot-schedule-1987 tr:nth-child(even) td {
+    background: var(--vintage-cream-dark);
+}
+
+/* 1987 Golf Course Board */
+.golf-course-1987 {
+    background: linear-gradient(180deg, 
+        var(--vintage-green-light) 0%, 
+        var(--vintage-green) 50%, 
+        var(--vintage-green-dark) 100%
+    );
+    border: 4px solid var(--vintage-brown);
+    border-radius: 12px;
+    position: relative;
+    min-height: 600px;
+    box-shadow: var(--vintage-shadow), inset 0 0 20px rgba(0,0,0,0.1);
+}
+
+.golf-course-1987::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: 
+        /* Vintage course texture */
+        radial-gradient(circle at 20% 30%, rgba(255,255,255,0.08) 1px, transparent 1px),
+        radial-gradient(circle at 80% 70%, rgba(0,0,0,0.03) 1px, transparent 1px);
+    background-size: 25px 25px;
+    border-radius: 8px;
+    pointer-events: none;
+}
+
+/* 1987 Tee Box */
+.tee-box-1987 {
+    background: linear-gradient(135deg, var(--vintage-brown) 0%, var(--vintage-brown-light) 100%);
+    border: 2px solid var(--vintage-brown-dark);
+    border-radius: 4px;
+    color: var(--vintage-off-white);
+    text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
+    font-family: 'Times New Roman', serif;
+    font-weight: bold;
+    box-shadow: var(--vintage-shadow);
+}
+
+/* 1987 Action Button */
+.action-button-1987 {
+    background: linear-gradient(135deg, var(--vintage-orange) 0%, var(--vintage-orange-dark) 100%);
+    color: var(--vintage-off-white);
+    border: var(--vintage-border);
+    border-radius: 6px;
+    padding: 1rem 2rem;
+    font-family: 'Times New Roman', serif;
+    font-size: 1.1rem;
+    font-weight: bold;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: var(--vintage-shadow);
+    text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
+}
+
+.action-button-1987:hover {
+    background: linear-gradient(135deg, var(--vintage-orange-light) 0%, var(--vintage-orange) 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(139, 69, 19, 0.4);
+}
+
+.action-button-1987:active {
+    transform: translateY(0);
+    box-shadow: var(--vintage-inset-shadow);
+}
+
+/* 1987 Status Display */
+.status-display-1987 {
+    background: var(--vintage-cream);
+    border: var(--vintage-border-light);
+    border-radius: 4px;
+    padding: 0.75rem;
+    font-family: 'Times New Roman', serif;
+    font-weight: bold;
+    color: var(--vintage-text-dark);
+}
+
+.status-value-1987 {
+    color: var(--vintage-orange-dark);
+    font-size: 1.2rem;
+    font-weight: bold;
+}
+
+/* Typography for 1987 authenticity */
+.text-1987-header {
+    font-family: 'Times New Roman', serif;
+    font-weight: bold;
+    color: var(--vintage-brown-dark);
+    text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
+}
+
+.text-1987-body {
+    font-family: 'Times New Roman', serif;
+    color: var(--vintage-text-dark);
+    line-height: 1.4;
+}
+
+/* Disable modern CSS features for authenticity */
+.authentic-1987 {
+    /* Remove modern effects that didn't exist in 1987 */
+    backdrop-filter: none !important;
+    filter: none !important;
+}
+
+.authentic-1987 * {
+    /* Ensure all child elements follow 1987 aesthetic */
+    border-radius: 8px !important; /* Max radius for period authenticity */
+}
+
+/* Vintage paper texture overlay for entire interface */
+body.vintage-1987 {
+    background: var(--vintage-cream);
+    background-image: 
+        /* Aged paper effect */
+        radial-gradient(circle at 20% 20%, rgba(139, 69, 19, 0.02) 0%, transparent 50%),
+        radial-gradient(circle at 80% 80%, rgba(210, 105, 30, 0.01) 0%, transparent 50%);
+    background-attachment: fixed;
+}
+
+body.vintage-1987::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: 
+        /* Paper grain */
+        repeating-linear-gradient(
+            45deg,
+            transparent,
+            transparent 2px,
+            rgba(139, 69, 19, 0.01) 2px,
+            rgba(139, 69, 19, 0.01) 4px
+        );
+    pointer-events: none;
+    z-index: -1;
+}

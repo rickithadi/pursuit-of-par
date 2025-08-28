@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Debug Loading - In Pursuit of Par</title>
+    <style>
+        body {
+            font-family: 'Courier New', monospace;
+            background: #1a1a1a;
+            color: #00ff00;
+            padding: 20px;
+            margin: 0;
+        }
+        .debug-panel {
+            background: #000;
+            border: 1px solid #00ff00;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+        .status-ok { color: #00ff00; }
+        .status-error { color: #ff0000; }
+        .status-pending { color: #ffff00; }
+        .log-entry {
+            margin: 5px 0;
+            padding: 2px 5px;
+            border-left: 3px solid #333;
+        }
+        .log-info { border-left-color: #00ff00; }
+        .log-error { border-left-color: #ff0000; color: #ff0000; }
+        .log-warn { border-left-color: #ffff00; color: #ffff00; }
+    </style>
+</head>
+<body>
+    <div class="debug-panel">
+        <h2>🔍 Loading Debug Console</h2>
+        <p>Real-time dependency loading status:</p>
+        <div id="dependency-status"></div>
+    </div>
+    
+    <div class="debug-panel">
+        <h3>📋 Console Logs</h3>
+        <div id="console-logs"></div>
+    </div>
+    
+    <div class="debug-panel">
+        <h3>🎮 Game Status</h3>
+        <div id="game-status">Initializing debug system...</div>
+    </div>
+
+    <script>
+        // Capture console logs
+        const originalConsole = {
+            log: console.log,
+            error: console.error,
+            warn: console.warn
+        };
+        
+        const logs = [];
+        
+        function addLog(type, message) {
+            const timestamp = new Date().toLocaleTimeString();
+            logs.push({ type, message, timestamp });
+            updateLogDisplay();
+        }
+        
+        console.log = function(...args) {
+            originalConsole.log(...args);
+            addLog('info', args.join(' '));
+        };
+        
+        console.error = function(...args) {
+            originalConsole.error(...args);
+            addLog('error', args.join(' '));
+        };
+        
+        console.warn = function(...args) {
+            originalConsole.warn(...args);
+            addLog('warn', args.join(' '));
+        };
+        
+        function updateLogDisplay() {
+            const logsContainer = document.getElementById('console-logs');
+            logsContainer.innerHTML = logs.slice(-20).map(log => 
+                `<div class="log-entry log-${log.type}">[${log.timestamp}] ${log.message}</div>`
+            ).join('');
+            logsContainer.scrollTop = logsContainer.scrollHeight;
+        }
+        
+        // Global dependency tracking with debug info
+        window.dependenciesLoaded = {
+            phaser: false,
+            intro: false,
+            authentic: false,
+            bridge: false,
+            holeData: false,
+            holeDisplay: false,
+            engine: false
+        };
+        
+        window.checkAllDependenciesLoaded = function() {
+            return Object.values(window.dependenciesLoaded).every(loaded => loaded);
+        };
+        
+        function updateDependencyStatus() {
+            const statusContainer = document.getElementById('dependency-status');
+            const statusHTML = Object.entries(window.dependenciesLoaded).map(([name, loaded]) => {
+                const status = loaded ? '✅' : '⏳';
+                const className = loaded ? 'status-ok' : 'status-pending';
+                return `<div class="${className}">${status} ${name}: ${loaded ? 'LOADED' : 'PENDING'}</div>`;
+            }).join('');
+            
+            const progress = Object.values(window.dependenciesLoaded).filter(Boolean).length;
+            statusContainer.innerHTML = `
+                <div>Progress: ${progress}/7 dependencies loaded</div>
+                <hr>
+                ${statusHTML}
+            `;
+        }
+        
+        window.onDependencyLoaded = function(name) {
+            window.dependenciesLoaded[name] = true;
+            console.log(`✓ Loaded: ${name} (${Object.values(window.dependenciesLoaded).filter(Boolean).length}/7)`);
+            updateDependencyStatus();
+            
+            if (window.checkAllDependenciesLoaded()) {
+                console.log('✓ All dependencies loaded successfully');
+                document.getElementById('game-status').innerHTML = '<span class="status-ok">🎮 All dependencies loaded! Attempting initialization...</span>';
+                
+                if (typeof window.initializeGame === 'function') {
+                    try {
+                        window.initializeGame();
+                        document.getElementById('game-status').innerHTML = '<span class="status-ok">🎉 Game initialized successfully!</span>';
+                    } catch (error) {
+                        console.error('Game initialization failed:', error);
+                        document.getElementById('game-status').innerHTML = `<span class="status-error">❌ Game initialization failed: ${error.message}</span>`;
+                    }
+                } else {
+                    console.error('initializeGame function not found');
+                    document.getElementById('game-status').innerHTML = '<span class="status-error">❌ initializeGame function not found</span>';
+                }
+            }
+        };
+        
+        window.onDependencyError = function(name, error) {
+            console.error(`✗ Failed to load: ${name}`, error);
+            updateDependencyStatus();
+            document.getElementById('game-status').innerHTML = `<span class="status-error">❌ Failed to load ${name}</span>`;
+        };
+        
+        // Initial status
+        updateDependencyStatus();
+        
+        // Test each dependency manually
+        setTimeout(() => {
+            console.log('🔍 Starting dependency analysis...');
+            
+            // Test Phaser
+            const phaserScript = document.createElement('script');
+            phaserScript.src = 'https://cdn.jsdelivr.net/npm/phaser@3.80.1/dist/phaser.min.js';
+            phaserScript.onload = () => window.onDependencyLoaded('phaser');
+            phaserScript.onerror = (e) => window.onDependencyError('phaser', e);
+            document.head.appendChild(phaserScript);
+            
+        }, 1000);
+        
+        setTimeout(() => {
+            // Test Intro.js
+            const introScript = document.createElement('script');
+            introScript.src = 'https://unpkg.com/intro.js/minified/intro.min.js';
+            introScript.onload = () => window.onDependencyLoaded('intro');
+            introScript.onerror = (e) => window.onDependencyError('intro', e);
+            document.head.appendChild(introScript);
+            
+        }, 2000);
+        
+        setTimeout(() => {
+            // Test local files
+            const localFiles = [
+                { name: 'authentic', src: 'authentic-mechanics.js' },
+                { name: 'bridge', src: 'board-game-bridge.js' },
+                { name: 'holeData', src: 'tpc-hole-data.js' },
+                { name: 'holeDisplay', src: 'hole-display-system.js' },
+                { name: 'engine', src: 'phaser-engine.js' }
+            ];
+            
+            localFiles.forEach((file, index) => {
+                setTimeout(() => {
+                    const script = document.createElement('script');
+                    script.src = file.src;
+                    script.onload = () => window.onDependencyLoaded(file.name);
+                    script.onerror = (e) => window.onDependencyError(file.name, e);
+                    document.head.appendChild(script);
+                }, index * 500);
+            });
+            
+        }, 3000);
+        
+        // Check for required classes after all dependencies should be loaded
+        setTimeout(() => {
+            console.log('🔍 Checking for required classes...');
+            const requiredClasses = [
+                'Phaser', 'introJs', 'AuthenticDiceSystem', 'BoardGameShotCalculator', 
+                'TPCHoleData', 'TPCHoleDisplaySystem', 'PhaserBoardGameEngine'
+            ];
+            
+            const missingClasses = requiredClasses.filter(className => !window[className]);
+            
+            if (missingClasses.length > 0) {
+                console.error('Missing required classes:', missingClasses);
+                document.getElementById('game-status').innerHTML = `<span class="status-error">❌ Missing classes: ${missingClasses.join(', ')}</span>`;
+            } else {
+                console.log('✓ All required classes found');
+                document.getElementById('game-status').innerHTML = '<span class="status-ok">✓ All required classes available</span>';
+            }
+        }, 8000);
+    </script>
+</body>
+</html>

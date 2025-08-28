@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Phaser Debug - Step by Step</title>
+    <style>
+        body { 
+            margin: 0; 
+            padding: 20px; 
+            background: #f0f0f0; 
+            font-family: Arial, sans-serif; 
+        }
+        #gameContainer { 
+            width: 800px; 
+            height: 600px; 
+            border: 2px solid #333; 
+            margin: 20px auto; 
+            background: white;
+        }
+        .controls {
+            text-align: center;
+            margin: 10px;
+        }
+        button {
+            padding: 10px 15px;
+            margin: 5px;
+            background: #007acc;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        button:hover {
+            background: #005999;
+        }
+        #log {
+            max-height: 200px;
+            overflow-y: auto;
+            background: #f9f9f9;
+            border: 1px solid #ccc;
+            padding: 10px;
+            margin: 10px auto;
+            width: 800px;
+            font-family: monospace;
+            font-size: 12px;
+        }
+    </style>
+</head>
+<body>
+    <div class="controls">
+        <h1>Phaser Debug - Step by Step</h1>
+        <p>Testing each graphics element individually</p>
+        <button onclick="step1()">Step 1: Background</button>
+        <button onclick="step2()">Step 2: Simple Shapes</button>
+        <button onclick="step3()">Step 3: Course Outline</button>
+        <button onclick="step4()">Step 4: Full Course</button>
+        <button onclick="step5()">Step 5: Add Ball</button>
+        <button onclick="reset()">Reset</button>
+    </div>
+    
+    <div id="gameContainer"></div>
+    
+    <div id="log"></div>
+
+    <script src="https://cdn.jsdelivr.net/npm/phaser@3.70.0/dist/phaser.min.js"></script>
+    
+    <script>
+        let game = null;
+        let debugScene = null;
+        let step = 0;
+        
+        function log(message) {
+            const logDiv = document.getElementById('log');
+            logDiv.innerHTML += '<div>' + new Date().toLocaleTimeString() + ': ' + message + '</div>';
+            logDiv.scrollTop = logDiv.scrollHeight;
+            console.log(message);
+        }
+        
+        class DebugScene extends Phaser.Scene {
+            constructor() {
+                super({ key: 'DebugScene' });
+                this.elements = [];
+            }
+            
+            create() {
+                log('🎮 DebugScene.create() called');
+                debugScene = this;
+                window.debugScene = this;
+                
+                // Start with basic test
+                this.runStep(1);
+            }
+            
+            runStep(stepNum) {
+                log(`Running Step ${stepNum}`);
+                step = stepNum;
+                
+                // Clear previous elements
+                this.children.removeAll();
+                this.elements = [];
+                
+                try {
+                    switch(stepNum) {
+                        case 1:
+                            this.step1_background();
+                            break;
+                        case 2:
+                            this.step1_background();
+                            this.step2_simpleShapes();
+                            break;
+                        case 3:
+                            this.step1_background();
+                            this.step2_simpleShapes();
+                            this.step3_courseOutline();
+                            break;
+                        case 4:
+                            this.step1_background();
+                            this.step4_fullCourse();
+                            break;
+                        case 5:
+                            this.step1_background();
+                            this.step4_fullCourse();
+                            this.step5_addBall();
+                            break;
+                    }
+                    
+                    log(`✅ Step ${stepNum} completed successfully`);
+                    log(`Scene now has ${this.children.list.length} objects`);
+                    
+                } catch (error) {
+                    log(`❌ Step ${stepNum} failed: ${error.message}`);
+                    log(`Stack: ${error.stack}`);
+                }
+            }
+            
+            step1_background() {
+                log('Drawing sky background...');
+                const bg = this.add.rectangle(400, 300, 800, 600, 0x87CEEB);
+                this.elements.push(bg);
+                log(`Background created: ${bg ? '✅' : '❌'}`);
+            }
+            
+            step2_simpleShapes() {
+                log('Drawing simple test shapes...');
+                
+                // Red rectangle
+                const rect = this.add.rectangle(200, 150, 100, 80, 0xFF0000);
+                this.elements.push(rect);
+                log(`Red rectangle: ${rect ? '✅' : '❌'}`);
+                
+                // Green circle
+                const circle = this.add.circle(400, 300, 40, 0x00FF00);
+                this.elements.push(circle);
+                log(`Green circle: ${circle ? '✅' : '❌'}`);
+                
+                // Blue triangle using graphics
+                const graphics = this.add.graphics();
+                graphics.fillStyle(0x0000FF);
+                graphics.fillTriangle(550, 100, 600, 180, 650, 100);
+                this.elements.push(graphics);
+                log(`Blue triangle graphics: ${graphics ? '✅' : '❌'}`);
+            }
+            
+            step3_courseOutline() {
+                log('Drawing course outline...');
+                
+                const graphics = this.add.graphics();
+                
+                // Rough background
+                graphics.fillStyle(0x556B2F);
+                graphics.fillRect(50, 100, 700, 450);
+                log('Rough background drawn');
+                
+                // Simple fairway rectangle
+                graphics.fillStyle(0x32CD32);
+                graphics.fillRect(200, 150, 400, 350);
+                log('Fairway rectangle drawn');
+                
+                this.elements.push(graphics);
+            }
+            
+            step4_fullCourse() {
+                log('Drawing full course...');
+                
+                const graphics = this.add.graphics();
+                
+                try {
+                    // Rough
+                    graphics.fillStyle(0x556B2F);
+                    graphics.fillRect(0, 50, 800, 550);
+                    log('✓ Rough drawn');
+                    
+                    // Fairway - using simple ellipse instead of complex path
+                    graphics.fillStyle(0x32CD32);
+                    graphics.fillEllipse(400, 325, 300, 400);
+                    log('✓ Fairway drawn');
+                    
+                    // Bunkers - simple circles
+                    graphics.fillStyle(0xF4A460);
+                    graphics.fillCircle(250, 250, 30);
+                    graphics.fillCircle(550, 350, 35);
+                    log('✓ Bunkers drawn');
+                    
+                    // Water - simple ellipse
+                    graphics.fillStyle(0x4682B4);
+                    graphics.fillEllipse(150, 400, 60, 40);
+                    log('✓ Water drawn');
+                    
+                    // Green
+                    graphics.fillStyle(0x228B22);
+                    graphics.fillCircle(400, 100, 50);
+                    log('✓ Green drawn');
+                    
+                    // Tee box
+                    graphics.fillStyle(0x8B4513);
+                    graphics.fillRect(350, 540, 100, 20);
+                    log('✓ Tee box drawn');
+                    
+                    // Pin
+                    graphics.fillStyle(0x654321);
+                    graphics.fillRect(396, 70, 8, 30);
+                    graphics.fillStyle(0xFF0000);
+                    graphics.fillTriangle(404, 75, 404, 85, 420, 80);
+                    log('✓ Pin drawn');
+                    
+                } catch (error) {
+                    log(`❌ Error in full course: ${error.message}`);
+                    throw error;
+                }
+                
+                this.elements.push(graphics);
+            }
+            
+            step5_addBall() {
+                log('Adding ball...');
+                
+                // Ball shadow
+                const shadow = this.add.ellipse(400, 553, 8, 4, 0x000000, 0.3);
+                this.elements.push(shadow);
+                log('✓ Ball shadow created');
+                
+                // Golf ball
+                const ball = this.add.circle(400, 550, 5, 0xFFFFFF);
+                ball.setStroke(0x000000, 1);
+                this.elements.push(ball);
+                log('✓ Golf ball created');
+                
+                // Test animation
+                this.tweens.add({
+                    targets: ball,
+                    scaleX: 1.2,
+                    scaleY: 1.2,
+                    duration: 1000,
+                    yoyo: true,
+                    repeat: -1
+                });
+                log('✓ Ball animation started');
+            }
+        }
+        
+        // Initialize Phaser
+        window.addEventListener('load', () => {
+            log('🚀 Page loaded, initializing Phaser...');
+            log('Phaser version: ' + Phaser.VERSION);
+            
+            const config = {
+                type: Phaser.AUTO,
+                width: 800,
+                height: 600,
+                parent: 'gameContainer',
+                backgroundColor: 0x333333, // Dark gray fallback
+                scene: DebugScene
+            };
+            
+            try {
+                game = new Phaser.Game(config);
+                log('✅ Phaser Game created successfully');
+            } catch (error) {
+                log('❌ Failed to create Phaser Game: ' + error.message);
+            }
+        });
+        
+        // Control functions
+        function step1() {
+            if (debugScene) debugScene.runStep(1);
+        }
+        
+        function step2() {
+            if (debugScene) debugScene.runStep(2);
+        }
+        
+        function step3() {
+            if (debugScene) debugScene.runStep(3);
+        }
+        
+        function step4() {
+            if (debugScene) debugScene.runStep(4);
+        }
+        
+        function step5() {
+            if (debugScene) debugScene.runStep(5);
+        }
+        
+        function reset() {
+            if (debugScene) {
+                debugScene.children.removeAll();
+                log('🔄 Scene reset');
+            }
+        }
+    </script>
+</body>
+</html>

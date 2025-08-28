@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <script src="https://cdn.jsdelivr.net/npm/phaser@3.80.1/dist/phaser.min.js"></script>
+</head>
+<body>
+    <div id="game" style="width:800px;height:600px;border:1px solid red;"></div>
+    <script>
+        console.log('Starting debug test...');
+        
+        // Comprehensive error logging
+        window.addEventListener('error', (e) => {
+            console.error('Window error:', e.error);
+        });
+        
+        try {
+            const config = {
+                type: Phaser.AUTO,
+                width: 800,
+                height: 600,
+                parent: 'game',
+                scene: {
+                    create: function() {
+                        console.log('Scene created successfully');
+                        this.add.circle(100, 100, 50, 0xff0000);
+                    }
+                }
+            };
+            
+            console.log('Creating Phaser game...');
+            const game = new Phaser.Game(config);
+            console.log('Game created successfully');
+            
+        } catch (e) {
+            console.error('Caught error:', e);
+            console.error('Error name:', e.name);
+            console.error('Error message:', e.message);
+            console.error('Error stack:', e.stack);
+        }
+    </script>
+</body>
+</html>

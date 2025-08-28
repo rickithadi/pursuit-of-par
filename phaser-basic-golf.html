@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Phaser Basic Golf - Step 1</title>
+    <style>
+        body { 
+            margin: 0; 
+            padding: 20px; 
+            background: #F5DEB3; 
+            font-family: 'Times New Roman', serif; 
+        }
+        #gameContainer { 
+            width: 800px; 
+            height: 600px; 
+            border: 3px solid #8B4513; 
+            margin: 20px auto; 
+            background: white;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+        }
+        .info {
+            text-align: center;
+            margin: 10px;
+            color: #8B4513;
+        }
+        button {
+            padding: 10px 20px;
+            margin: 5px;
+            background: #D2691E;
+            color: white;
+            border: 2px solid #8B4513;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        button:hover {
+            background: #CD853F;
+        }
+    </style>
+</head>
+<body>
+    <div class="info">
+        <h1>Phaser Basic Golf - Course Visualization</h1>
+        <p>Step 1: Drawing the golf course</p>
+    </div>
+    
+    <div id="gameContainer"></div>
+    
+    <div class="info">
+        <button onclick="testBallMovement()">Test Ball Movement</button>
+        <button onclick="resetBall()">Reset Ball</button>
+        <button onclick="showDiagnostics()">Diagnostics</button>
+        <div id="status"></div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/phaser@3.70.0/dist/phaser.min.js"></script>
+    
+    <script>
+        let game = null;
+        let golfScene = null;
+        
+        class BasicGolfScene extends Phaser.Scene {
+            constructor() {
+                super({ key: 'BasicGolfScene' });
+                this.ball = null;
+                this.ballPosition = { x: 400, y: 550 };
+            }
+            
+            create() {
+                console.log('🎮 Creating Basic Golf Course...');
+                
+                // Store scene reference
+                golfScene = this;
+                window.golfScene = this;
+                
+                // Sky background
+                this.add.rectangle(400, 300, 800, 600, 0x87CEEB);
+                
+                // Draw the course
+                this.drawCourse();
+                
+                // Create ball
+                this.createBall();
+                
+                // Add status text
+                this.statusText = this.add.text(10, 10, 'Ball Position: Tee Box', {
+                    fontSize: '16px',
+                    fill: '#000000',
+                    backgroundColor: '#FFFFFF',
+                    padding: { x: 5, y: 3 }
+                });
+                
+                console.log('✅ Basic Golf Scene created successfully');
+                updateStatus('Course loaded successfully');
+            }
+            
+            drawCourse() {
+                const graphics = this.add.graphics();
+                
+                // Rough (background)
+                graphics.fillStyle(0x556B2F, 1);
+                graphics.fillRect(0, 50, 800, 550);
+                
+                // Fairway (main playing area)
+                graphics.fillStyle(0x32CD32, 1);
+                // Create fairway with curved edges
+                graphics.beginPath();
+                graphics.moveTo(300, 580);
+                graphics.lineTo(250, 450);
+                graphics.lineTo(200, 300);
+                graphics.lineTo(250, 150);
+                graphics.lineTo(350, 80);
+                graphics.lineTo(450, 80);
+                graphics.lineTo(550, 150);
+                graphics.lineTo(600, 300);
+                graphics.lineTo(550, 450);
+                graphics.lineTo(500, 580);
+                graphics.closePath();
+                graphics.fillPath();
+                
+                // Sand bunkers
+                graphics.fillStyle(0xF4A460, 1);
+                // Left bunker
+                graphics.fillEllipse(200, 250, 60, 40);
+                // Right bunker
+                graphics.fillEllipse(600, 320, 70, 45);
+                // Greenside bunker
+                graphics.fillEllipse(480, 130, 50, 35);
+                
+                // Water hazard
+                graphics.fillStyle(0x4682B4, 1);
+                graphics.fillEllipse(150, 400, 80, 60);
+                // Add water shimmer effect
+                graphics.fillStyle(0x5A9FD4, 0.5);
+                graphics.fillEllipse(145, 395, 70, 50);
+                
+                // Green (putting surface)
+                graphics.fillStyle(0x228B22, 1);
+                graphics.fillCircle(400, 100, 70);
+                // Inner green (smoother surface)
+                graphics.fillStyle(0x00FF00, 0.3);
+                graphics.fillCircle(400, 100, 55);
+                
+                // Tee box
+                graphics.fillStyle(0x8B4513, 1);
+                graphics.fillRoundedRect(350, 550, 100, 30, 5);
+                // Tee markers
+                graphics.fillStyle(0xFFFFFF, 1);
+                graphics.fillCircle(365, 565, 3);
+                graphics.fillCircle(435, 565, 3);
+                
+                // Pin and flag
+                graphics.fillStyle(0x654321, 1);
+                graphics.fillRect(396, 60, 8, 50);
+                // Flag
+                graphics.fillStyle(0xFF0000, 1);
+                graphics.beginPath();
+                graphics.moveTo(404, 65);
+                graphics.lineTo(404, 85);
+                graphics.lineTo(430, 75);
+                graphics.closePath();
+                graphics.fillPath();
+                
+                // Yardage markers
+                this.addYardageMarkers();
+            }
+            
+            addYardageMarkers() {
+                const yardages = [100, 150, 200, 250, 300, 350];
+                yardages.forEach(yard => {
+                    const y = 550 - ((yard / 400) * 450);
+                    
+                    // Marker dot
+                    const marker = this.add.circle(400, y, 5, 0xFFFFFF);
+                    marker.setStroke(0x000000, 1);
+                    
+                    // Yardage text
+                    const text = this.add.text(415, y - 5, yard + 'y', {
+                        fontSize: '12px',
+                        fill: '#FFFFFF',
+                        backgroundColor: '#000000',
+                        padding: { x: 2, y: 1 }
+                    });
+                });
+            }
+            
+            createBall() {
+                // Golf ball
+                this.ball = this.add.circle(this.ballPosition.x, this.ballPosition.y, 6, 0xFFFFFF);
+                this.ball.setStroke(0x000000, 2);
+                
+                // Ball shadow
+                this.ballShadow = this.add.ellipse(
+                    this.ballPosition.x, 
+                    this.ballPosition.y + 3, 
+                    8, 4, 
+                    0x000000, 0.3
+                );
+                
+                console.log('✅ Ball created at tee box');
+            }
+            
+            moveBall(targetX, targetY) {
+                if (!this.ball) return;
+                
+                console.log(`Moving ball from (${this.ballPosition.x}, ${this.ballPosition.y}) to (${targetX}, ${targetY})`);
+                
+                // Update position
+                this.ballPosition.x = targetX;
+                this.ballPosition.y = targetY;
+                
+                // Animate ball and shadow
+                this.tweens.add({
+                    targets: [this.ball, this.ballShadow],
+                    x: targetX,
+                    y: targetY,
+                    duration: 1500,
+                    ease: 'Power2',
+                    onComplete: () => {
+                        // Add landing effect
+                        this.tweens.add({
+                            targets: this.ball,
+                            scaleX: 1.2,
+                            scaleY: 0.8,
+                            duration: 100,
+                            yoyo: true,
+                            onComplete: () => {
+                                this.updateBallStatus();
+                            }
+                        });
+                    }
+                });
+                
+                // Add trail effect
+                this.addBallTrail(targetX, targetY);
+            }
+            
+            addBallTrail(x, y) {
+                const trail = this.add.circle(this.ballPosition.x, this.ballPosition.y, 3, 0xFFD700, 0.5);
+                
+                this.tweens.add({
+                    targets: trail,
+                    alpha: 0,
+                    duration: 2000,
+                    onComplete: () => {
+                        trail.destroy();
+                    }
+                });
+            }
+            
+            updateBallStatus() {
+                const y = this.ballPosition.y;
+                let status = 'Unknown';
+                
+                if (y > 540) status = 'Tee Box';
+                else if (y > 400) status = 'Fairway';
+                else if (y > 200) status = 'Fairway';
+                else if (y > 130) status = 'Approach';
+                else status = 'Green';
+                
+                this.statusText.setText(`Ball Position: ${status} (${Math.round(550 - y)} yards)`);
+            }
+            
+            resetBallPosition() {
+                this.ballPosition = { x: 400, y: 550 };
+                this.ball.setPosition(400, 550);
+                this.ballShadow.setPosition(400, 553);
+                this.statusText.setText('Ball Position: Tee Box');
+                updateStatus('Ball reset to tee box');
+            }
+        }
+        
+        // Initialize Phaser
+        window.addEventListener('load', () => {
+            console.log('🚀 Starting Basic Golf Game...');
+            
+            const config = {
+                type: Phaser.AUTO,
+                width: 800,
+                height: 600,
+                parent: 'gameContainer',
+                backgroundColor: 0x87CEEB,
+                scene: BasicGolfScene,
+                physics: {
+                    default: 'arcade',
+                    arcade: {
+                        gravity: { y: 0 },
+                        debug: false
+                    }
+                }
+            };
+            
+            try {
+                game = new Phaser.Game(config);
+                console.log('✅ Phaser Game created');
+                updateStatus('Game initialized');
+            } catch (error) {
+                console.error('❌ Failed to create game:', error);
+                updateStatus('Error: ' + error.message);
+            }
+        });
+        
+        // Test functions
+        function testBallMovement() {
+            if (!golfScene) {
+                updateStatus('Scene not ready');
+                return;
+            }
+            
+            // Random shot
+            const distance = 100 + Math.random() * 200;
+            const deviation = (Math.random() - 0.5) * 100;
+            
+            const targetY = golfScene.ballPosition.y - distance;
+            const targetX = 400 + deviation;
+            
+            golfScene.moveBall(
+                Math.max(100, Math.min(700, targetX)),
+                Math.max(100, targetY)
+            );
+            
+            updateStatus(`Shot: ${Math.round(distance)} yards`);
+        }
+        
+        function resetBall() {
+            if (!golfScene) {
+                updateStatus('Scene not ready');
+                return;
+            }
+            golfScene.resetBallPosition();
+        }
+        
+        function showDiagnostics() {
+            const status = document.getElementById('status');
+            let html = '<h3>Diagnostics:</h3>';
+            html += '<p>Phaser: ' + (typeof Phaser !== 'undefined' ? '✅ v' + Phaser.VERSION : '❌') + '</p>';
+            html += '<p>Game: ' + (game ? '✅' : '❌') + '</p>';
+            html += '<p>Scene: ' + (golfScene ? '✅' : '❌') + '</p>';
+            
+            if (golfScene) {
+                html += '<p>Scene objects: ' + golfScene.children.list.length + '</p>';
+                html += '<p>Ball position: (' + Math.round(golfScene.ballPosition.x) + ', ' + 
+                        Math.round(golfScene.ballPosition.y) + ')</p>';
+            }
+            
+            status.innerHTML = html;
+        }
+        
+        function updateStatus(message) {
+            document.getElementById('status').innerHTML = '<p>' + message + '</p>';
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Ultra Minimal Phaser Test</title>
+    <style>
+        body { 
+            margin: 20px; 
+            font-family: Arial, sans-serif;
+            background: #f0f0f0;
+        }
+        #gameDiv { 
+            width: 800px; 
+            height: 600px; 
+            border: 2px solid #000; 
+            margin: 20px auto; 
+            background: white;
+        }
+        .info {
+            text-align: center;
+            margin: 10px;
+        }
+        #status {
+            background: #f9f9f9;
+            border: 1px solid #ccc;
+            padding: 10px;
+            margin: 10px auto;
+            width: 800px;
+            font-family: monospace;
+            font-size: 12px;
+        }
+    </style>
+</head>
+<body>
+    <div class="info">
+        <h1>Ultra Minimal Phaser Test</h1>
+        <p>Testing the absolute minimum Phaser setup</p>
+    </div>
+    
+    <div id="gameDiv"></div>
+    
+    <div id="status">Loading...</div>
+
+    <script src="https://cdn.jsdelivr.net/npm/phaser@3.70.0/dist/phaser.min.js"></script>
+    
+    <script>
+        let statusDiv = document.getElementById('status');
+        
+        function log(msg) {
+            statusDiv.innerHTML += msg + '<br>';
+            console.log(msg);
+        }
+        
+        log('Script loading...');
+        log('Phaser version: ' + (typeof Phaser !== 'undefined' ? Phaser.VERSION : 'NOT LOADED'));
+        
+        class UltraMinimalScene extends Phaser.Scene {
+            constructor() {
+                super({ key: 'UltraMinimalScene' });
+                log('Scene constructor called');
+            }
+            
+            preload() {
+                log('Scene preload called');
+            }
+            
+            create() {
+                log('Scene create called - DRAWING NOW');
+                
+                // Test 1: Simple background
+                this.add.rectangle(400, 300, 800, 600, 0xFF0000);
+                log('Red background added');
+                
+                // Test 2: Simple shape
+                this.add.circle(200, 200, 50, 0x00FF00);
+                log('Green circle added');
+                
+                // Test 3: Text
+                this.add.text(400, 300, 'PHASER WORKS!', {
+                    fontSize: '32px',
+                    fill: '#FFFFFF'
+                }).setOrigin(0.5);
+                log('Text added');
+                
+                log('Scene create complete - should see red background with green circle and white text');
+            }
+        }
+        
+        // Wait for page load
+        window.addEventListener('load', () => {
+            log('Page loaded, creating Phaser game...');
+            
+            if (typeof Phaser === 'undefined') {
+                log('ERROR: Phaser not loaded!');
+                return;
+            }
+            
+            try {
+                const config = {
+                    type: Phaser.AUTO,
+                    width: 800,
+                    height: 600,
+                    parent: 'gameDiv',
+                    backgroundColor: 0x0000FF, // Blue fallback
+                    scene: UltraMinimalScene
+                };
+                
+                log('Creating game with config: ' + JSON.stringify(config, null, 2));
+                
+                const game = new Phaser.Game(config);
+                
+                log('Phaser.Game created successfully');
+                
+                // Check if canvas was created
+                setTimeout(() => {
+                    const canvas = document.querySelector('#gameDiv canvas');
+                    log('Canvas element found: ' + (canvas ? 'YES' : 'NO'));
+                    if (canvas) {
+                        log('Canvas size: ' + canvas.width + 'x' + canvas.height);
+                        log('Canvas style: ' + canvas.style.cssText);
+                    }
+                    
+                    const gameDiv = document.getElementById('gameDiv');
+                    log('GameDiv children: ' + gameDiv.children.length);
+                }, 1000);
+                
+            } catch (error) {
+                log('ERROR creating game: ' + error.message);
+                log('Error stack: ' + error.stack);
+            }
+        });
+        
+        log('Script loaded, waiting for page load...');
+    </script>
+</body>
+</html>
